@@ -1,0 +1,329 @@
+{% extends "base.html" %}
+
+{% block title %}Attendance Summary - Attendance System{% endblock %}
+
+{% block header_actions %}
+<!-- Native Bootstrap 5 Profile Dropdown -->
+<div class="dropdown">
+    <button class="btn btn-profile-dropdown d-flex align-items-center gap-2 px-2 py-1 rounded-pill shadow-sm"
+        type="button" id="userProfileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+
+        <!-- User Avatar Image -->
+        <img src="{{ url_for('static', filename='images/user_avatar.jpg') }}" alt="User Profile"
+            class="rounded-circle object-fit-cover border border-2 border-primary" width="34" height="34"
+            onerror="this.src='https://ui-avatars.com/api/?name=John+Doe&background=2563eb&color=fff'">
+
+        <div class="d-none d-sm-flex flex-column text-start me-1">
+            <span class="text-white small fw-bold lh-1">Prof. John Doe</span>
+            <span class="text-white-50 extra-small lh-1 mt-1" style="font-size: 0.72rem;">Teacher / Faculty</span>
+        </div>
+    </button>
+
+    <!-- Bootstrap 5 Popover Menu -->
+    <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 mt-2 py-2" aria-labelledby="userProfileDropdown"
+        style="min-width: 260px;">
+        <li class="px-3 py-2 border-bottom mb-2">
+            <div class="d-flex align-items-center gap-2">
+                <img src="{{ url_for('static', filename='images/user_avatar.jpg') }}" alt="User Avatar"
+                    class="rounded-circle object-fit-cover border" width="40" height="40"
+                    onerror="this.src='https://ui-avatars.com/api/?name=John+Doe&background=2563eb&color=fff'">
+                <div class="d-flex flex-column">
+                    <span class="fw-bold text-dark small lh-1">Prof. John Doe</span>
+                    <span class="text-muted extra-small mt-1" style="font-size: 0.75rem;">john.doe@abes.ac.in</span>
+                    <span class="badge bg-primary-subtle text-primary mt-1 align-self-start"
+                        style="font-size: 0.65rem;">Teacher / Faculty</span>
+                </div>
+            </div>
+        </li>
+
+        <li>
+            <a class="dropdown-item py-2 d-flex align-items-center fw-medium small"
+                href="{{ url_for('main.attendance') }}">
+                <i class="fa-solid fa-camera me-2 text-primary" style="width: 18px;"></i>Mark Attendance
+            </a>
+        </li>
+        <li>
+            <a class="dropdown-item py-2 d-flex align-items-center text-secondary small" href="#">
+                <i class="fa-solid fa-id-card me-2 text-primary" style="width: 18px;"></i>View & Edit Profile
+            </a>
+        </li>
+        <li>
+            <a class="dropdown-item py-2 d-flex align-items-center text-secondary small" href="#">
+                <i class="fa-solid fa-key me-2 text-warning" style="width: 18px;"></i>Change Password
+            </a>
+        </li>
+        <li>
+            <hr class="dropdown-divider my-2">
+        </li>
+        <li>
+            <a class="dropdown-item dropdown-item-danger py-2 d-flex align-items-center text-danger fw-semibold small"
+                href="{{ url_for('auth.logout') }}">
+                <i class="fa-solid fa-right-from-bracket me-2" style="width: 18px;"></i>Sign Out
+            </a>
+        </li>
+    </ul>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="main-container flex-column gap-3">
+
+    <!-- Top Summary Stat Cards -->
+    <div class="row g-3">
+        <div class="col-md-3 col-sm-6">
+            <div class="card-custom py-3 px-3 d-flex flex-row align-items-center gap-3">
+                <div class="rounded-circle bg-primary bg-opacity-10 p-3 text-primary">
+                    <i class="fa-solid fa-users fa-xl"></i>
+                </div>
+                <div>
+                    <span class="text-muted small d-block">Total Enrolled</span>
+                    <h4 class="mb-0 fw-bold">128</h4>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 col-sm-6">
+            <div class="card-custom py-3 px-3 d-flex flex-row align-items-center gap-3">
+                <div class="rounded-circle bg-success bg-opacity-10 p-3 text-success">
+                    <i class="fa-solid fa-circle-check fa-xl"></i>
+                </div>
+                <div>
+                    <span class="text-muted small d-block">Present Today</span>
+                    <h4 class="mb-0 fw-bold text-success">112</h4>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 col-sm-6">
+            <div class="card-custom py-3 px-3 d-flex flex-row align-items-center gap-3">
+                <div class="rounded-circle bg-danger bg-opacity-10 p-3 text-danger">
+                    <i class="fa-solid fa-circle-xmark fa-xl"></i>
+                </div>
+                <div>
+                    <span class="text-muted small d-block">Absent Today</span>
+                    <h4 class="mb-0 fw-bold text-danger">16</h4>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 col-sm-6">
+            <div class="card-custom py-3 px-3 d-flex flex-row align-items-center gap-3">
+                <div class="rounded-circle bg-warning bg-opacity-10 p-3 text-warning">
+                    <i class="fa-solid fa-chart-line fa-xl"></i>
+                </div>
+                <div>
+                    <span class="text-muted small d-block">Attendance Rate</span>
+                    <h4 class="mb-0 fw-bold">87.5%</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Bar & Table Section -->
+    <div class="card-custom w-100 flex-grow-1 d-flex flex-column">
+
+        <!-- Header & Actions -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-3">
+            <div>
+                <h2 class="mb-1"><i class="fa-solid fa-chart-column me-2 text-primary"></i>Class Attendance Logs</h2>
+                <p class="text-muted small mb-0">Search and filter recorded attendance history</p>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="{{ url_for('main.attendance') }}" class="btn btn-outline-secondary btn-sm fw-semibold">
+                    <i class="fa-solid fa-camera me-1"></i>Mark Attendance
+                </a>
+                <button class="btn btn-primary btn-sm fw-semibold"
+                    onclick="showToast('Exporting Data', 'Downloading Attendance CSV report...', 'info')">
+                    <i class="fa-solid fa-file-arrow-down me-1"></i>Export CSV
+                </button>
+            </div>
+        </div>
+
+        <!-- Filter Controls -->
+        <div class="row g-2 mb-3 bg-light p-3 rounded border">
+            <div class="col-md-3">
+                <label class="form-label text-muted extra-small fw-medium mb-1">
+                    <i class="fa-solid fa-user-tag me-1"></i>Search Student
+                </label>
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text bg-white"><i
+                            class="fa-solid fa-magnifying-glass text-muted"></i></span>
+                    <input type="text" id="searchInput" class="form-control" placeholder="Name or Roll No...">
+                </div>
+            </div>
+
+            <div class="col-md-3 col-sm-6">
+                <label class="form-label text-muted extra-small fw-medium mb-1">
+                    <i class="fa-solid fa-calendar-day me-1"></i>Date
+                </label>
+                <input type="date" id="dateFilter" class="form-control form-control-sm">
+            </div>
+
+            <div class="col-md-3 col-sm-6">
+                <label class="form-label text-muted extra-small fw-medium mb-1">
+                    <i class="fa-solid fa-graduation-cap me-1"></i>Branch / Course
+                </label>
+                <select class="form-select form-select-sm">
+                    <option value="all">All Branches</option>
+                    <option value="btech_cse" selected>B.Tech - CSE</option>
+                    <option value="btech_ece">B.Tech - ECE</option>
+                    <option value="btech_me">B.Tech - ME</option>
+                </select>
+            </div>
+
+            <div class="col-md-3 col-sm-6">
+                <label class="form-label text-muted extra-small fw-medium mb-1">
+                    <i class="fa-solid fa-filter me-1"></i>Status
+                </label>
+                <select class="form-select form-select-sm">
+                    <option value="all">All Statuses</option>
+                    <option value="present">Present</option>
+                    <option value="absent">Absent</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Responsive Attendance Table -->
+        <div class="table-responsive flex-grow-1">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light text-muted small">
+                    <tr>
+                        <th scope="col"><i class="fa-solid fa-id-badge me-1"></i>Roll / ID</th>
+                        <th scope="col"><i class="fa-solid fa-user me-1"></i>Student Name</th>
+                        <th scope="col"><i class="fa-solid fa-book-bookmark me-1"></i>Branch</th>
+                        <th scope="col"><i class="fa-solid fa-clock me-1"></i>Date & Time</th>
+                        <th scope="col"><i class="fa-solid fa-shield-halved me-1"></i>Verification Method</th>
+                        <th scope="col" class="text-center"><i class="fa-solid fa-clipboard-user me-1"></i>Status</th>
+                    </tr>
+                </thead>
+                <tbody class="small">
+                    <tr>
+                        <td class="fw-semibold">ST-2026-081</td>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <img src="https://ui-avatars.com/api/?name=Aarav+Sharma&background=0D8ABC&color=fff"
+                                    width="28" height="28" class="rounded-circle">
+                                <span>Aarav Sharma</span>
+                            </div>
+                        </td>
+                        <td>B.Tech (CSE)</td>
+                        <td>08 Aug 2026, 09:15 AM</td>
+                        <td>
+                            <span class="badge bg-light text-dark border">
+                                <i class="fa-solid fa-face-viewfinder text-primary me-1"></i>Face AI
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1">
+                                <i class="fa-solid fa-circle-check me-1"></i>Present
+                            </span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="fw-semibold">ST-2026-082</td>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <img src="https://ui-avatars.com/api/?name=Ananya+Verma&background=2563eb&color=fff"
+                                    width="28" height="28" class="rounded-circle">
+                                <span>Ananya Verma</span>
+                            </div>
+                        </td>
+                        <td>B.Tech (CSE)</td>
+                        <td>08 Aug 2026, 09:16 AM</td>
+                        <td>
+                            <span class="badge bg-light text-dark border">
+                                <i class="fa-solid fa-face-viewfinder text-primary me-1"></i>Face AI
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1">
+                                <i class="fa-solid fa-circle-check me-1"></i>Present
+                            </span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="fw-semibold">ST-2026-083</td>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <img src="https://ui-avatars.com/api/?name=Rohan+Gupta&background=64748b&color=fff"
+                                    width="28" height="28" class="rounded-circle">
+                                <span>Rohan Gupta</span>
+                            </div>
+                        </td>
+                        <td>B.Tech (CSE)</td>
+                        <td>-</td>
+                        <td>
+                            <span class="badge bg-light text-muted border">
+                                <i class="fa-solid fa-ban me-1"></i>None
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-1">
+                                <i class="fa-solid fa-circle-xmark me-1"></i>Absent
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Footer Pagination Control Bar -->
+        <div
+            class="d-flex flex-column flex-sm-row justify-content-between align-items-center gap-3 pt-3 mt-2 border-top">
+
+            <!-- Left: Records per Page Selector & Counter -->
+            <div class="d-flex align-items-center gap-2 text-muted small">
+                <span>Show</span>
+                <select id="recordsPerPage" class="form-select form-select-sm w-auto" style="min-width: 70px;">
+                    <option value="10" selected>10</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
+                <span>entries per page</span>
+                <span class="d-none d-md-inline ms-2 border-start ps-2 text-secondary">
+                    Showing <strong>1</strong> to <strong>3</strong> of <strong>128</strong> records
+                </span>
+            </div>
+
+            <!-- Right: Pagination Links -->
+            <nav aria-label="Table Navigation">
+                <ul class="pagination pagination-sm mb-0">
+                    <li class="page-item disabled">
+                        <a class="page-item-link page-link" href="#" tabindex="-1" aria-disabled="true">
+                            <i class="fa-solid fa-angle-left"></i>
+                        </a>
+                    </li>
+                    <li class="page-item active" aria-current="page">
+                        <a class="page-link" href="#">1</a>
+                    </li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                    <li class="page-item"><a class="page-link" href="#">13</a></li>
+                    <li class="page-item">
+                        <a class="page-link" href="#">
+                            <i class="fa-solid fa-angle-right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const dateInput = document.getElementById('dateFilter');
+        if (dateInput) {
+            const today = new Date().toISOString().split('T')[0];
+            dateInput.value = today;
+        }
+    });
+</script>
+{% endblock %}
