@@ -68,14 +68,19 @@
                             placeholder="e.g. teacher@university.edu" required>
                     </div>
                 </div>
-
                 <!-- Password -->
                 <div class="mb-4">
                     <label for="passwordInput" class="form-label text-muted small fw-medium">Password</label>
                     <div class="input-group">
                         <span class="input-group-text bg-light text-muted"><i class="fa-solid fa-lock"></i></span>
-                        <input type="password" id="passwordInput" name="password" class="form-control"
-                            placeholder="••••••••" required>
+                        
+                        <!-- Added border-end-0 to blend with the eye icon -->
+                        <input type="password" id="passwordInput" name="password" class="form-control border-end-0" placeholder="••••••••" required>
+                        
+                        <!-- Fixed the target ID in the onclick function to match 'passwordInput' -->
+                        <span class="input-group-text bg-transparent" onclick="togglePasswordVisibility('passwordInput', 'icon-pwd')" style="cursor: pointer;">
+                            <i class="fa-regular fa-eye-slash text-muted" id="icon-pwd"></i>
+                        </span>
                     </div>
                 </div>
 

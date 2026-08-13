@@ -23,7 +23,7 @@
 
 <body>
 
-    <!-- Header Section -->
+<!-- Header Section -->
     <header class="navbar navbar-expand-lg navbar-dark px-3 px-md-4">
         <div class="container-fluid p-0 d-flex align-items-center justify-content-between">
 
@@ -38,24 +38,35 @@
                 </div>
             </a>
 
-            <!-- Hamburger Toggle Button -->
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navDrawer"
-                aria-controls="navDrawer" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+            <!-- Right-Side Persistent Actions (Profile + Hamburger) -->
+            <!-- Uses 'order-lg-3' to stay on the far right on desktop -->
+            <div class="d-flex align-items-center gap-2 gap-md-3 order-lg-3 ms-auto ms-lg-3">
+                
+                <!-- Dedicated space for the Profile Dropdown (Overrides go here) -->
+                {% block profile_action %}{% endblock %}
 
-            <!-- Right Side Nav Drawer -->
-            <div class="collapse navbar-collapse justify-content-end" id="navDrawer">
-                <div
-                    class="d-flex flex-column flex-lg-row align-items-stretch align-items-lg-center gap-2 gap-lg-3 my-2 my-lg-0">
+                <!-- Hamburger Toggle Button -->
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navDrawer"
+                    aria-controls="navDrawer" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+            </div>
+
+            <!-- Nav Drawer (Collapsible Menu Items) -->
+            <!-- Uses 'order-lg-2' to sit between the logo and the profile on desktop -->
+            <div class="collapse navbar-collapse justify-content-end order-lg-2" id="navDrawer">
+                <div class="d-flex flex-column flex-lg-row align-items-stretch align-items-lg-center gap-2 gap-lg-3 my-2 my-lg-0">
+                    
+                    <!-- Default Fallback Menu Items (Applied to Login/Register pages) -->
                     {% block header_actions %}
-                    <a href="{{ url_for('main.attendance') }}" class="btn btn-outline-light fw-semibold btn-header">
-                        <i class="fa-solid fa-camera me-2"></i>Mark Attendance
+                    <a href="{{ url_for('main.attendance') }}" class="btn btn-outline-light fw-semibold btn-header border-0 justify-content-start px-3">
+                        <i class="fa-solid fa-camera me-2" style="width: 20px; text-align: center;"></i>Mark Attendance
                     </a>
-                    <a href="{{ url_for('auth.login') }}" class="btn btn-outline-light fw-semibold btn-header">
-                        <i class="fa-solid fa-right-to-bracket me-2"></i>Sign In
+                    <a href="{{ url_for('auth.login') }}" class="btn btn-outline-light fw-semibold btn-header border-0 justify-content-start px-3">
+                        <i class="fa-solid fa-right-to-bracket me-2" style="width: 20px; text-align: center;"></i>Sign In
                     </a>
                     {% endblock %}
+                    
                 </div>
             </div>
 

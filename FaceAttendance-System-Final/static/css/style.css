@@ -1,4 +1,6 @@
-/* 1) CSS Variables & Base Styles */
+/* ==========================================================================
+   1) CSS Variables & Color Palette
+   ========================================================================== */
 :root {
     --bg-color: #f8fafc;
     --card-bg: #ffffff;
@@ -6,8 +8,12 @@
     --header-footer-text: #f8fafc;
     --header-height: 64px;
     --footer-height: 50px;
+    
+    /* Primary Brand Colors */
     --primary-color: #2563eb;
     --primary-hover: #1d4ed8;
+    --primary-light: #3b82f6; /* Used for softer hover states */
+    
     --success-color: #16a34a;
     --text-dark: #1e293b;
     --text-muted: #64748b;
@@ -18,6 +24,9 @@
     --bs-primary-rgb: 37, 99, 235;
 }
 
+/* ==========================================================================
+   2) Base Elements & Reset
+   ========================================================================== */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -33,14 +42,44 @@ body {
     min-height: 100vh;
 }
 
+/* Lock Desktop Body to enable App Shell Scrolling */
 @media (min-width: 992px) {
     body {
         height: 100vh;
-        overflow: hidden;
+        overflow: hidden; 
     }
 }
 
-/* Button Variants & Hover Effects */
+/* ==========================================================================
+   3) App Shell Layout (Scrolling Middle Canvas)
+   ========================================================================== */
+.min-vh-100-custom {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 transparent;
+}
+
+/* Webkit Scrollbar Styling for Chrome/Safari/Edge */
+.min-vh-100-custom::-webkit-scrollbar {
+    width: 8px;
+}
+.min-vh-100-custom::-webkit-scrollbar-track {
+    background: transparent;
+}
+.min-vh-100-custom::-webkit-scrollbar-thumb {
+    background-color: #cbd5e1;
+    border-radius: 10px;
+}
+.min-vh-100-custom::-webkit-scrollbar-thumb:hover {
+    background-color: #94a3b8;
+}
+
+/* ==========================================================================
+   4) Reusable UI Components (Buttons & Forms)
+   ========================================================================== */
 .btn-primary,
 .btn-custom-primary {
     background-color: var(--primary-color);
@@ -59,46 +98,16 @@ body {
     color: white;
 }
 
-/* Header Action Buttons */
-.btn-header,
-.btn-login-header,
-.btn-teacher-login,
-.btn-system-portal {
-    background-color: transparent;
-    color: #f8fafc;
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    padding: 0.5rem 1rem;
-    border-radius: 6px;
-    font-weight: 600;
-    font-size: 0.85rem;
-    transition: all 0.2s ease-in-out;
-    white-space: nowrap;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.btn-header:hover,
-.btn-header:focus,
-.btn-header:active,
-.btn-login-header:hover,
-.btn-teacher-login:hover,
-.btn-system-portal:hover {
-    background-color: var(--primary-color) !important;
-    border-color: var(--primary-color) !important;
-    color: #ffffff !important;
-    box-shadow: none;
-}
-
 /* Form Controls Custom Focus State */
 .form-control:focus,
 .form-select:focus {
-    border-color: #3b82f6;
+    border-color: var(--primary-light);
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
 }
 
-/* 2) Header & Navigation Styles */
+/* ==========================================================================
+   5) Header & Navigation
+   ========================================================================== */
 header.navbar {
     background-color: var(--header-footer-bg);
     color: var(--header-footer-text);
@@ -147,7 +156,7 @@ header.navbar {
     text-overflow: ellipsis;
 }
 
-/* Bootstrap Navbar Overrides */
+/* Navbar Toggle (Hamburger) */
 .navbar-toggler {
     border: 1px solid rgba(255, 255, 255, 0.3) !important;
     padding: 0.35rem 0.65rem;
@@ -157,27 +166,125 @@ header.navbar {
     box-shadow: none !important;
 }
 
-/* Mobile Dropdown & Animation */
-@media (max-width: 991.98px) {
-
-    #navDrawer.collapse.show,
-    #navDrawer.collapsing {
-        position: relative;
-        width: 100%;
-        background-color: var(--header-footer-bg);
-        padding: 0.75rem 0 0.5rem 0;
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
-        margin-top: 0.75rem;
-    }
-}
-
+/* Mobile Nav Drawer Animations */
 #navDrawer.collapsing {
     transition: height 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
     will-change: height;
     transform: translateZ(0);
 }
 
-/* 3) Containers & Panels */
+/* -- Header Transparent Action Buttons -- */
+.btn-header,
+.btn-login-header,
+.btn-teacher-login,
+.btn-system-portal,
+.btn-profile-dropdown {
+    background-color: transparent;
+    color: var(--header-footer-text);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    transition: all 0.2s ease-in-out;
+    white-space: nowrap;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Profile Dropdown specific overrides */
+.btn-profile-dropdown {
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 0.25rem 0.75rem;
+}
+
+/* ==========================================================================
+   Header & Navigation Action Buttons State Management
+   ========================================================================== */
+
+/* 1. Rich Theme Hover State */
+.btn-header:hover,
+.btn-header:focus,
+.btn-login-header:hover,
+.btn-teacher-login:hover,
+.btn-system-portal:hover,
+.btn-profile-dropdown:hover,
+.btn-profile-dropdown:focus {
+    background-color: var(--primary-color) !important; 
+    border-color: var(--primary-color) !important;
+    color: #ffffff !important;
+    box-shadow: 0 2px 10px rgba(37, 99, 235, 0.3) !important; 
+}
+
+/* 2. Clear browser focus/active color trapping on standard temporary clicks */
+.btn-header:active,
+.btn-profile-dropdown:active {
+    background-color: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
+    color: #ffffff !important;
+    box-shadow: none !important;
+}
+
+/* 3. Permanent Sleek Underline State (Strictly for active page & open menu) */
+.btn-header.active,
+.btn-profile-dropdown.show {
+    background-color: rgba(37, 99, 235, 0.1) !important; 
+    border-color: transparent !important; 
+    color: #ffffff !important;
+    box-shadow: inset 0 -3px 0 var(--primary-color) !important; 
+}
+
+/* ==========================================================================
+   Dropdown Menu Styling
+   ========================================================================== */
+.dropdown-menu {
+    border-radius: 12px !important;
+    padding: 0.5rem;
+}
+
+.dropdown-item {
+    border-radius: 6px;
+    transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
+}
+/* Smooth Fade-In Animation for Dropdown Menu */
+@keyframes dropdownFade {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.dropdown-menu.show {
+    animation: dropdownFade 0.2s ease-in-out forwards;
+}
+
+/* Menu Item: Light Blue Hover */
+.dropdown-item:hover {
+    background-color: #dbeafe; 
+    color: var(--primary-color);
+    font-weight: 500; 
+}
+
+/* Menu Item: Solid Active */
+.dropdown-item:active,
+.dropdown-item.active {
+    background-color: var(--primary-color) !important;
+    color: #ffffff !important;
+}
+
+.dropdown-item-danger:hover {
+    background-color: #fef2f2 !important;
+    color: #dc2626 !important;
+}
+/* ==========================================================================
+   6) Main Workspace Layout Panels (e.g., Attendance Page)
+   ========================================================================== */
 .main-container {
     display: flex;
     flex: 1;
@@ -190,7 +297,6 @@ header.navbar {
     min-height: 0;
 }
 
-/* Cards & Layout Panels */
 .card-custom {
     background-color: var(--card-bg);
     border-radius: 12px;
@@ -238,40 +344,59 @@ header.navbar {
     padding-bottom: 0.5rem;
 }
 
-/* Camera Stream Components */
+/* ==========================================================================
+   7) Camera & Live Feed Components
+   ========================================================================== */
 .camera-card {
+    position: relative;
     height: 100%;
+    min-height: 560px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     gap: 1.25rem;
-    min-height: 560px;
+    overflow: hidden;
 }
 
 .camera-frame {
     position: relative;
-    background-color: #0f172a;
-    border-radius: 8px;
+    width: 100%;
     flex: 1 1 auto;
     min-height: 380px;
-    max-height: 720px;
-    height: 40vh;
+    aspect-ratio: 16 / 9;
+    background-color: #0f172a;
+    border-radius: 12px;
+    border: 2px solid #334155;
+    overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: center;
-    overflow: hidden;
-    padding-top: 0.5rem;
+}
+
+.camera-frame img,
+.camera-frame video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
 }
 
 .scan-overlay {
     position: absolute;
-    top: 15%;
-    left: 28%;
-    width: 44%;
-    height: 70%;
-    border: 2px dashed rgba(37, 99, 235, 0.7);
-    border-radius: 8px;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, transparent, #2563eb, transparent);
+    animation: scan 3s infinite linear;
+    z-index: 2;
     pointer-events: none;
+}
+
+@keyframes scan {
+    0% { top: 0%; opacity: 0.8; }
+    50% { top: 95%; opacity: 0.8; }
+    100% { top: 0%; opacity: 0.8; }
 }
 
 .status-badge {
@@ -293,66 +418,9 @@ header.navbar {
     border-radius: 50%;
 }
 
-/* Live Terminal Camera Frame Alignment */
-.camera-card {
-    position: relative;
-    overflow: hidden;
-}
-
-.camera-frame {
-    position: relative;
-    width: 100%;
-    aspect-ratio: 16 / 9;
-    background-color: #0f172a;
-    border-radius: 12px;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 2px solid #334155;
-}
-
-/* Video Feed Object Alignment */
-.camera-frame img,
-.camera-frame video {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    /* Prevents video stretching and ensures precise frame fill */
-    object-position: center;
-}
-
-/* Scan Overlay Animation Line */
-.scan-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 4px;
-    background: linear-gradient(90deg, transparent, #2563eb, transparent);
-    animation: scan 3s infinite linear;
-    z-index: 2;
-    pointer-events: none;
-}
-
-@keyframes scan {
-    0% {
-        top: 0%;
-        opacity: 0.8;
-    }
-
-    50% {
-        top: 95%;
-        opacity: 0.8;
-    }
-
-    100% {
-        top: 0%;
-        opacity: 0.8;
-    }
-}
-
-/* Login Page Components */
+/* ==========================================================================
+   8) Login Page Specifics
+   ========================================================================== */
 .login-card-container {
     background-color: var(--card-bg);
     border-radius: 16px;
@@ -373,7 +441,6 @@ header.navbar {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    /* Perfectly centers content vertically */
     align-items: center;
     padding: 3rem 2.5rem;
     color: white;
@@ -404,22 +471,15 @@ header.navbar {
     position: absolute;
     width: 100%;
     height: 3px;
-    background: linear-gradient(90deg, transparent, #3b82f6, transparent);
+    background: linear-gradient(90deg, transparent, var(--primary-light), transparent);
     top: 20%;
     animation: scanAnim 3s infinite ease-in-out;
-    box-shadow: 0 0 8px #3b82f6;
+    box-shadow: 0 0 8px var(--primary-light);
 }
 
 @keyframes scanAnim {
-
-    0%,
-    100% {
-        top: 15%;
-    }
-
-    50% {
-        top: 80%;
-    }
+    0%, 100% { top: 15%; }
+    50% { top: 80%; }
 }
 
 .visual-title {
@@ -439,7 +499,6 @@ header.navbar {
 .login-form-panel {
     flex: 1;
     padding: 2.5rem 3rem;
-    /* padding: 3.5rem 3.5rem; */
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -459,63 +518,9 @@ header.navbar {
     margin-bottom: 1.5rem;
 }
 
-/* Registration Page Components */
-/* Step Wizard Container */
-.wizard-steps {
-    display: flex;
-    justify-content: space-between;
-    position: relative;
-    margin-bottom: 1.5rem;
-}
-
-.wizard-steps::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 0;
-    width: 100%;
-    height: 2px;
-    background: #e2e8f0;
-    z-index: 1;
-    transform: translateY(-50%);
-}
-
-.step-indicator {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    background: #ffffff;
-    border: 2px solid #cbd5e1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 600;
-    color: #64748b;
-    position: relative;
-    z-index: 2;
-    transition: all 0.3s ease;
-}
-
-.step-indicator.active {
-    border-color: #0d6efd;
-    background: #0d6efd;
-    color: #ffffff;
-}
-
-.step-indicator.completed {
-    border-color: #198754;
-    background: #198754;
-    color: #ffffff;
-}
-
-/* Ensure step panels respond strictly to Bootstrap's d-none class */
-.step-panel {
-    width: 100%;
-}
-
-
-/* Registration Card Container */
-
+/* ==========================================================================
+   9) Registration Page Specifics
+   ========================================================================== */
 .register-card-container {
     background-color: var(--card-bg);
     border-radius: 16px;
@@ -598,47 +603,61 @@ header.navbar {
     display: none;
 }
 
-
-/* Attendance Page Components   */
-/* Profile Dropdown Button Theme Integration */
-.btn-profile-dropdown {
-    background-color: transparent;
-    color: var(--header-footer-text);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    transition: all 0.2s ease-in-out;
+/* -- Registration Wizard -- */
+.wizard-steps {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    margin-bottom: 1.5rem;
 }
 
-.btn-profile-dropdown:hover,
-.btn-profile-dropdown:focus,
-.btn-profile-dropdown.show {
-    background-color: var(--primary-color) !important;
-    border-color: var(--primary-color) !important;
-    color: #ffffff !important;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25);
+.wizard-steps::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: #e2e8f0;
+    z-index: 1;
+    transform: translateY(-50%);
 }
 
-/* Dropdown Menu Item Hover States */
-.dropdown-menu {
-    border-radius: 12px !important;
-    padding: 0.5rem;
+.step-indicator {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #ffffff;
+    border: 2px solid #cbd5e1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    color: #64748b;
+    position: relative;
+    z-index: 2;
+    transition: all 0.3s ease;
 }
 
-.dropdown-item {
-    border-radius: 6px;
-    transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
+.step-indicator.active {
+    border-color: #0d6efd;
+    background: #0d6efd;
+    color: #ffffff;
 }
 
-.dropdown-item:hover {
-    background-color: #f0f7ff;
-    color: var(--primary-color);
+.step-indicator.completed {
+    border-color: #198754;
+    background: #198754;
+    color: #ffffff;
 }
 
-.dropdown-item-danger:hover {
-    background-color: #fef2f2 !important;
-    color: #dc2626 !important;
+.step-panel {
+    width: 100%;
 }
 
-/* 4) Footer */
+/* ==========================================================================
+   10) Footer
+   ========================================================================== */
 footer {
     background-color: var(--header-footer-bg);
     color: var(--header-footer-text);
@@ -654,7 +673,24 @@ footer {
     padding: 2rem 1.5rem;
 }
 
-/* 5) Responsive Breakpoints */
+/* ==========================================================================
+   11) Responsive Breakpoints
+   ========================================================================== */
+
+/* Mobile Nav Drawer Formatting overrides */
+@media (max-width: 991.98px) {
+    #navDrawer.collapse.show,
+    #navDrawer.collapsing {
+        position: relative;
+        width: 100%;
+        background-color: var(--header-footer-bg);
+        padding: 0.75rem 0 0.5rem 0;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        margin-top: 0.75rem;
+    }
+}
+
+/* Tablet & Mobile Layout Shifts */
 @media (max-width: 991px) {
     .main-container {
         flex-direction: column-reverse;
@@ -700,6 +736,7 @@ footer {
     }
 }
 
+/* Extra Small Screens */
 @media (max-width: 575px) {
     .college-info {
         display: none !important;
