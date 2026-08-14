@@ -1,6 +1,22 @@
+/**
+ * ============================================================================
+ * COMMON JAVASCRIPT UTILITIES
+ * This file contains global helper functions used across the entire application,
+ * such as Toast notifications, file upload handling, date initialization, and 
+ * responsive menu toggles.
+ * ============================================================================
+ */
+
 (function () {
     "use strict";
 
+    /**
+     * ------------------------------------------------------------------------
+     * 1. TOAST NOTIFICATION SYSTEM
+     * ------------------------------------------------------------------------
+     * Creates and manages the container that holds the popup notifications.
+     * Ensures toasts float above the footer and action buttons.
+     */
     function createToastContainer() {
         let container = document.getElementById("toastContainer");
         if (!container) {
@@ -34,35 +50,44 @@
         return container;
     }
 
+    /**
+     * Displays a dynamic popup notification (Toast).
+     * Automatically maps backend statuses (success, danger, warning, info) 
+     * to the correct colors and icons.
+     */
     window.showToast = function (
         message,
         title = "",
-        type = "info",
+        type = "info", // Default is info
         autohide = true,
         delay = 4000,
     ) {
         const container = createToastContainer();
         if (!container) return;
 
-        const iconClass =
-            type === "success"
-                ? "fa-solid fa-circle-check text-success fa-lg"
-                : type === "error"
-                    ? "fa-solid fa-circle-xmark text-danger fa-lg"
-                    : "fa-solid fa-circle-info text-primary fa-lg";
+        // Dynamic Icon Logic mapping backend status to UI icons
+        let iconClass = "fa-solid fa-circle-info text-primary fa-lg"; // Default Blue Info (Already Marked)
+
+        if (type === "success") {
+            iconClass = "fa-solid fa-circle-check text-success fa-lg"; // Green Tick (Match Found)
+        } else if (type === "danger" || type === "error") {
+            iconClass = "fa-solid fa-circle-xmark text-danger fa-lg";  // Red Cross (Mismatch/Error)
+        } else if (type === "warning") {
+            iconClass = "fa-solid fa-triangle-exclamation text-warning fa-lg"; // Yellow Triangle (Missing Input)
+        }
 
         const toastEl = document.createElement("div");
-        toastEl.className = "toast align-items-center text-bg-light border-0 mb-2";
+        toastEl.className = "toast align-items-center text-bg-light border-0 mb-2 shadow";
         toastEl.setAttribute("role", "status");
         toastEl.setAttribute("aria-live", "polite");
         toastEl.setAttribute("aria-atomic", "true");
         toastEl.innerHTML = `
-            <div class="d-flex">
-                <div class="toast-body d-flex align-items-center gap-2">
-                    <i class="${iconClass}"></i>
-                    <div>
-                        ${title ? '<strong class="me-2">' + title + "</strong>" : ""}
-                        <span>${message}</span>
+            <div class="d-flex p-1">
+                <div class="toast-body d-flex align-items-center gap-2 border-start border-3 ${type === 'danger' ? 'border-danger' : type === 'success' ? 'border-success' : type === 'warning' ? 'border-warning' : 'border-primary'}">
+                    <i class="${iconClass} me-1"></i>
+                    <div class="d-flex flex-column lh-sm">
+                        ${title ? '<strong class="text-dark">' + title + "</strong>" : ""}
+                        <span class="text-muted small mt-1">${message}</span>
                     </div>
                 </div>
                 <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
@@ -77,16 +102,12 @@
             const footer = document.querySelector('footer');
             const footerHeight = footer ? (footer.offsetHeight || 0) : 0;
 
-            // If there is a prominent action button near the viewport bottom (e.g. capture button),
-            // make sure toasts appear above it instead of overlapping it.
             let extra = 0;
             const actionBtn = document.querySelector('.btn-custom-primary');
             if (actionBtn) {
                 const rect = actionBtn.getBoundingClientRect();
                 const vwHeight = window.innerHeight || document.documentElement.clientHeight;
-                // distance from button bottom to viewport bottom
                 const dist = Math.max(0, vwHeight - rect.bottom);
-                // if the button is close to bottom (less than footerHeight + 12), add extra offset
                 const desiredGap = footerHeight + 12;
                 if (dist < desiredGap) {
                     extra = desiredGap - dist;
@@ -98,12 +119,18 @@
             // ignore
         }
 
-        // remove toast element when hidden
+        // Remove toast HTML element when hidden to free up memory
         toastEl.addEventListener("hidden.bs.toast", function () {
             toastEl.remove();
         });
     };
 
+    /**
+     * ------------------------------------------------------------------------
+     * 2. FILE UPLOAD UI HANDLER
+     * ------------------------------------------------------------------------
+     * Updates the text of the custom file upload button to show the selected filename.
+     */
     window.handleFile = function (
         input,
         uploadTextId = "uploadText",
@@ -125,6 +152,12 @@
         }
     };
 
+    /**
+     * ------------------------------------------------------------------------
+     * 3. MOCK FORM SUBMIT HANDLERS
+     * ------------------------------------------------------------------------
+     * Demonstrates Toast notifications during registration/login flows.
+     */
     window.handleRegistrationSubmit = function (event) {
         event.preventDefault();
         showToast(
@@ -149,6 +182,12 @@
         }, 1500);
     };
 
+    /**
+     * ------------------------------------------------------------------------
+     * 4. RESPONSIVE NAVIGATION DRAWER
+     * ------------------------------------------------------------------------
+     * Initializes and toggles the mobile/tablet side navigation menu.
+     */
     window.initMenuToggle = function (
         menuToggleId = "menuToggleBtn",
         navDrawerId = "navDrawer",
@@ -175,13 +214,11 @@
         let toggleBtn;
         let navDrawer;
 
-        // Called with an Event object (inline onclick passes event)
         if (menuToggleId && menuToggleId.target) {
             const evt = menuToggleId;
             toggleBtn = evt.currentTarget || (evt.target && evt.target.closest && evt.target.closest('button')) || evt.target;
             navDrawer = document.getElementById(navDrawerId || 'navDrawer');
         } else {
-            // Called with IDs (init binding)
             toggleBtn = document.getElementById(menuToggleId);
             navDrawer = document.getElementById(navDrawerId);
         }
@@ -191,7 +228,6 @@
             return;
         }
 
-        console.debug('toggleMenu: toggling', toggleBtn, navDrawer);
         const isExpanded = navDrawer.classList.toggle('show');
         try {
             toggleBtn.setAttribute('aria-expanded', isExpanded ? 'true' : 'false');
@@ -200,6 +236,12 @@
         }
     };
 
+    /**
+     * ------------------------------------------------------------------------
+     * 5. DYNAMIC DATE INITIALIZATION
+     * ------------------------------------------------------------------------
+     * Injects the current, localized date into a designated element on load.
+     */
     window.initCurrentDate = function (dateElementId = "currentDate", options) {
         const dateEl = document.getElementById(dateElementId);
         if (!dateEl) return;
@@ -215,14 +257,20 @@
         );
     };
 
+    // Initialize UI components once the DOM is fully loaded
     document.addEventListener("DOMContentLoaded", function () {
         initMenuToggle();
         initCurrentDate();
     });
 })();
 
-
-// Toggle Password Visibility (Show/Hide)
+/**
+ * ------------------------------------------------------------------------
+ * 6. PASSWORD VISIBILITY TOGGLE
+ * ------------------------------------------------------------------------
+ * Toggles the password input field between masked (dots) and text, swapping
+ * the FontAwesome eye icon simultaneously.
+ */
 function togglePasswordVisibility(inputId, iconId) {
     const passwordInput = document.getElementById(inputId);
     const toggleIcon = document.getElementById(iconId);

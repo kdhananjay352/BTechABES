@@ -12,6 +12,7 @@ from config import Config
 from extensions import db, login_manager, csrf
 from routes.auth import auth_bp
 from routes.main import main_bp
+from datetime import timedelta
 
 limiter = Limiter(key_func=get_remote_address, default_limits=[
     "200 per day", "50 per hour"], storage_uri="memory://")
@@ -22,6 +23,9 @@ def create_app():
 
     flask_app = Flask(__name__)
     flask_app.config.from_object(Config)
+    
+    # 10-Minute Idle Timeout Configuration
+    flask_app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=10)
 
     # Ensure upload directories exist
     os.makedirs(flask_app.config['UPLOAD_FOLDER_FACES'], exist_ok=True)
@@ -40,6 +44,16 @@ def create_app():
     # Automatically initialize SQLite tables
     with flask_app.app_context():
         db.create_all()
+
+    # ==============================================================================
+    # SESSION TIMEOUT HOOK
+    # ==============================================================================
+    @flask_app.before_request
+    def refresh_session_timeout():
+        # Make the session permanent to respect the PERMANENT_SESSION_LIFETIME
+        session.permanent = True
+        # Mark it as modified so the timer resets on every request
+        session.modified = True
 
     # ==============================================================================
     # GLOBAL CSRF ERROR HANDLER
@@ -79,4 +93,4 @@ def create_app():
 app = create_app()
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=8080)
