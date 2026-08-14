@@ -4,7 +4,8 @@
 
 {% block header_actions %}
 <!-- Only Sign Up in header to enforce login first flow -->
-<a href="{{ url_for('auth.register') }}" class="btn btn-outline-light fw-semibold btn-header">
+<a href="{{ url_for('auth.register') }}"
+    class="btn btn-outline-light fw-semibold btn-header border-0 justify-content-start px-3">
     <i class="fa-solid fa-user-plus me-2"></i>Sign Up
 </a>
 {% endblock %}
@@ -73,12 +74,14 @@
                     <label for="passwordInput" class="form-label text-muted small fw-medium">Password</label>
                     <div class="input-group">
                         <span class="input-group-text bg-light text-muted"><i class="fa-solid fa-lock"></i></span>
-                        
+
                         <!-- Added border-end-0 to blend with the eye icon -->
-                        <input type="password" id="passwordInput" name="password" class="form-control border-end-0" placeholder="••••••••" required>
-                        
+                        <input type="password" id="passwordInput" name="password" class="form-control border-end-0"
+                            placeholder="••••••••" required>
+
                         <!-- Fixed the target ID in the onclick function to match 'passwordInput' -->
-                        <span class="input-group-text bg-transparent" onclick="togglePasswordVisibility('passwordInput', 'icon-pwd')" style="cursor: pointer;">
+                        <span class="input-group-text bg-transparent"
+                            onclick="togglePasswordVisibility('passwordInput', 'icon-pwd')" style="cursor: pointer;">
                             <i class="fa-regular fa-eye-slash text-muted" id="icon-pwd"></i>
                         </span>
                     </div>

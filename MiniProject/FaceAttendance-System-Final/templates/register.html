@@ -1,5 +1,8 @@
-{% extends "base.html" %} {% block title %}Account Registration - Smart
-Attendance System{% endblock %} {% block content %}
+{% extends "base.html" %}
+
+{% block title %}Account Registration - Smart Attendance System{% endblock %}
+
+{% block content %}
 <!-- CSRF Security Meta Tag for Fetch Requests -->
 <meta name="csrf-token" content="{{ csrf_token() if csrf_token else '' }}" />
 
@@ -116,7 +119,8 @@ Attendance System{% endblock %} {% block content %}
                                     <div class="input-group">
                                         <span class="input-group-text bg-white"><i
                                                 class="fa-solid fa-user-shield text-muted"></i></span>
-                                        <select id="role" name="role" class="form-select" onchange="toggleRoleFields(); autoSaveDraft();" required>
+                                        <select id="role" name="role" class="form-select"
+                                            onchange="toggleRoleFields(); autoSaveDraft();" required>
                                             <option value="student" selected>Student</option>
                                             <option value="faculty">Faculty</option>
                                             <option value="staff">Staff</option>
@@ -159,7 +163,9 @@ Attendance System{% endblock %} {% block content %}
                                             <input type="password" id="password" name="password"
                                                 class="form-control border-end-0" required oninput="autoSaveDraft()" />
                                             <!-- Added clickable eye toggle -->
-                                            <span class="input-group-text bg-white bg-transparent" onclick="togglePasswordVisibility('password', 'icon-pwd')" style="cursor: pointer">
+                                            <span class="input-group-text bg-white bg-transparent"
+                                                onclick="togglePasswordVisibility('password', 'icon-pwd')"
+                                                style="cursor: pointer">
                                                 <i class="fa-regular fa-eye-slash text-muted" id="icon-pwd"></i>
                                             </span>
                                         </div>
@@ -176,7 +182,9 @@ Attendance System{% endblock %} {% block content %}
                                             <input type="password" id="confirm_password" name="confirm_password"
                                                 class="form-control border-end-0" required oninput="autoSaveDraft()" />
                                             <!-- Added clickable eye toggle -->
-                                            <span class="input-group-text bg-white bg-transparent" onclick="togglePasswordVisibility('confirm_password','icon-confirm-pwd',)" style="cursor: pointer">
+                                            <span class="input-group-text bg-white bg-transparent"
+                                                onclick="togglePasswordVisibility('confirm_password','icon-confirm-pwd',)"
+                                                style="cursor: pointer">
                                                 <i class="fa-regular fa-eye-slash text-muted" id="icon-confirm-pwd"></i>
                                             </span>
                                         </div>
@@ -353,7 +361,8 @@ Attendance System{% endblock %} {% block content %}
                                             <div class="input-group">
                                                 <span class="input-group-text bg-white"><i
                                                         class="fa-solid fa-laptop-code text-muted"></i></span>
-                                                <select name="branch" id="branch" class="form-select" onchange="updateSessionOptions(); autoSaveDraft();">
+                                                <select name="branch" id="branch" class="form-select"
+                                                    onchange="updateSessionOptions(); autoSaveDraft();">
                                                     <!-- 4-Year Programs -->
                                                     <option value="B.Tech - CSE" data-duration="4" selected>
                                                         B.Tech - CSE (4 Years)

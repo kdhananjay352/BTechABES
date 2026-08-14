@@ -16,15 +16,16 @@ main_bp = Blueprint('main', __name__)
 # ==============================================================================
 # GLOBAL CAMERA FRAME STATE
 # ==============================================================================
-# Holds the latest camera frame so the API route can grab it instantly 
+# Holds the latest camera frame so the API route can grab it instantly
 # when the "Capture" button is clicked.
 global_frame = None
+
 
 def generate_frames():
     """Capture video frames from the webcam and yield them as a byte stream."""
     global global_frame
     camera = cv2.VideoCapture(0)  # 0 is the default built-in webcam
-    
+
     while True:
         success, frame = camera.read()
         if not success:
@@ -32,11 +33,11 @@ def generate_frames():
         else:
             # Save a clean copy of the current frame for the verification API
             global_frame = frame.copy()
-            
+
             # Encode the frame in JPEG format for the HTML video stream
             ret, buffer = cv2.imencode('.jpg', frame)
             frame_bytes = buffer.tobytes()
-            
+
             # Yield the frame in the multipart format expected by the browser
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
@@ -45,21 +46,33 @@ def generate_frames():
 # UI ROUTES
 # ==============================================================================
 
+
 @main_bp.route('/')
 def index():
     if current_user.is_authenticated:
         return redirect(url_for('main.attendance'))
     return redirect(url_for('auth.login'))
 
+
 @main_bp.route('/attendance')
 @login_required
 def attendance():
-    return render_template('attendance.html', user=current_user)
+    today_date = date.today()
+
+    # Calculate how many unique users marked attendance today
+    # We now query the new 'date' column directly instead of using func.date(timestamp)
+    present_today = db.session.query(func.count(db.distinct(AttendanceRecord.user_id))).filter(
+        AttendanceRecord.date == today_date
+    ).scalar() or 0
+
+    return render_template('attendance.html', user=current_user, present_today=present_today)
+
 
 @main_bp.route('/attendance-summary')
 @login_required
 def attendance_summary():
     return render_template('attendance_summary.html', user=current_user)
+
 
 @main_bp.route('/video_feed')
 @login_required
@@ -71,15 +84,16 @@ def video_feed():
 # API: MARK ATTENDANCE ROUTE
 # ==============================================================================
 
+
 @main_bp.route('/api/mark-attendance', methods=['POST'])
 @login_required
 def mark_attendance():
     """API endpoint to capture frame, verify face, and save attendance."""
     global global_frame
-    
+
     data = request.get_json()
     role = data.get('role', '').strip().lower()
-    identifier = data.get('user_id', '').strip() # Roll No or Employee ID
+    identifier = data.get('user_id', '').strip()  # Roll No or Employee ID
 
     # 1. Validation Errors (Yellow/Warning)
     if not identifier:
@@ -94,7 +108,7 @@ def mark_attendance():
         profile = Student.query.filter_by(roll_no=identifier).first()
     elif role in ['teacher', 'faculty', 'staff']:
         profile = FacultyStaff.query.filter_by(employee_id=identifier).first()
-    
+
     if not profile:
         return jsonify({'status': 'warning', 'title': 'Not Found', 'message': f'No account found with ID {identifier}.'})
 
@@ -103,8 +117,9 @@ def mark_attendance():
 
     # 3. Extract Face Encoding from LIVE Camera Frame
     temp_filename = "temp_capture_auth.jpg"
-    temp_filepath = os.path.join(current_app.config.get('UPLOAD_FOLDER_FACES', 'static/uploads/faces'), temp_filename)
-    
+    temp_filepath = os.path.join(current_app.config.get(
+        'UPLOAD_FOLDER_FACES', 'static/uploads/faces'), temp_filename)
+
     # Save the current frame to disk temporarily for the extraction service
     cv2.imwrite(temp_filepath, global_frame)
     live_encoding = extract_face_encoding(temp_filepath)
@@ -119,12 +134,14 @@ def mark_attendance():
     # 4. Load the Saved Database Encoding Safely
     try:
         # Extract just the filename (fixes absolute Windows paths saved in DB)
-        encoding_filename = profile.encoding_path.replace('\\', '/').split('/')[-1]
-        
+        encoding_filename = profile.encoding_path.replace(
+            '\\', '/').split('/')[-1]
+
         # Rebuild the correct path dynamically
-        encodings_dir = current_app.config.get('UPLOAD_FOLDER_ENCODINGS', 'static/uploads/encodings')
+        encodings_dir = current_app.config.get(
+            'UPLOAD_FOLDER_ENCODINGS', 'static/uploads/encodings')
         safe_encoding_path = os.path.join(encodings_dir, encoding_filename)
-        
+
         # Check if the file actually exists physically
         if not os.path.exists(safe_encoding_path):
             print(f"DEBUG: Missing File! Looked for -> {safe_encoding_path}")
@@ -132,22 +149,22 @@ def mark_attendance():
 
         # Load the array
         saved_encoding = np.load(safe_encoding_path)
-        
+
     except Exception as e:
         print(f"DEBUG: Numpy Load Error -> {str(e)}")
         return jsonify({'status': 'danger', 'title': 'Storage Error', 'message': 'Failed to load registered face data.'})
 
     # 5. Compare the Faces using Euclidean Distance
     distance = np.linalg.norm(saved_encoding - live_encoding)
-    
+
     # THIS IS THE CRITICAL CHANGE! Matches your model's 14.xxx scale
-    threshold = 18.0  
-    
+    threshold = 18.0
+
     if distance < threshold:
         # -- MATCH FOUND --
         user_account = profile.user_account
         today_date = date.today()
-        
+
         # Prevent double-marking for the day
         existing_record = AttendanceRecord.query.filter(
             AttendanceRecord.user_id == user_account.id,
@@ -157,7 +174,7 @@ def mark_attendance():
         # Already Marked (Blue/Info)
         if existing_record:
             return jsonify({
-                'status': 'warning', 
+                'status': 'warning',
                 'title': 'Already Marked',
                 'message': f'Attendance for {profile.full_name} is already marked for today.'
             })
@@ -172,17 +189,17 @@ def mark_attendance():
             )
             db.session.add(new_record)
             db.session.commit()
-            
+
             return jsonify({
-                'status': 'success', 
+                'status': 'success',
                 'title': 'Attendance Recorded',
                 'message': f'Face verified! Attendance recorded for {profile.full_name}.'
             })
-            
+
         except Exception as e:
             db.session.rollback()
             return jsonify({'status': 'danger', 'title': 'Database Error', 'message': 'Error while saving attendance.'})
-            
+
     else:
         # -- NO MATCH (Red/Danger) --
         print(f"Failed Match Distance: {distance}")

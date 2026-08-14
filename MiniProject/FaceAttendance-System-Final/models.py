@@ -2,6 +2,8 @@ from datetime import datetime
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from extensions import db, login_manager
+from datetime import datetime, date
+from extensions import db
 
 # ==============================================================================
 # 1. CORE AUTHENTICATION USER MODEL
@@ -113,20 +115,29 @@ class FacultyStaff(db.Model):
 # ==============================================================================
 # 4. ATTENDANCE RECORD ENTITY
 # ==============================================================================
+# ==============================================================================
+# 4. ATTENDANCE RECORD ENTITY
+# ==============================================================================
 class AttendanceRecord(db.Model):
-    """Attendance record model for storing attendance information."""
+    """Attendance record model for storing time-in/time-out attendance information."""
 
     __tablename__ = 'attendance_records'
 
-    record_id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
+    # Ensure this matches your actual user table name (e.g., 'users.id' or 'user.id')
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
-    # 'Face AI', 'Manual', 'Card'
+
     verification_method = db.Column(db.String(50), default='Face AI')
-    # 'Present', 'Absent', 'Late'
-    status = db.Column(db.String(20), default='Present')
+    status = db.Column(db.String(50), default='Present')
     marked_by_operator_id = db.Column(
         db.Integer, db.ForeignKey('users.id'), nullable=True)
+
+    # Replaced single timestamp with specific IN and OUT tracking
+    date = db.Column(db.Date, default=date.today)
+    time_in = db.Column(db.DateTime, default=datetime.now)
+    time_out = db.Column(db.DateTime, nullable=True)
+    # Stores the calculated hours
+    total_hours = db.Column(db.Float, nullable=True)
 
 
 @login_manager.user_loader

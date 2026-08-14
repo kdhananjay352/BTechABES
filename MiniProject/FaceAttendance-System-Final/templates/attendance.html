@@ -2,14 +2,8 @@
 Attendance System{% endblock %} {% block profile_action %}
 <div class="dropdown">
   <!-- Navbar Profile Pill Button with Online Status Dot -->
-  <button
-    class="btn btn-profile-dropdown d-flex align-items-center gap-3 px-2 px-sm-3 py-1 rounded-pill shadow-sm"
-    type="button"
-    id="userProfileDropdown"
-    data-bs-toggle="dropdown"
-    aria-expanded="false"
-    style="width: fit-content"
-  >
+  <button class="btn btn-profile-dropdown d-flex align-items-center gap-3 px-2 px-sm-3 py-1 rounded-pill shadow-sm"
+    type="button" id="userProfileDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="width: fit-content">
     {% set raw_path = user.student_profile.photo_path if user.student_profile
     and user.student_profile.photo_path else (user.faculty_profile.photo_path if
     user.faculty_profile and user.faculty_profile.photo_path else None) %} {%
@@ -20,64 +14,41 @@ Attendance System{% endblock %} {% block profile_action %}
     <div class="position-relative d-flex align-items-center">
       <img
         src="{{ url_for('static', filename='uploads/faces/' + user_photo) if user_photo else 'https://ui-avatars.com/api/?name=' + user.username|urlencode + '&background=2563eb&color=fff' }}"
-        alt="{{ user.username }}"
-        class="rounded-circle object-fit-cover border border-2 border-primary"
-        width="34"
-        height="34"
-        loading="lazy"
-        onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name={{ user.username|urlencode }}&background=2563eb&color=fff';"
-      />
+        alt="{{ user.username }}" class="rounded-circle object-fit-cover border border-2 border-primary" width="34"
+        height="34" loading="lazy"
+        onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name={{ user.username|urlencode }}&background=2563eb&color=fff';" />
 
       <!-- Tiny Online Status Indicator Dot -->
-      <span
-        class="position-absolute bottom-0 end-0 p-1 bg-success border border-white rounded-circle"
-        style="width: 10px; height: 10px"
-      >
+      <span class="position-absolute bottom-0 end-0 p-1 bg-success border border-white rounded-circle"
+        style="width: 10px; height: 10px">
         <span class="visually-hidden">Online</span>
       </span>
     </div>
 
     <!-- User Name & Role -->
     <div class="d-none d-sm-flex flex-column text-start me-1">
-      <span class="text-white small fw-bold lh-1"
-        >{{ user.username | capitalize }}</span
-      >
-      <span
-        class="text-white-50 extra-small lh-1 mt-1"
-        style="font-size: 0.72rem"
-        >{{ user.role | capitalize }}</span
-      >
+      <span class="text-white small fw-bold lh-1">{{ user.username | capitalize }}</span>
+      <span class="text-white-50 extra-small lh-1 mt-1" style="font-size: 0.72rem">{{ user.role | capitalize }}</span>
     </div>
   </button>
 
   <!-- Bootstrap Popover Menu with Fade-In Animation -->
-  <ul
-    class="dropdown-menu dropdown-menu-end shadow-lg border-0 mt-2 py-2"
-    aria-labelledby="userProfileDropdown"
-    style="min-width: 260px; position: absolute"
-  >
+  <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 mt-2 py-2" aria-labelledby="userProfileDropdown"
+    style="min-width: 260px; position: absolute">
     <!-- Dropdown Header: Detailed User Info -->
     <li class="px-3 py-2 border-bottom mb-2">
       <div class="d-flex align-items-center gap-3 py-1">
         <img
           src="{{ url_for('static', filename='uploads/faces/' + user_photo) if user_photo else 'https://ui-avatars.com/api/?name=' + user.username|urlencode + '&background=2563eb&color=fff' }}"
-          alt="{{ user.username }}"
-          class="rounded-circle object-fit-cover border border-2 border-primary flex-shrink-0"
-          width="48"
-          height="48"
-          onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name={{ user.username|urlencode }}&background=2563eb&color=fff';"
-        />
+          alt="{{ user.username }}" class="rounded-circle object-fit-cover border border-2 border-primary flex-shrink-0"
+          width="48" height="48"
+          onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name={{ user.username|urlencode }}&background=2563eb&color=fff';" />
 
         <div class="d-flex flex-column justify-content-center">
           <span class="fw-bold text-dark small lh-sm">{{ user.username }}</span>
-          <span class="text-muted extra-small" style="font-size: 0.75rem"
-            >{{ user.email }}</span
-          >
-          <span
-            class="badge bg-primary-subtle text-primary mt-1 align-self-start"
-            style="font-size: 0.65rem"
-            >{{ user.role | capitalize }}</span
-          >
+          <span class="text-muted extra-small" style="font-size: 0.75rem">{{ user.email }}</span>
+          <span class="badge bg-primary-subtle text-primary mt-1 align-self-start" style="font-size: 0.65rem">{{
+            user.role | capitalize }}</span>
         </div>
       </div>
     </li>
@@ -85,44 +56,26 @@ Attendance System{% endblock %} {% block profile_action %}
     <!-- Links -->
     {% if user.role == 'faculty' or user.role == 'staff' %}
     <li>
-      <a
-        class="dropdown-item py-2 d-flex align-items-center fw-medium small"
-        href="{{ url_for('main.attendance_summary') }}"
-      >
-        <i
-          class="fa-solid fa-chart-column me-2 text-primary"
-          style="width: 18px"
-        ></i
-        >Attendance Reports & Summary
+      <a class="dropdown-item py-2 d-flex align-items-center fw-medium small"
+        href="{{ url_for('main.attendance_summary') }}">
+        <i class="fa-solid fa-chart-column me-2 text-primary" style="width: 18px"></i>Attendance Reports & Summary
       </a>
     </li>
     {% endif %}
 
     <li>
-      <a
-        class="dropdown-item py-2 d-flex align-items-center text-secondary small"
-        href="#"
-      >
-        <i class="fa-solid fa-id-card me-2 text-primary" style="width: 18px"></i
-        >View & Edit Profile
+      <a class="dropdown-item py-2 d-flex align-items-center text-secondary small" href="#">
+        <i class="fa-solid fa-id-card me-2 text-primary" style="width: 18px"></i>View & Edit Profile
       </a>
     </li>
     <li>
-      <a
-        class="dropdown-item py-2 d-flex align-items-center text-secondary small"
-        href="#"
-      >
-        <i class="fa-solid fa-key me-2 text-warning" style="width: 18px"></i
-        >Change Password
+      <a class="dropdown-item py-2 d-flex align-items-center text-secondary small" href="#">
+        <i class="fa-solid fa-key me-2 text-warning" style="width: 18px"></i>Change Password
       </a>
     </li>
     <li>
-      <a
-        class="dropdown-item py-2 d-flex align-items-center text-secondary small"
-        href="#"
-      >
-        <i class="fa-solid fa-sliders me-2 text-info" style="width: 18px"></i
-        >System Settings
+      <a class="dropdown-item py-2 d-flex align-items-center text-secondary small" href="#">
+        <i class="fa-solid fa-sliders me-2 text-info" style="width: 18px"></i>System Settings
       </a>
     </li>
 
@@ -131,112 +84,110 @@ Attendance System{% endblock %} {% block profile_action %}
     </li>
 
     <li>
-      <a
-        class="dropdown-item dropdown-item-danger py-2 d-flex align-items-center text-danger fw-semibold small"
-        href="{{ url_for('auth.logout') }}"
-      >
-        <i class="fa-solid fa-right-from-bracket me-2" style="width: 18px"></i
-        >Sign Out
+      <a class="dropdown-item dropdown-item-danger py-2 d-flex align-items-center text-danger fw-semibold small"
+        href="{{ url_for('auth.logout') }}">
+        <i class="fa-solid fa-right-from-bracket me-2" style="width: 18px"></i>Sign Out
       </a>
     </li>
   </ul>
 </div>
-{% endblock %} {% block header_actions %}
+{% endblock %}
+
+{% block header_actions %}
 <!-- Dummy Menu Items for Demonstration -->
 <!-- Notice we added 'border-0' to make them look like standard text links on desktop -->
-<a
-  href="#"
-  class="btn fw-semibold btn-header border-0 justify-content-start px-3 active"
->
-  <i class="fa-solid fa-house me-2" style="width: 20px; text-align: center"></i
-  >Dashboard
+<a href="#" class="btn fw-semibold btn-header border-0 justify-content-start px-3 active">
+  <i class="fa-solid fa-house me-2" style="width: 20px; text-align: center"></i>Dashboard
 </a>
 
-<a
-  href="#"
-  class="btn fw-semibold btn-header border-0 justify-content-start px-3"
->
-  <i class="fa-solid fa-bell me-2" style="width: 20px; text-align: center"></i
-  >Notifications <span class="badge bg-danger ms-2">3</span>
+<a href="#" class="btn fw-semibold btn-header border-0 justify-content-start px-3">
+  <i class="fa-solid fa-bell me-2" style="width: 20px; text-align: center"></i>Notifications <span
+    class="badge bg-danger ms-2">3</span>
 </a>
 
-<a
-  href="#"
-  class="btn fw-semibold btn-header border-0 justify-content-start px-3"
->
-  <i
-    class="fa-solid fa-circle-question me-2"
-    style="width: 20px; text-align: center"
-  ></i
-  >Help
+<a href="#" class="btn fw-semibold btn-header border-0 justify-content-start px-3">
+  <i class="fa-solid fa-circle-question me-2" style="width: 20px; text-align: center"></i>Help
 </a>
-{% endblock %} {% block content %}
+{% endblock %}
+
+
+{% block content %}
 <div class="main-container">
   <!-- Left Column: User Verification & System Summary -->
+
+  <!-- Left Column: User Verification & System Summary -->
   <div class="left-panel">
-    <!-- Verification Form -->
+
+    <!-- Jinja logic to extract the ID and Full Name based on the user's role -->
+    {% set user_id_val = '' %}
+    {% set user_name_val = '' %}
+
+    {% if user.role == 'student' and user.student_profile %}
+    {% set user_id_val = user.student_profile.roll_no %}
+    {% set user_name_val = user.student_profile.full_name %}
+    {% elif user.role in ['teacher', 'faculty', 'staff'] and user.faculty_profile %}
+    {% set user_id_val = user.faculty_profile.employee_id %}
+    {% set user_name_val = user.faculty_profile.full_name %}
+    {% endif %}
+
+    <!-- Verification Form (Auto-Filled & Locked) -->
     <div class="card-custom registration-card">
-      <h2>
-        <i class="fa-solid fa-user-check me-2 text-primary"></i>Verification
-        Details
+      <h2 class="mb-4">
+        <i class="fa-solid fa-user-lock me-2 text-primary"></i>Verification Details
       </h2>
       <div>
+
+        <!-- Role Field -->
         <div class="mb-3">
-          <label for="role" class="form-label text-muted small fw-medium"
-            >Select Role</label
-          >
+          <label for="role" class="form-label text-muted small fw-medium mb-1">Role</label>
           <div class="input-group input-group-sm">
-            <span class="input-group-text bg-light text-muted"
-              ><i class="fa-solid fa-user-shield"></i
-            ></span>
-            <select id="role" class="form-select">
-              <option value="student">Student</option>
-              <option value="teacher">Teacher / Faculty</option>
-            </select>
+            <span class="input-group-text bg-light text-muted"><i class="fa-solid fa-user-shield"></i></span>
+            <input type="text" id="role" class="form-control bg-light text-muted text-capitalize fw-bold"
+              value="{{ user.role }}" disabled />
           </div>
         </div>
 
+        <!-- Full Name Field -->
         <div class="mb-3">
-          <label for="userId" class="form-label text-muted small fw-medium"
-            >ID Number / Roll No.</label
-          >
+          <label for="userName" class="form-label text-muted small fw-medium mb-1">Name</label>
           <div class="input-group input-group-sm">
-            <span class="input-group-text bg-light text-muted"
-              ><i class="fa-solid fa-id-badge"></i
-            ></span>
-            <input
-              type="text"
-              id="userId"
-              class="form-control"
-              placeholder="e.g. ST-2026-081"
-            />
+            <span class="input-group-text bg-light text-muted"><i class="fa-solid fa-user"></i></span>
+            <input type="text" id="userName" class="form-control bg-light text-muted fw-bold text-capitalize"
+              value="{{ user_name_val }}" disabled />
           </div>
         </div>
+
+        <!-- ID Number Field -->
+        <div class="mb-3">
+          <label for="userId" class="form-label text-muted small fw-medium mb-1">Role Number</label>
+          <div class="input-group input-group-sm">
+            <span class="input-group-text bg-light text-muted"><i class="fa-solid fa-id-badge"></i></span>
+            <input type="text" id="userId" class="form-control bg-light text-muted fw-bold" value="{{ user_id_val }}"
+              disabled />
+          </div>
+        </div>
+
       </div>
     </div>
 
-    <!-- System Overview Card -->
+    <!-- System Overview Card (Live Data) -->
     <div class="card-custom">
       <div class="d-flex justify-content-between align-items-center mb-2">
         <h2 class="mb-0">
           <i class="fa-solid fa-chart-pie me-2 text-primary"></i>System Overview
         </h2>
-        <a
-          href="{{ url_for('main.attendance_summary') }}"
-          class="btn btn-sm btn-outline-primary py-0 px-2 style-btn-sm"
-          style="font-size: 0.75rem"
-        >
+        <a href="{{ url_for('main.attendance_summary') }}" class="btn btn-sm btn-outline-primary py-0 px-2 style-btn-sm"
+          style="font-size: 0.75rem">
           <i class="fa-solid fa-arrow-right-to-bracket me-1"></i>Summary
         </a>
       </div>
       <p class="text-muted small mb-0 lh-lg">
         <strong>Date:</strong> <span id="currentDate">Loading...</span><br />
-        <strong>Operator:</strong> Prof. John Doe<br />
-        <strong>Present Today:</strong> 42 Accounts<br />
-        <strong>System Status:</strong>
-        <span class="text-success fw-semibold"
-          ><i class="fa-solid fa-circle-check me-1"></i>Face Engine Active</span
-        >
+        <strong>Session User:</strong> {{ user.username | capitalize }}<br />
+        <strong>Present Today:</strong> <span class="badge bg-primary rounded-pill">{{ present_today }}
+          Accounts</span><br />
+        <strong>System Status:</strong> <span class="text-success fw-semibold"><i
+            class="fa-solid fa-circle-check me-1"></i>Face Engine Active</span>
       </p>
     </div>
   </div>
@@ -249,39 +200,33 @@ Attendance System{% endblock %} {% block profile_action %}
           <i class="fa-solid fa-video me-2 text-primary"></i>Live Camera Stream
         </h2>
         <!-- Status Badge with IDs for JavaScript control -->
-        <div id="cameraStatusBadge" class="status-badge d-flex align-items-center gap-2 px-2 py-1 rounded shadow-sm border" style="background: rgba(255,255,255,0.1);">
+        <div id="cameraStatusBadge"
+          class="status-badge d-flex align-items-center gap-2 px-2 py-1 rounded shadow-sm border"
+          style="background: rgba(255,255,255,0.1);">
           <!-- Dot defaults to yellow (warning) while connecting -->
-          <span id="cameraStatusDot" class="spinner-grow spinner-grow-sm text-warning" role="status" style="width: 10px; height: 10px;"></span> 
+          <span id="cameraStatusDot" class="spinner-grow spinner-grow-sm text-warning" role="status"
+            style="width: 10px; height: 10px;"></span>
           <span id="cameraStatusText" class="small fw-bold text-warning">Connecting...</span>
         </div>
       </div>
 
       <!-- Video Stream Container -->
       <!-- Added aspect-ratio and rounded corners so it perfectly matches the UI -->
-    <div
+      <div
         class="camera-frame bg-black position-relative overflow-hidden rounded-3 shadow-sm border border-secondary border-opacity-25"
-        style="aspect-ratio: 16/9; width: 100%"
-      >
+        style="aspect-ratio: 16/9; width: 100%">
         <!-- The scanning animation overlay -->
         <div class="scan-overlay"></div>
 
         <!-- Live Camera Feed Image with onload and onerror triggers -->
-        <img
-          src="{{ url_for('main.video_feed') }}"
-          alt="Live Face Recognition Stream"
-          class="w-100 h-100"
-          style="object-fit: cover; object-position: center"
-          id="cameraStream"
-          onload="updateCameraStatus('active')"
-          onerror="updateCameraStatus('error')"
-        />
+        <img src="{{ url_for('main.video_feed') }}" alt="Live Face Recognition Stream" class="w-100 h-100"
+          style="object-fit: cover; object-position: center" id="cameraStream" onload="updateCameraStatus('active')"
+          onerror="updateCameraStatus('error')" />
 
         <!-- Fallback text placeholder if the camera fails to load -->
-        <div
-          id="fallbackStreamText"
+        <div id="fallbackStreamText"
           class="position-absolute top-50 start-50 translate-middle text-center text-secondary small"
-          style="display: none; z-index: 1"
-        >
+          style="display: none; z-index: 1">
           <i class="fa-solid fa-camera-slash fa-2x mb-2 d-block mx-auto text-danger"></i>
           <span class="text-danger fw-semibold">[ Camera Stream Offline ]</span>
         </div>
@@ -289,18 +234,16 @@ Attendance System{% endblock %} {% block profile_action %}
 
       <!-- Action Button triggering capture logic -->
       <div class="mt-2 mb-0">
-        <button
-          id="captureBtn"
+        <button id="captureBtn"
           class="btn btn-primary fw-semibold w-100 py-2 d-flex align-items-center justify-content-center gap-2"
-          onclick="captureAttendance()"
-        >
+          onclick="captureAttendance()">
           <i class="fa-solid fa-camera-retro"></i>Capture & Mark Attendance
         </button>
       </div>
     </div>
   </div>
 </div>
-{% endblock %} 
+{% endblock %}
 
 
 
@@ -315,95 +258,113 @@ Attendance System{% endblock %} {% block profile_action %}
     }
   });
 
-  // 2. Handle Camera Status Indicator
-  function updateCameraStatus(status) {
-      const dot = document.getElementById('cameraStatusDot');
-      const text = document.getElementById('cameraStatusText');
-      const badge = document.getElementById('cameraStatusBadge');
-      
-      if (status === 'active') {
-          // Camera is successfully streaming
-          dot.className = 'bg-success rounded-circle'; // Solid green dot
-          text.className = 'small fw-bold text-success';
-          text.textContent = 'Camera Active';
-          badge.style.borderColor = 'var(--bs-success)';
-      } 
-      else if (status === 'error') {
-          // Camera failed to load or disconnected
-          dot.className = 'bg-danger rounded-circle'; // Solid red dot
-          text.className = 'small fw-bold text-danger';
-          text.textContent = 'Camera Offline';
-          badge.style.borderColor = 'var(--bs-danger)';
-          
-          // Hide the broken image and show the fallback UI
-          document.getElementById('cameraStream').style.display = 'none';
-          document.getElementById('fallbackStreamText').style.display = 'block';
+  // ==========================================
+  // 1. Camera Timeout & Status Logic
+  // ==========================================
+  let cameraConnected = false;
+  const CAMERA_TIMEOUT_MS = 10000; // 10 seconds
+
+  // Start the timeout countdown on page load
+  document.addEventListener("DOMContentLoaded", function () {
+    setTimeout(() => {
+      if (!cameraConnected) {
+        updateCameraStatus('timeout');
       }
+    }, CAMERA_TIMEOUT_MS);
+  });
+
+  function updateCameraStatus(status) {
+    const dot = document.getElementById('cameraStatusDot');
+    const text = document.getElementById('cameraStatusText');
+    const badge = document.getElementById('cameraStatusBadge');
+
+    if (status === 'active') {
+      cameraConnected = true; // Prevents the timeout from triggering
+      dot.className = 'bg-success rounded-circle';
+      text.className = 'small fw-bold text-success';
+      text.textContent = 'Camera Active';
+      badge.style.borderColor = 'var(--bs-success)';
+    }
+    else if (status === 'error' || status === 'timeout') {
+      // Change badge to Red
+      dot.className = 'bg-danger rounded-circle';
+      text.className = 'small fw-bold text-danger';
+      text.textContent = status === 'timeout' ? 'Connection Timeout' : 'Camera Offline';
+      badge.style.borderColor = 'var(--bs-danger)';
+
+      // Hide video stream and show interactive error message
+      document.getElementById('cameraStream').style.display = 'none';
+      const fallback = document.getElementById('fallbackStreamText');
+      fallback.style.display = 'block';
+
+      fallback.innerHTML = `
+            <i class="fa-solid fa-camera-slash fa-2x mb-2 d-block mx-auto text-danger"></i>
+            <span class="text-danger fw-semibold d-block mb-3">
+              [ ${status === 'timeout' ? 'Camera Connection Timed Out' : 'Camera Stream Unavailable'} ]
+            </span>
+            <button class="btn btn-sm btn-outline-danger" onclick="window.location.reload()">
+              <i class="fa-solid fa-rotate-right me-1"></i> Retry Connection
+            </button>
+          `;
+
+      // Show a toast notifying the user
+      if (typeof showToast === "function") {
+        showToast("Camera failed to initialize. Please check camera or permissions and try again.", "Hardware Error", "danger");
+      }
+    }
   }
 
-  // 3. Handle Capture & Mark Attendance Trigger
-  // Handle Capture & Mark Attendance Trigger
-  // 3. Handle Capture & Mark Attendance Trigger
+  // ==========================================
+  // 2. Handle Capture & Mark Attendance Trigger
+  // ==========================================
   function captureAttendance() {
     const role = document.getElementById("role").value;
     const userId = document.getElementById("userId").value.trim();
 
-    // Local Basic Validation
     if (!userId) {
-      showToast("Missing Input", "Please enter an ID Number / Roll No. before capturing.", "warning");
+      showToast("Profile missing ID Number. Please update your profile.", "Missing Data", "warning");
       return;
     }
 
-    // Button loading state feedback
     const btn = document.getElementById("captureBtn");
     const originalText = btn.innerHTML;
     btn.disabled = true;
     btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin me-2"></i>Processing Face AI...`;
 
-    // Extract CSRF Token if your app uses Flask-WTF protection
     let csrfToken = "";
     const metaCsrf = document.querySelector('meta[name="csrf-token"]');
     if (metaCsrf) {
-        csrfToken = metaCsrf.getAttribute('content');
+      csrfToken = metaCsrf.getAttribute('content');
     }
 
-    // AJAX POST request to backend recognition endpoint
     fetch("/api/mark-attendance", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "X-CSRFToken": csrfToken // Injects CSRF token dynamically
+        "X-CSRFToken": csrfToken
       },
       body: JSON.stringify({ role: role, user_id: userId }),
     })
       .then(async (response) => {
-        // Safely check if the server returned JSON or crashed with HTML
         const isJson = response.headers.get('content-type')?.includes('application/json');
         const data = isJson ? await response.json() : null;
-        
+
         if (!response.ok) {
-            // Throw the actual server error message to the catch block
-            const errorMsg = (data && data.message) ? data.message : "Server rejected the request (Check CSRF or Console).";
-            throw new Error(errorMsg);
+          const errorMsg = (data && data.message) ? data.message : "Server rejected the request (Check CSRF or Console).";
+          throw new Error(errorMsg);
         }
         return data;
       })
       .then((data) => {
-        // Safe fallbacks to ensure "undefined" never shows up again!
         const title = data.title || (data.success ? "Success" : "Notice");
         const msg = data.message || "Action processed, but no message provided.";
         const status = data.status || (data.success ? "success" : "info");
-        
-        showToast(title, msg, status);
-        
-        // Only clear the input field if it was a successful NEW attendance
-        if (status === 'success' || data.success === true) {
-            document.getElementById("userId").value = ""; 
-        }
+
+        showToast(msg, title, status);
       })
       .catch((error) => {
         console.error("Backend Error:", error);
-        showToast("Action Failed", error.message || "Failed to process face recognition.", "danger");
+        showToast(error.message || "Failed to process face recognition.", "Action Failed", "danger");
       })
       .finally(() => {
         btn.disabled = false;
