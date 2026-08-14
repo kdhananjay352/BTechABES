@@ -1,0 +1,237 @@
+{% extends "base.html" %}
+
+{% block title %}Face Recognition Terminal - Attendance System{% endblock %}
+
+
+{% block profile_action %}
+<div class="dropdown">
+    <!-- Navbar Profile Pill Button with Online Status Dot -->
+    <button class="btn btn-profile-dropdown d-flex align-items-center gap-3 px-2 px-sm-3 py-1 rounded-pill shadow-sm"
+        type="button" id="userProfileDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="width: fit-content;">
+
+        {% set raw_path = user.student_profile.photo_path if user.student_profile and user.student_profile.photo_path else (user.faculty_profile.photo_path if user.faculty_profile and user.faculty_profile.photo_path else None) %}
+        {% set user_photo = raw_path.replace('\\', '/').split('/')[-1] if raw_path else None %}
+
+        <!-- Container for Avatar + Status Dot -->
+        <div class="position-relative d-flex align-items-center">
+            <img src="{{ url_for('static', filename='uploads/faces/' + user_photo) if user_photo else 'https://ui-avatars.com/api/?name=' + user.username|urlencode + '&background=2563eb&color=fff' }}" 
+                 alt="{{ user.username }}"
+                 class="rounded-circle object-fit-cover border border-2 border-primary" width="34" height="34" loading="lazy"
+                 onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name={{ user.username|urlencode }}&background=2563eb&color=fff';">
+            
+            <!-- Tiny Online Status Indicator Dot -->
+            <span class="position-absolute bottom-0 end-0 p-1 bg-success border border-white rounded-circle" style="width: 10px; height: 10px;">
+                <span class="visually-hidden">Online</span>
+            </span>
+        </div>
+
+        <!-- User Name & Role -->
+        <div class="d-none d-sm-flex flex-column text-start me-1">
+            <span class="text-white small fw-bold lh-1">{{ user.username | capitalize }}</span>
+            <span class="text-white-50 extra-small lh-1 mt-1" style="font-size: 0.72rem;">{{ user.role | capitalize }}</span>
+        </div>
+    </button>
+
+    <!-- Bootstrap Popover Menu with Fade-In Animation -->
+    <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 mt-2 py-2" aria-labelledby="userProfileDropdown"
+        style="min-width: 260px; position: absolute;">
+
+        <!-- Dropdown Header: Detailed User Info -->
+        <li class="px-3 py-2 border-bottom mb-2">
+            <div class="d-flex align-items-center gap-3 py-1">
+                <img src="{{ url_for('static', filename='uploads/faces/' + user_photo) if user_photo else 'https://ui-avatars.com/api/?name=' + user.username|urlencode + '&background=2563eb&color=fff' }}" 
+                     alt="{{ user.username }}"
+                     class="rounded-circle object-fit-cover border border-2 border-primary flex-shrink-0" width="48" height="48"
+                     onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name={{ user.username|urlencode }}&background=2563eb&color=fff';">
+                
+                <div class="d-flex flex-column justify-content-center">
+                    <span class="fw-bold text-dark small lh-sm">{{ user.username }}</span>
+                    <span class="text-muted extra-small" style="font-size: 0.75rem;">{{ user.email }}</span>
+                    <span class="badge bg-primary-subtle text-primary mt-1 align-self-start"
+                        style="font-size: 0.65rem;">{{ user.role | capitalize }}</span>
+                </div>
+            </div>
+        </li>
+
+        <!-- Links -->
+        {% if user.role == 'faculty' or user.role == 'staff' %}
+        <li>
+            <a class="dropdown-item py-2 d-flex align-items-center fw-medium small"
+                href="{{ url_for('main.attendance_summary') }}">
+                <i class="fa-solid fa-chart-column me-2 text-primary" style="width: 18px;"></i>Attendance Reports & Summary
+            </a>
+        </li>
+        {% endif %}
+
+        <li>
+            <a class="dropdown-item py-2 d-flex align-items-center text-secondary small" href="#">
+                <i class="fa-solid fa-id-card me-2 text-primary" style="width: 18px;"></i>View & Edit Profile
+            </a>
+        </li>
+        <li>
+            <a class="dropdown-item py-2 d-flex align-items-center text-secondary small" href="#">
+                <i class="fa-solid fa-key me-2 text-warning" style="width: 18px;"></i>Change Password
+            </a>
+        </li>
+        <li>
+            <a class="dropdown-item py-2 d-flex align-items-center text-secondary small" href="#">
+                <i class="fa-solid fa-sliders me-2 text-info" style="width: 18px;"></i>System Settings
+            </a>
+        </li>
+
+        <li>
+            <hr class="dropdown-divider my-2">
+        </li>
+
+        <li>
+            <a class="dropdown-item dropdown-item-danger py-2 d-flex align-items-center text-danger fw-semibold small"
+                href="{{ url_for('auth.logout') }}">
+                <i class="fa-solid fa-right-from-bracket me-2" style="width: 18px;"></i>Sign Out
+            </a>
+        </li>
+    </ul>
+</div>
+{% endblock %}
+
+
+{% block header_actions %}
+<!-- Dummy Menu Items for Demonstration -->
+<!-- Notice we added 'border-0' to make them look like standard text links on desktop -->
+<a href="#" class="btn fw-semibold btn-header border-0 justify-content-start px-3 active">
+    <i class="fa-solid fa-house me-2" style="width: 20px; text-align: center;"></i>Dashboard
+</a>
+
+<a href="#" class="btn fw-semibold btn-header border-0 justify-content-start px-3">
+    <i class="fa-solid fa-bell me-2" style="width: 20px; text-align: center;"></i>Notifications <span class="badge bg-danger ms-2">3</span>
+</a>
+
+<a href="#" class="btn fw-semibold btn-header border-0 justify-content-start px-3">
+    <i class="fa-solid fa-circle-question me-2" style="width: 20px; text-align: center;"></i>Help
+</a>
+{% endblock %}
+
+
+
+{% block content %}
+<div class="main-container">
+  <!-- Left Column: User Verification & System Summary -->
+  <div class="left-panel">
+    <!-- Verification Form -->
+    <div class="card-custom registration-card">
+      <h2>
+        <i class="fa-solid fa-user-check me-2 text-primary"></i>Verification
+        Details
+      </h2>
+      <div>
+        <div class="mb-3">
+          <label for="role" class="form-label text-muted small fw-medium"
+            >Select Role</label
+          >
+          <div class="input-group input-group-sm">
+            <span class="input-group-text bg-light text-muted"
+              ><i class="fa-solid fa-user-shield"></i
+            ></span>
+            <select id="role" class="form-select">
+              <option value="student">Student</option>
+              <option value="teacher">Teacher / Faculty</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="userId" class="form-label text-muted small fw-medium"
+            >ID Number / Roll No.</label
+          >
+          <div class="input-group input-group-sm">
+            <span class="input-group-text bg-light text-muted"
+              ><i class="fa-solid fa-id-badge"></i
+            ></span>
+            <input
+              type="text"
+              id="userId"
+              class="form-control"
+              placeholder="e.g. ST-2026-081"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- System Overview Card -->
+    <div class="card-custom">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h2 class="mb-0">
+          <i class="fa-solid fa-chart-pie me-2 text-primary"></i>System Overview
+        </h2>
+        <a
+          href="{{ url_for('main.attendance_summary') }}"
+          class="btn btn-sm btn-outline-primary py-0 px-2 style-btn-sm"
+          style="font-size: 0.75rem"
+        >
+          <i class="fa-solid fa-arrow-right-to-bracket me-1"></i>Summary
+        </a>
+      </div>
+      <p class="text-muted small mb-0 lh-lg">
+        <strong>Date:</strong> <span id="currentDate">Loading...</span><br />
+        <strong>Operator:</strong> Prof. John Doe<br />
+        <strong>Present Today:</strong> 42 Accounts<br />
+        <strong>System Status:</strong>
+        <span class="text-success fw-semibold"
+          ><i class="fa-solid fa-circle-check me-1"></i>Face Engine Active</span
+        >
+      </p>
+    </div>
+  </div>
+
+  <!-- Right Column: Live Camera Stream -->
+  <div class="right-panel">
+    <div class="card-custom camera-card">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="mb-0">
+          <i class="fa-solid fa-video me-2 text-primary"></i>Live Camera Stream
+        </h2>
+        <div class="status-badge">
+          <span class="status-dot"></span> Camera Active
+        </div>
+      </div>
+
+      <!-- Video Stream Container -->
+      <div class="camera-frame">
+        <div class="scan-overlay"></div>
+        <span class="text-secondary small text-center">
+          <i
+            class="fa-solid fa-camera fa-2x mb-2 d-block mx-auto text-primary"
+          ></i>
+          [ Camera Feed Space ]
+        </span>
+      </div>
+
+      <!-- Action Button -->
+      <div class="mt-2 mb-0">
+        <button
+          class="btn btn-primary fw-semibold w-100 py-2"
+          onclick="
+            showToast(
+              'Face Captured',
+              'Attendance marked successfully!',
+              'success',
+            )
+          "
+        >
+          <i class="fa-solid fa-camera-retro me-2"></i>Capture & Mark Attendance
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block extra_js %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const dateElement = document.getElementById("currentDate");
+    if (dateElement) {
+      const options = { year: "numeric", month: "short", day: "numeric" };
+      dateElement.textContent = new Date().toLocaleDateString("en-US", options);
+    }
+  });
+</script>
+{% endblock %}
