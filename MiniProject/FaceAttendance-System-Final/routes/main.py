@@ -166,9 +166,9 @@ def mark_attendance():
         today_date = date.today()
 
         # Prevent double-marking for the day
-        existing_record = AttendanceRecord.query.filter(
-            AttendanceRecord.user_id == user_account.id,
-            func.date(AttendanceRecord.timestamp) == today_date
+        existing_record = AttendanceRecord.query.filter_by(
+            user_id=user_account.id,
+            date=today_date
         ).first()
 
         # Already Marked (Blue/Info)
