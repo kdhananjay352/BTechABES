@@ -99,27 +99,19 @@ Attendance System{% endblock %} {% block profile_action %}
     {% endif %}
 
     <li>
-      <a
-        class="dropdown-item py-2 d-flex align-items-center text-secondary small"
-        href="#"
-      >
-        <i class="fa-solid fa-id-card me-2 text-primary" style="width: 18px"></i
-        >View & Edit Profile
+      <a class="dropdown-item py-2 d-flex align-items-center text-secondary small" href="{{ url_for('main.profile') }}">
+        <i class="fa-solid fa-id-card me-2 text-primary" style="width: 18px"></i>View & Edit Profile
+      </a>
+    </li>
+    <li>
+      <a class="dropdown-item py-2 d-flex align-items-center text-secondary small" href="{{ url_for('main.change_password') }}">
+        <i class="fa-solid fa-key me-2 text-warning" style="width: 18px"></i>Change Password
       </a>
     </li>
     <li>
       <a
         class="dropdown-item py-2 d-flex align-items-center text-secondary small"
-        href="#"
-      >
-        <i class="fa-solid fa-key me-2 text-warning" style="width: 18px"></i
-        >Change Password
-      </a>
-    </li>
-    <li>
-      <a
-        class="dropdown-item py-2 d-flex align-items-center text-secondary small"
-        href="#"
+        href="{{ url_for('main.system_settings') }}"
       >
         <i class="fa-solid fa-sliders me-2 text-info" style="width: 18px"></i
         >System Settings
@@ -262,7 +254,7 @@ Attendance System{% endblock %} {% block profile_action %}
     </div>
 
     <!-- System Overview Card (Live Data) -->
-<!-- Dynamic System Overview Card -->
+    <!-- Dynamic System Overview Card -->
     <div class="card-custom">
       <!-- 1. SHARED HEADER & DYNAMIC ENGINE STATUS -->
       <!-- Added flexbox back to put the title and badge on the exact same line -->
@@ -364,8 +356,6 @@ Attendance System{% endblock %} {% block profile_action %}
 
     </div>
     <!-- End of Attendance Card -->
-
-
   </div>
 
   <!-- Right Column: Live Camera Stream -->

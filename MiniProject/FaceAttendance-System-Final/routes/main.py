@@ -2,14 +2,19 @@ import os
 import cv2
 import numpy as np
 from datetime import datetime, date
-from flask import Blueprint, render_template, redirect, url_for, request, Response, jsonify, current_app
+from flask import Blueprint, render_template, redirect, url_for, request, Response, jsonify, current_app, flash
 from flask_login import login_required, current_user
 from sqlalchemy import func
+from sqlalchemy.exc import SQLAlchemyError
 from extensions import db
 from models import User, Student, FacultyStaff, AttendanceRecord, Course, Department
-
 # Import your existing custom face detection service
 from services.face_detection import extract_face_encoding
+from flask import render_template, request, flash, redirect, url_for
+from werkzeug.security import check_password_hash, generate_password_hash
+
+
+
 
 main_bp = Blueprint('main', __name__)
 
@@ -327,3 +332,120 @@ def mark_attendance():
     else:
         # -- NO MATCH --
         return jsonify({'status': 'danger', 'title': 'Verification Failed', 'message': 'Face mismatch. You do not match the registered user for this ID.'})
+    
+    
+
+# ==============================================================================
+# PROFILE ROUTE
+# ==============================================================================
+
+@main_bp.route('/profile', methods=['GET', 'POST'])
+@login_required
+def profile():
+    # Determine the correct profile table based on user role
+    if current_user.role == 'student':
+        user_profile = current_user.student_profile
+    else:
+        user_profile = current_user.faculty_profile
+
+    if request.method == 'POST':
+        try:
+            # Update editable fields from the form
+            user_profile.mobile_no = request.form.get('mobile_no', '').strip()
+            user_profile.father_name = request.form.get('father_name', '').strip()
+            user_profile.mother_name = request.form.get('mother_name', '').strip()
+            user_profile.address = request.form.get('address', '').strip()
+            user_profile.city = request.form.get('city', '').strip()
+            user_profile.state = request.form.get('state', '').strip()
+            user_profile.pin_code = request.form.get('pin_code', '').strip()
+
+            db.session.commit()
+            flash('Your profile has been successfully updated.', 'success')
+            return redirect(url_for('main.profile'))
+            
+        except SQLAlchemyError as err:
+            db.session.rollback()
+            flash('Database error occurred while updating profile.', 'danger')
+            print(f"Profile Update Error: {err}")
+
+    # Render template on GET request
+    return render_template('profile.html', user=current_user)
+
+
+# ==============================================================================
+# CHANGE PASSWORD ROUTE
+# ==============================================================================
+
+@main_bp.route('/change-password', methods=['GET', 'POST'])
+@login_required
+def change_password():
+    if request.method == 'POST':
+        current_password = request.form.get('current_password')
+        new_password = request.form.get('new_password')
+        confirm_password = request.form.get('confirm_password')
+
+        # Basic Validation
+        if not current_password or not new_password or not confirm_password:
+            flash('All fields are required.', 'warning')
+            return redirect(url_for('main.change_password'))
+
+        # Verify new passwords match
+        if new_password != confirm_password:
+            flash('New passwords do not match. Please try again.', 'danger')
+            return redirect(url_for('main.change_password'))
+
+        # Verify current password is correct (Updated to password_hash)
+        if not check_password_hash(current_user.password_hash, current_password):
+            flash('The current password you entered is incorrect.', 'danger')
+            return redirect(url_for('main.change_password'))
+            
+        # Prevent reusing the same password (Updated to password_hash)
+        if check_password_hash(current_user.password_hash, new_password):
+            flash('Your new password must be different from your current password.', 'warning')
+            return redirect(url_for('main.change_password'))
+
+        # Update and hash the new password (Updated to password_hash)
+        try:
+            current_user.password_hash = generate_password_hash(new_password)
+            db.session.commit()
+            flash('Your password has been successfully updated! Please use it for future logins.', 'success')
+            return redirect(url_for('main.attendance')) # Redirect to profile on success
+            
+        except Exception as e:
+            db.session.rollback()
+            flash('A database error occurred. Please try again.', 'danger')
+            print(f"Password Change Error: {e}")
+
+    return render_template('change_password.html')
+
+
+# ==============================================================================
+# system setting 
+# ==============================================================================
+
+@main_bp.route('/settings', methods=['GET', 'POST'])
+@login_required
+def system_settings():
+    role = current_user.role.lower() if current_user.role else 'student'
+
+    if request.method == 'POST':
+        # Restrict students from saving system-level configurations
+        if role == 'student':
+            flash('Permission Denied: Students cannot modify system settings.', 'danger')
+            return redirect(url_for('main.system_settings'))
+
+        # Handle saving logic for Admin/Faculty here...
+        flash('Settings have been successfully updated.', 'success')
+        return redirect(url_for('main.system_settings'))
+
+    current_settings = {
+        'ai_threshold': 18.0,
+        'camera_source': '0',
+        'shift_duration': 8.5,
+        'cooldown_mins': 5,
+        'session_timeout': 10,
+        'maintenance_mode': False,
+        'email_notifications': True
+    }
+
+    return render_template('system_settings.html', settings=current_settings, role=role)

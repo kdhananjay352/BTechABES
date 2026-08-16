@@ -1,0 +1,204 @@
+{% extends "base.html" %}
+
+{% block title %}My Profile - Smart Attendance System{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* 1. Lock the whole screen to exactly the monitor height */
+    body {
+        height: 100vh !important;
+        overflow: hidden !important;
+    }
+    
+    /* 2. Turn the main area into a frozen flex container */
+    main {
+        overflow: hidden !important;
+        display: flex;
+        flex-direction: column;
+    }
+</style>
+{% endblock %}
+
+{% block header_actions %}
+<a href="{{ url_for('main.attendance') }}" class="btn fw-semibold btn-header border-0 justify-content-start px-3 text-white">
+  <i class="fa-solid fa-house me-2" style="width: 20px; text-align: center"></i>Dashboard
+</a>
+<a href="#" class="btn fw-semibold btn-header border-0 justify-content-start px-3 active">
+  <i class="fa-solid fa-id-card me-2" style="width: 20px; text-align: center"></i>My Profile
+</a>
+{% endblock %}
+
+{% block content %}
+<!-- CONTAINER: Fills the main area completely -->
+<div class="container-fluid py-4 px-md-4 d-flex flex-column flex-grow-1 overflow-hidden">
+    
+    <!-- PAGE TITLE & GLOBAL ACTIONS: Locked (Will not shrink or scroll) -->
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-shrink-0">
+        <h2 class="h4 fw-bold text-dark mb-0">
+            <i class="fa-solid fa-user-gear text-primary me-2"></i>Profile Settings
+        </h2>
+        
+        <!-- MOVED SAVE BUTTON: Links to the form below via form="profileForm" -->
+        <button type="submit" form="profileForm" class="btn btn-primary px-4 fw-semibold shadow-sm">
+            <i class="fa-solid fa-floppy-disk me-2"></i>Save Changes
+        </button>
+    </div>
+
+    {% set profile = current_user.student_profile if current_user.role == 'student' else current_user.faculty_profile %}
+    {% set raw_path = profile.photo_path if profile else None %}
+    {% set user_photo = raw_path.replace('\\', '/').split('/')[-1] if raw_path else None %}
+
+    <!-- ROW: Fills the remaining space below the title -->
+    <div class="row g-4 flex-grow-1 overflow-hidden">
+        
+        <!-- LEFT COLUMN: Static Avatar -->
+        <div class="col-lg-4 col-xl-3 h-100 overflow-y-auto pb-3">
+            <div class="card shadow-sm border-0 rounded-4 overflow-hidden mb-4">
+                <div class="bg-dark pt-5 pb-4 px-3 text-center position-relative" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%)">
+                    <img src="{{ url_for('static', filename='uploads/faces/' + user_photo) if user_photo else 'https://ui-avatars.com/api/?name=' + current_user.username|urlencode + '&background=2563eb&color=fff' }}" 
+                         alt="Profile Photo" 
+                         class="rounded-circle object-fit-cover border border-4 border-white shadow bg-white"
+                         style="width: 120px; height: 120px; margin-top: -20px;"
+                         onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name={{ current_user.username|urlencode }}&background=2563eb&color=fff';">
+                    
+                    <h5 class="text-white fw-bold mt-3 mb-1">{{ profile.full_name | default(current_user.username) | title }}</h5>
+                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-1 rounded-pill">{{ current_user.role | title }}</span>
+                </div>
+                
+                <div class="card-body p-0">
+                    <ul class="list-group list-group-flush small">
+                        <li class="list-group-item px-4 py-3 d-flex justify-content-between align-items-center">
+                            <span class="text-muted fw-medium"><i class="fa-solid fa-at me-2 text-secondary"></i>Username</span>
+                            <span class="fw-bold text-dark">{{ current_user.username }}</span>
+                        </li>
+                        <li class="list-group-item px-4 py-3 d-flex justify-content-between align-items-center">
+                            <span class="text-muted fw-medium"><i class="fa-solid fa-shield-check me-2 text-success"></i>Account Status</span>
+                            <span class="badge bg-success">Active</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Face Data Info Card -->
+            <div class="alert alert-info border-info shadow-sm rounded-4 d-flex gap-3 align-items-start p-3 small mb-0">
+                <i class="fa-solid fa-face-viewfinder fa-2x text-info mt-1"></i>
+                <div>
+                    <strong class="d-block mb-1 text-dark">Biometric Link Active</strong>
+                    <span class="text-muted" style="font-size: 0.8rem;">Your 512-d facial embedding is securely encrypted and linked to this account for terminal verification.</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: The Scrollable Form -->
+        <div class="col-lg-8 col-xl-9 h-100 pb-3">
+            
+            <!-- ADDED id="profileForm" so the top button can trigger it -->
+            <form id="profileForm" action="{{ url_for('main.profile') }}" method="POST" class="card shadow-sm border-0 rounded-4 h-100 d-flex flex-column">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token else '' }}" />
+                
+                <!-- FIXED CARD HEADER -->
+                <div class="card-header bg-white border-bottom p-4 flex-shrink-0 rounded-top-4">
+                    <h5 class="mb-0 fw-bold text-dark">Personal Information</h5>
+                </div>
+                
+                <!-- SCROLLABLE CARD BODY (Now rounds at the bottom since the footer is gone) -->
+                <div class="card-body p-4 overflow-y-auto flex-grow-1 rounded-bottom-4">
+                    
+                    <!-- Read-Only Institutional Fields -->
+                    <h6 class="text-muted fw-bold mb-3 small text-uppercase spacing-1">Institutional Details (Locked)</h6>
+                    <div class="row g-3 mb-4 bg-light p-3 rounded-3 border">
+                        <div class="col-md-6">
+                            <label class="form-label text-muted small fw-bold mb-1">
+                                <i class="fa-solid fa-lock me-1" style="font-size: 0.7rem;"></i>{% if current_user.role == 'student' %}Roll Number{% else %}Employee ID{% endif %}
+                            </label>
+                            <input type="text" class="form-control text-secondary fw-bold border-secondary border-opacity-25" 
+                                   style="background-color: #e2e8f0; cursor: not-allowed;"
+                                   value="{{ profile.roll_no if current_user.role == 'student' else profile.employee_id }}" disabled readonly>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-muted small fw-bold mb-1">
+                                <i class="fa-solid fa-lock me-1" style="font-size: 0.7rem;"></i>{% if current_user.role == 'student' %}Branch / Course{% else %}Department{% endif %}
+                            </label>
+                            <input type="text" class="form-control text-secondary fw-bold border-secondary border-opacity-25" 
+                                   style="background-color: #e2e8f0; cursor: not-allowed;"
+                                   value="{{ profile.course_info.name if current_user.role == 'student' and profile.course_info else (profile.department_info.name if profile.department_info else '') }}" disabled readonly>
+                        </div>
+                        <div class="col-12 mt-2">
+                            <span class="text-danger" style="font-size: 0.75rem;"><i class="fa-solid fa-circle-info me-1"></i>Please contact the IT Administration desk to change institutional identifiers.</span>
+                        </div>
+                    </div>
+
+                    <!-- Editable Personal Fields -->
+                    <h6 class="text-muted fw-bold mb-3 small text-uppercase spacing-1">Contact & Demographics</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-12">
+                            <label for="email" class="form-label small fw-medium text-dark">Email Address <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light text-muted"><i class="fa-solid fa-envelope"></i></span>
+                                <input type="email" class="form-control" id="email" name="email" value="{{ current_user.email }}" required>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="mobile_no" class="form-label small fw-medium text-dark">Mobile Number <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light text-muted"><i class="fa-solid fa-phone"></i></span>
+                                <input type="tel" class="form-control" id="mobile_no" name="mobile_no" value="{{ profile.mobile_no }}" required>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="dob" class="form-label small fw-medium text-dark">Date of Birth</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light text-muted"><i class="fa-solid fa-calendar"></i></span>
+                                <input type="date" class="form-control bg-light text-muted" id="dob" value="{{ profile.dob }}" disabled>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="father_name" class="form-label small fw-medium text-dark">Father's Name</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light text-muted"><i class="fa-solid fa-user-tie"></i></span>
+                                <input type="text" class="form-control" id="father_name" name="father_name" value="{{ profile.father_name }}">
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="mother_name" class="form-label small fw-medium text-dark">Mother's Name</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light text-muted"><i class="fa-solid fa-user-large"></i></span>
+                                <input type="text" class="form-control" id="mother_name" name="mother_name" value="{{ profile.mother_name }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <h6 class="text-muted fw-bold mb-3 small text-uppercase spacing-1">Residential Address</h6>
+                    <div class="row g-3 mb-2">
+                        <div class="col-12">
+                            <label for="address" class="form-label small fw-medium text-dark">Full Address</label>
+                            <textarea class="form-control" id="address" name="address" rows="2">{{ profile.address }}</textarea>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <label for="city" class="form-label small fw-medium text-dark">City</label>
+                            <input type="text" class="form-control" id="city" name="city" value="{{ profile.city }}">
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <label for="state" class="form-label small fw-medium text-dark">State</label>
+                            <input type="text" class="form-control" id="state" name="state" value="{{ profile.state }}">
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="pin_code" class="form-label small fw-medium text-dark">Pincode</label>
+                            <input type="text" class="form-control" id="pin_code" name="pin_code" value="{{ profile.pin_code }}">
+                        </div>
+                    </div>
+                </div>
+
+            </form>
+            
+        </div>
+    </div>
+</div>
+{% endblock %}

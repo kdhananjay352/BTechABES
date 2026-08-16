@@ -33,8 +33,8 @@
 
     {% block extra_css %}{% endblock %}
   </head>
-
-  <body>
+<!-- class="d-flex flex-column min-vh-100 bg-light" -->
+  <body class="bg-light">
     <!-- Header Section -->
     <header class="navbar navbar-expand-lg navbar-dark px-3 px-md-4">
       <div
@@ -123,10 +123,21 @@
     {% include 'components/toast.html' %}
 
     <!-- Main Workspace Block -->
-    {% block content %}{% endblock %}
+
+    <!-- Main Content Area class="flex-grow-1" -->
+    <!-- <main > -->
+        {% block content %}{% endblock %}
+    <!-- </main> -->
 
     <!-- Footer Section -->
-    <footer>&copy; 2026 Smart Attendance System | All Rights Reserved</footer>
+    <!-- <footer>&copy; 2026 Smart Attendance System | All Rights Reserved</footer> -->
+<!-- Footer Section: mt-auto is ready for when flexbox is active -->
+    <footer class="py-3 w-100 text-center text-white mt-auto" style="background-color: #0f172a;">
+        <div class="container small text-white-50">
+            &copy; 2026 Smart Attendance System | All Rights Reserved
+        </div>
+    </footer>
+
 
     <!-- Bootstrap JS Bundle & Common App JS -->
     <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>

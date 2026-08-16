@@ -11,6 +11,11 @@ from extensions import db
 from models import User, Student, FacultyStaff, Department, Course
 from services.face_detection import extract_face_encoding, save_encoding
 from sqlalchemy.exc import SQLAlchemyError
+from werkzeug.security import generate_password_hash
+from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadTimeSignature
+
+
+
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -331,6 +336,75 @@ def logout():
     logout_user()
     flash('You have been signed out successfully.', 'info')
     return redirect(url_for('auth.login'))
+
+
+
+
+# Helper function to get the serializer
+def get_reset_serializer():
+    # Uses your app's SECRET_KEY to encrypt the token
+    return URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
+
+@auth_bp.route('/forgot-password', methods=['GET', 'POST'])
+def forgot_password():
+    if request.method == 'POST':
+        email = request.form.get('email', '').strip().lower()
+        user = User.query.filter_by(email=email).first()
+
+        if user:
+            # 1. Generate a secure token valid for 3600 seconds (1 hour)
+            s = get_reset_serializer()
+            token = s.dumps(user.email, salt='password-reset-salt')
+            
+            # 2. Create the reset link
+            reset_link = url_for('auth.reset_password', token=token, _external=True)
+            
+            # 3. TODO: Send the email!
+            # You will need to configure Flask-Mail or an API like SendGrid here.
+            print(f"DEBUG: Send this link to {user.email}: {reset_link}")
+            
+        # Security Best Practice: Always show the same success message whether the 
+        # email exists or not, to prevent hackers from "guessing" valid emails.
+        flash('If an account with that email exists, a password reset link has been sent.', 'info')
+        return redirect(url_for('auth.login'))
+
+    return render_template('forgot_password.html')
+
+@auth_bp.route('/reset-password/<token>', methods=['GET', 'POST'])
+def reset_password(token):
+    s = get_reset_serializer()
+    try:
+        # Try to decode the token. max_age=3600 means it expires in 1 hour.
+        email = s.loads(token, salt='password-reset-salt', max_age=3600)
+    except SignatureExpired:
+        flash('The password reset link has expired. Please request a new one.', 'danger')
+        return redirect(url_for('auth.forgot_password'))
+    except BadTimeSignature:
+        flash('Invalid password reset link.', 'danger')
+        return redirect(url_for('auth.forgot_password'))
+
+    # If we get here, the token is valid! Find the user.
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        flash('User not found.', 'danger')
+        return redirect(url_for('auth.login'))
+
+    if request.method == 'POST':
+        new_password = request.form.get('new_password')
+        confirm_password = request.form.get('confirm_password')
+
+        if not new_password or new_password != confirm_password:
+            flash('Passwords do not match.', 'danger')
+            return render_template('reset_password.html', token=token)
+
+        # Hash new password and save
+        user.password = generate_password_hash(new_password)
+        db.session.commit()
+        
+        flash('Your password has been reset successfully! You can now log in.', 'success')
+        return redirect(url_for('auth.login'))
+
+    return render_template('reset_password.html', token=token)
 
 
 # ==============================================================================
