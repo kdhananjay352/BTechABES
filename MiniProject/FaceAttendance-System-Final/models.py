@@ -1,15 +1,11 @@
-from datetime import datetime
+from datetime import datetime, date
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from extensions import db, login_manager
-from datetime import datetime, date
-from extensions import db
 
 # ==============================================================================
 # 1. CORE AUTHENTICATION USER MODEL
 # ==============================================================================
-
-
 class User(UserMixin, db.Model):
     """Core authentication user model."""
     __tablename__ = 'users'
@@ -42,32 +38,55 @@ class User(UserMixin, db.Model):
         self.password_updated_at = datetime.utcnow()
 
     def check_password(self, password):
-        """Check if the provided password matches the user's password.
-
-        Args:
-            password (_type_): _description_
-
-        Returns:
-            _type_: _description_
-        """
+        """Check if the provided password matches the user's password."""
         return check_password_hash(self.password_hash, password)
 
 
 # ==============================================================================
-# 2. STUDENT PROFILE ENTITY
+# 2. REFERENCE TABLES (Departments & Courses)
+# ==============================================================================
+class Department(db.Model):
+    """Department model for standardizing faculty departments and course groupings."""
+    __tablename__ = 'departments'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), unique=True, nullable=False)
+    
+    # Relationships
+    courses = db.relationship('Course', backref='department', lazy=True, cascade="all, delete-orphan")
+    faculty_members = db.relationship('FacultyStaff', backref='department_info', lazy=True)
+
+
+class Course(db.Model):
+    """Course model for standardizing student branches and admission types."""
+    __tablename__ = 'courses'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)  # e.g., "B.Tech - CSE"
+    course_type = db.Column(db.String(50), nullable=False)  # e.g., "Regular", "Lateral Entry"
+    department_id = db.Column(db.Integer, db.ForeignKey('departments.id'), nullable=False)
+    
+    # Relationships
+    students = db.relationship('Student', backref='course_info', lazy=True)
+
+
+# ==============================================================================
+# 3. STUDENT PROFILE ENTITY
 # ==============================================================================
 class Student(db.Model):
     """Student profile model for storing student information."""
     __tablename__ = 'students'
 
-    student_id = db.Column(db.Integer, db.ForeignKey(
-        'users.id'), primary_key=True)
+    student_id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
     roll_no = db.Column(db.String(50), unique=True, nullable=False)
     admission_no = db.Column(db.String(50), unique=True, nullable=False)
     full_name = db.Column(db.String(100), nullable=False)
     gender = db.Column(db.String(15), nullable=False)
     dob = db.Column(db.Date, nullable=False)
-    branch = db.Column(db.String(100), nullable=False)
+    
+    # Replaced 'branch' string with a Foreign Key to the Course table
+    course_id = db.Column(db.Integer, db.ForeignKey('courses.id'), nullable=False)
+    
     session = db.Column(db.String(20), nullable=False)
     mobile_no = db.Column(db.String(15), nullable=False)
     father_name = db.Column(db.String(100), nullable=False)
@@ -82,23 +101,21 @@ class Student(db.Model):
 
 
 # ==============================================================================
-# 3. FACULTY & STAFF PROFILE ENTITY
+# 4. FACULTY & STAFF PROFILE ENTITY
 # ==============================================================================
 class FacultyStaff(db.Model):
-    """FacultyStaff model for storing faculty staff information
-
-    Args:
-        db (_type_): _description_
-    """
+    """FacultyStaff model for storing faculty staff information."""
     __tablename__ = 'faculty_staff'
 
-    staff_id = db.Column(db.Integer, db.ForeignKey(
-        'users.id'), primary_key=True)
+    staff_id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
     employee_id = db.Column(db.String(50), unique=True, nullable=False)
     full_name = db.Column(db.String(100), nullable=False)
     gender = db.Column(db.String(15), nullable=False)
     dob = db.Column(db.Date, nullable=False)
-    department = db.Column(db.String(100), nullable=False)
+    
+    # Replaced 'department' string with a Foreign Key to the Department table
+    department_id = db.Column(db.Integer, db.ForeignKey('departments.id'), nullable=False)
+    
     designation = db.Column(db.String(100), nullable=False)
     mobile_no = db.Column(db.String(15), nullable=False)
     father_name = db.Column(db.String(100), nullable=False)
@@ -113,30 +130,20 @@ class FacultyStaff(db.Model):
 
 
 # ==============================================================================
-# 4. ATTENDANCE RECORD ENTITY
-# ==============================================================================
-# ==============================================================================
-# 4. ATTENDANCE RECORD ENTITY
+# 5. ATTENDANCE RECORD ENTITY
 # ==============================================================================
 class AttendanceRecord(db.Model):
     """Attendance record model for storing time-in/time-out attendance information."""
-
     __tablename__ = 'attendance_records'
 
     id = db.Column(db.Integer, primary_key=True)
-    # Ensure this matches your actual user table name (e.g., 'users.id' or 'user.id')
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-
     verification_method = db.Column(db.String(50), default='Face AI')
     status = db.Column(db.String(50), default='Present')
-    marked_by_operator_id = db.Column(
-        db.Integer, db.ForeignKey('users.id'), nullable=True)
-
-    # Replaced single timestamp with specific IN and OUT tracking
+    marked_by_operator_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
     date = db.Column(db.Date, default=date.today)
     time_in = db.Column(db.DateTime, default=datetime.now)
     time_out = db.Column(db.DateTime, nullable=True)
-    # Stores the calculated hours
     total_hours = db.Column(db.Float, nullable=True)
 
 

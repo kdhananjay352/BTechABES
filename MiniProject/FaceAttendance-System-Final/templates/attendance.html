@@ -2,8 +2,14 @@
 Attendance System{% endblock %} {% block profile_action %}
 <div class="dropdown">
   <!-- Navbar Profile Pill Button with Online Status Dot -->
-  <button class="btn btn-profile-dropdown d-flex align-items-center gap-3 px-2 px-sm-3 py-1 rounded-pill shadow-sm"
-    type="button" id="userProfileDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="width: fit-content">
+  <button
+    class="btn btn-profile-dropdown d-flex align-items-center gap-3 px-2 px-sm-3 py-1 rounded-pill shadow-sm"
+    type="button"
+    id="userProfileDropdown"
+    data-bs-toggle="dropdown"
+    aria-expanded="false"
+    style="width: fit-content"
+  >
     {% set raw_path = user.student_profile.photo_path if user.student_profile
     and user.student_profile.photo_path else (user.faculty_profile.photo_path if
     user.faculty_profile and user.faculty_profile.photo_path else None) %} {%
@@ -14,41 +20,64 @@ Attendance System{% endblock %} {% block profile_action %}
     <div class="position-relative d-flex align-items-center">
       <img
         src="{{ url_for('static', filename='uploads/faces/' + user_photo) if user_photo else 'https://ui-avatars.com/api/?name=' + user.username|urlencode + '&background=2563eb&color=fff' }}"
-        alt="{{ user.username }}" class="rounded-circle object-fit-cover border border-2 border-primary" width="34"
-        height="34" loading="lazy"
-        onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name={{ user.username|urlencode }}&background=2563eb&color=fff';" />
+        alt="{{ user.username }}"
+        class="rounded-circle object-fit-cover border border-2 border-primary"
+        width="34"
+        height="34"
+        loading="lazy"
+        onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name={{ user.username|urlencode }}&background=2563eb&color=fff';"
+      />
 
       <!-- Tiny Online Status Indicator Dot -->
-      <span class="position-absolute bottom-0 end-0 p-1 bg-success border border-white rounded-circle"
-        style="width: 10px; height: 10px">
+      <span
+        class="position-absolute bottom-0 end-0 p-1 bg-success border border-white rounded-circle"
+        style="width: 10px; height: 10px"
+      >
         <span class="visually-hidden">Online</span>
       </span>
     </div>
 
     <!-- User Name & Role -->
     <div class="d-none d-sm-flex flex-column text-start me-1">
-      <span class="text-white small fw-bold lh-1">{{ user.username | capitalize }}</span>
-      <span class="text-white-50 extra-small lh-1 mt-1" style="font-size: 0.72rem">{{ user.role | capitalize }}</span>
+      <span class="text-white small fw-bold lh-1"
+        >{{ user.username | capitalize }}</span
+      >
+      <span
+        class="text-white-50 extra-small lh-1 mt-1"
+        style="font-size: 0.72rem"
+        >{{ user.role | capitalize }}</span
+      >
     </div>
   </button>
 
   <!-- Bootstrap Popover Menu with Fade-In Animation -->
-  <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 mt-2 py-2" aria-labelledby="userProfileDropdown"
-    style="min-width: 260px; position: absolute">
+  <ul
+    class="dropdown-menu dropdown-menu-end shadow-lg border-0 mt-2 py-2"
+    aria-labelledby="userProfileDropdown"
+    style="min-width: 260px; position: absolute"
+  >
     <!-- Dropdown Header: Detailed User Info -->
     <li class="px-3 py-2 border-bottom mb-2">
       <div class="d-flex align-items-center gap-3 py-1">
         <img
           src="{{ url_for('static', filename='uploads/faces/' + user_photo) if user_photo else 'https://ui-avatars.com/api/?name=' + user.username|urlencode + '&background=2563eb&color=fff' }}"
-          alt="{{ user.username }}" class="rounded-circle object-fit-cover border border-2 border-primary flex-shrink-0"
-          width="48" height="48"
-          onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name={{ user.username|urlencode }}&background=2563eb&color=fff';" />
+          alt="{{ user.username }}"
+          class="rounded-circle object-fit-cover border border-2 border-primary flex-shrink-0"
+          width="48"
+          height="48"
+          onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name={{ user.username|urlencode }}&background=2563eb&color=fff';"
+        />
 
         <div class="d-flex flex-column justify-content-center">
           <span class="fw-bold text-dark small lh-sm">{{ user.username }}</span>
-          <span class="text-muted extra-small" style="font-size: 0.75rem">{{ user.email }}</span>
-          <span class="badge bg-primary-subtle text-primary mt-1 align-self-start" style="font-size: 0.65rem">{{
-            user.role | capitalize }}</span>
+          <span class="text-muted extra-small" style="font-size: 0.75rem"
+            >{{ user.email }}</span
+          >
+          <span
+            class="badge bg-primary-subtle text-primary mt-1 align-self-start"
+            style="font-size: 0.65rem"
+            >{{ user.role | capitalize }}</span
+          >
         </div>
       </div>
     </li>
@@ -56,26 +85,44 @@ Attendance System{% endblock %} {% block profile_action %}
     <!-- Links -->
     {% if user.role == 'faculty' or user.role == 'staff' %}
     <li>
-      <a class="dropdown-item py-2 d-flex align-items-center fw-medium small"
-        href="{{ url_for('main.attendance_summary') }}">
-        <i class="fa-solid fa-chart-column me-2 text-primary" style="width: 18px"></i>Attendance Reports & Summary
+      <a
+        class="dropdown-item py-2 d-flex align-items-center fw-medium small"
+        href="{{ url_for('main.attendance_summary') }}"
+      >
+        <i
+          class="fa-solid fa-chart-column me-2 text-primary"
+          style="width: 18px"
+        ></i
+        >Attendance Reports & Summary
       </a>
     </li>
     {% endif %}
 
     <li>
-      <a class="dropdown-item py-2 d-flex align-items-center text-secondary small" href="#">
-        <i class="fa-solid fa-id-card me-2 text-primary" style="width: 18px"></i>View & Edit Profile
+      <a
+        class="dropdown-item py-2 d-flex align-items-center text-secondary small"
+        href="#"
+      >
+        <i class="fa-solid fa-id-card me-2 text-primary" style="width: 18px"></i
+        >View & Edit Profile
       </a>
     </li>
     <li>
-      <a class="dropdown-item py-2 d-flex align-items-center text-secondary small" href="#">
-        <i class="fa-solid fa-key me-2 text-warning" style="width: 18px"></i>Change Password
+      <a
+        class="dropdown-item py-2 d-flex align-items-center text-secondary small"
+        href="#"
+      >
+        <i class="fa-solid fa-key me-2 text-warning" style="width: 18px"></i
+        >Change Password
       </a>
     </li>
     <li>
-      <a class="dropdown-item py-2 d-flex align-items-center text-secondary small" href="#">
-        <i class="fa-solid fa-sliders me-2 text-info" style="width: 18px"></i>System Settings
+      <a
+        class="dropdown-item py-2 d-flex align-items-center text-secondary small"
+        href="#"
+      >
+        <i class="fa-solid fa-sliders me-2 text-info" style="width: 18px"></i
+        >System Settings
       </a>
     </li>
 
@@ -84,32 +131,48 @@ Attendance System{% endblock %} {% block profile_action %}
     </li>
 
     <li>
-      <a class="dropdown-item dropdown-item-danger py-2 d-flex align-items-center text-danger fw-semibold small"
-        href="{{ url_for('auth.logout') }}">
-        <i class="fa-solid fa-right-from-bracket me-2" style="width: 18px"></i>Sign Out
+      <a
+        class="dropdown-item dropdown-item-danger py-2 d-flex align-items-center text-danger fw-semibold small"
+        href="{{ url_for('auth.logout') }}"
+      >
+        <i class="fa-solid fa-right-from-bracket me-2" style="width: 18px"></i
+        >Sign Out
       </a>
     </li>
   </ul>
 </div>
-{% endblock %}
+{% endblock %} 
 
 {% block header_actions %}
 <!-- Dummy Menu Items for Demonstration -->
 <!-- Notice we added 'border-0' to make them look like standard text links on desktop -->
-<a href="#" class="btn fw-semibold btn-header border-0 justify-content-start px-3 active">
-  <i class="fa-solid fa-house me-2" style="width: 20px; text-align: center"></i>Dashboard
+<a
+  href="#"
+  class="btn fw-semibold btn-header border-0 justify-content-start px-3 active"
+>
+  <i class="fa-solid fa-house me-2" style="width: 20px; text-align: center"></i
+  >Dashboard
 </a>
 
-<a href="#" class="btn fw-semibold btn-header border-0 justify-content-start px-3">
-  <i class="fa-solid fa-bell me-2" style="width: 20px; text-align: center"></i>Notifications <span
-    class="badge bg-danger ms-2">3</span>
+<a
+  href="#"
+  class="btn fw-semibold btn-header border-0 justify-content-start px-3"
+>
+  <i class="fa-solid fa-bell me-2" style="width: 20px; text-align: center"></i
+  >Notifications <span class="badge bg-danger ms-2">3</span>
 </a>
 
-<a href="#" class="btn fw-semibold btn-header border-0 justify-content-start px-3">
-  <i class="fa-solid fa-circle-question me-2" style="width: 20px; text-align: center"></i>Help
+<a
+  href="#"
+  class="btn fw-semibold btn-header border-0 justify-content-start px-3"
+>
+  <i
+    class="fa-solid fa-circle-question me-2"
+    style="width: 20px; text-align: center"
+  ></i
+  >Help
 </a>
-{% endblock %}
-
+{% endblock %} 
 
 {% block content %}
 <div class="main-container">
@@ -117,79 +180,192 @@ Attendance System{% endblock %} {% block profile_action %}
 
   <!-- Left Column: User Verification & System Summary -->
   <div class="left-panel">
-
     <!-- Jinja logic to extract the ID and Full Name based on the user's role -->
-    {% set user_id_val = '' %}
-    {% set user_name_val = '' %}
-
-    {% if user.role == 'student' and user.student_profile %}
-    {% set user_id_val = user.student_profile.roll_no %}
-    {% set user_name_val = user.student_profile.full_name %}
-    {% elif user.role in ['teacher', 'faculty', 'staff'] and user.faculty_profile %}
-    {% set user_id_val = user.faculty_profile.employee_id %}
-    {% set user_name_val = user.faculty_profile.full_name %}
-    {% endif %}
+    {% set user_id_val = '' %} {% set user_name_val = '' %} {% if user.role ==
+    'student' and user.student_profile %} {% set user_id_val =
+    user.student_profile.roll_no %} {% set user_name_val =
+    user.student_profile.full_name %} {% elif user.role in ['teacher',
+    'faculty', 'staff'] and user.faculty_profile %} {% set user_id_val =
+    user.faculty_profile.employee_id %} {% set user_name_val =
+    user.faculty_profile.full_name %} {% endif %}
 
     <!-- Verification Form (Auto-Filled & Locked) -->
     <div class="card-custom registration-card">
       <h2 class="mb-4">
-        <i class="fa-solid fa-user-lock me-2 text-primary"></i>Verification Details
+        <i class="fa-solid fa-user-lock me-2 text-primary"></i>Verification
+        Details
       </h2>
       <div>
-
         <!-- Role Field -->
         <div class="mb-3">
-          <label for="role" class="form-label text-muted small fw-medium mb-1">Role</label>
+          <label for="role" class="form-label text-muted small fw-medium mb-1"
+            >Role</label
+          >
           <div class="input-group input-group-sm">
-            <span class="input-group-text bg-light text-muted"><i class="fa-solid fa-user-shield"></i></span>
-            <input type="text" id="role" class="form-control bg-light text-muted text-capitalize fw-bold"
-              value="{{ user.role }}" disabled />
+            <span class="input-group-text bg-light text-muted"
+              ><i class="fa-solid fa-user-shield"></i
+            ></span>
+            <input
+              type="text"
+              id="role"
+              class="form-control bg-light text-muted text-capitalize fw-bold"
+              value="{{ user.role }}"
+              disabled
+            />
           </div>
         </div>
 
         <!-- Full Name Field -->
         <div class="mb-3">
-          <label for="userName" class="form-label text-muted small fw-medium mb-1">Name</label>
+          <label
+            for="userName"
+            class="form-label text-muted small fw-medium mb-1"
+            >Name</label
+          >
           <div class="input-group input-group-sm">
-            <span class="input-group-text bg-light text-muted"><i class="fa-solid fa-user"></i></span>
-            <input type="text" id="userName" class="form-control bg-light text-muted fw-bold text-capitalize"
-              value="{{ user_name_val }}" disabled />
+            <span class="input-group-text bg-light text-muted"
+              ><i class="fa-solid fa-user"></i
+            ></span>
+            <input
+              type="text"
+              id="userName"
+              class="form-control bg-light text-muted fw-bold text-capitalize"
+              value="{{ user_name_val }}"
+              disabled
+            />
           </div>
         </div>
 
         <!-- ID Number Field -->
-        <div class="mb-3">
-          <label for="userId" class="form-label text-muted small fw-medium mb-1">Role Number</label>
-          <div class="input-group input-group-sm">
-            <span class="input-group-text bg-light text-muted"><i class="fa-solid fa-id-badge"></i></span>
-            <input type="text" id="userId" class="form-control bg-light text-muted fw-bold" value="{{ user_id_val }}"
-              disabled />
+          <div class="mb-3">
+            <label for="userId" class="form-label text-muted small fw-medium mb-1">
+              {% if user.role in ['teacher', 'faculty', 'staff'] %}
+                Employee ID
+              {% else %}
+                Roll Number
+              {% endif %}
+            </label>
+            <div class="input-group input-group-sm">
+              <span class="input-group-text bg-light text-muted"
+                ><i class="fa-solid fa-id-badge"></i
+              ></span>
+              <input
+                type="text"
+                id="userId"
+                class="form-control bg-light text-muted fw-bold"
+                value="{{ user_id_val }}"
+                disabled
+              />
+            </div>
           </div>
-        </div>
-
       </div>
     </div>
 
     <!-- System Overview Card (Live Data) -->
+<!-- Dynamic System Overview Card -->
     <div class="card-custom">
-      <div class="d-flex justify-content-between align-items-center mb-2">
-        <h2 class="mb-0">
+      <!-- 1. SHARED HEADER & DYNAMIC ENGINE STATUS -->
+      <!-- Added flexbox back to put the title and badge on the exact same line -->
+      <div class="mb-3 border-bottom pb-3 d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 text-dark fw-bold">
           <i class="fa-solid fa-chart-pie me-2 text-primary"></i>System Overview
-        </h2>
-        <a href="{{ url_for('main.attendance_summary') }}" class="btn btn-sm btn-outline-primary py-0 px-2 style-btn-sm"
-          style="font-size: 0.75rem">
-          <i class="fa-solid fa-arrow-right-to-bracket me-1"></i>Summary
-        </a>
+        </h5>
+        <!-- Dynamic Camera/Engine Status Badge -->
+        <span id="engine-status" class="badge bg-secondary text-white px-2 py-1 shadow-sm" style="font-size: 0.70rem;">
+          <i class="fa-solid fa-spinner fa-spin me-1"></i>Initializing...
+        </span>
       </div>
-      <p class="text-muted small mb-0 lh-lg">
-        <strong>Date:</strong> <span id="currentDate">Loading...</span><br />
-        <strong>Session User:</strong> {{ user.username | capitalize }}<br />
-        <strong>Present Today:</strong> <span class="badge bg-primary rounded-pill">{{ present_today }}
-          Accounts</span><br />
-        <strong>System Status:</strong> <span class="text-success fw-semibold"><i
-            class="fa-solid fa-circle-check me-1"></i>Face Engine Active</span>
-      </p>
+
+      <!-- 2. TIME & ATTENDANCE + TOTAL HOURS -->
+      <div class="{% if user.role != 'student' %}mb-3 pb-3 border-bottom{% endif %}">
+        
+        <!-- Header & Date combined cleanly -->
+        <div class="d-flex justify-content-between align-items-end mb-3">
+          <h6 class="text-dark fw-bold mb-0">Time & Attendance</h6>
+          <!-- Stripped the bulky border/background so it looks like sleek metadata -->
+          <span class="fw-semibold text-muted small" id="currentDateDisplay"><i class="fa-regular fa-calendar me-1"></i>Loading...</span> 
+        </div>
+
+        <!-- User's Live Punch Details & Total Hours Badge -->
+        <div class="d-flex flex-wrap gap-2 mb-1">
+          {% if my_attendance %}
+            <span class="badge bg-success px-2 py-1 fw-medium shadow-sm"><i class="fa-solid fa-right-to-bracket me-1"></i>In: {{ my_attendance.time_in.strftime('%I:%M %p') }}</span>
+            {% if my_attendance.time_out %}
+              <span class="badge bg-danger px-2 py-1 fw-medium shadow-sm"><i class="fa-solid fa-right-from-bracket me-1"></i>Out: {{ my_attendance.time_out.strftime('%I:%M %p') }}</span>
+              
+              <!-- Total Hours: Changed to a soft theme-matching blue instead of bright cyan -->
+              {% if my_attendance.total_hours %}
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1 fw-bold shadow-sm"><i class="fa-solid fa-stopwatch me-1"></i>{{ my_attendance.total_hours }} hrs</span>
+              {% endif %}
+
+            {% else %}
+              <span class="badge bg-secondary px-2 py-1 fw-medium shadow-sm"><i class="fa-regular fa-clock me-1"></i>Out: Pending</span>
+            {% endif %}
+          {% else %}
+            <span class="badge bg-secondary px-2 py-1 fw-medium shadow-sm"><i class="fa-solid fa-clock me-1"></i>Not Checked In</span>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- ========================================== -->
+      <!-- 3. ROLE-SPECIFIC EXTRA OPTIONS -->
+      <!-- ========================================== -->
+
+      <!-- A. FACULTY/STAFF VIEW (Department Stats) -->
+      {% if user.role in ['teacher', 'faculty', 'staff'] %}
+      <div class="bg-light border rounded-3 p-3 mt-2">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="small text-dark fw-bold">{{ teacher_stats.department }}</span>
+        </div>
+        <div class="d-flex justify-content-between align-items-center">
+          <span class="text-muted fw-medium small"><i class="fa-solid fa-users me-1 text-primary"></i>Students Present:</span>
+          
+          {% if teacher_stats.branch_students_present > 0 %}
+            <a href="{{ url_for('main.attendance_summary') }}" class="badge bg-primary text-white text-decoration-none px-2 py-1 shadow-sm transition-hover" title="View details">
+              {{ teacher_stats.branch_students_present }} <i class="fa-solid fa-arrow-right ms-1" style="font-size: 0.65rem;"></i>
+            </a>
+          {% else %}
+            <span class="badge bg-secondary text-white px-2 py-1" title="No data available" style="opacity: 0.6; cursor: not-allowed;">0</span>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- B. ADMIN VIEW (Campus Live Stats) -->
+      {% elif user.role == 'admin' %}
+      <div class="bg-light border rounded-3 p-3 mt-2">
+        <div class="d-flex justify-content-between align-items-center mb-3 border-bottom border-secondary border-opacity-25 pb-2">
+           <span class="text-dark fw-bold small">Campus Total:</span>
+           <span class="fw-bold text-dark">{{ admin_stats.total_present }}</span>
+        </div>
+        
+        <div class="d-flex justify-content-between align-items-center mb-2">
+           <span class="text-muted small fw-medium"><i class="fa-solid fa-user-graduate me-1"></i>Students:</span>
+           {% if admin_stats.students_present > 0 %}
+               <a href="{{ url_for('main.attendance_summary', role='student') }}" class="badge bg-primary text-white text-decoration-none px-2 py-1 shadow-sm transition-hover" title="View student details">
+                   {{ admin_stats.students_present }} <i class="fa-solid fa-arrow-right ms-1" style="font-size: 0.65rem;"></i>
+               </a>
+           {% else %}
+               <span class="badge bg-secondary text-white px-2 py-1" title="No data available" style="opacity: 0.6; cursor: not-allowed;">0</span>
+           {% endif %}
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center">
+           <span class="text-muted small fw-medium"><i class="fa-solid fa-user-tie me-1"></i>Faculty:</span>
+           {% if admin_stats.faculty_present > 0 %}
+               <a href="{{ url_for('main.attendance_summary', role='faculty') }}" class="badge bg-primary text-white text-decoration-none px-2 py-1 shadow-sm transition-hover" title="View faculty details">
+                   {{ admin_stats.faculty_present }} <i class="fa-solid fa-arrow-right ms-1" style="font-size: 0.65rem;"></i>
+               </a>
+           {% else %}
+               <span class="badge bg-secondary text-white px-2 py-1" title="No data available" style="opacity: 0.6; cursor: not-allowed;">0</span>
+           {% endif %}
+        </div>
+      </div>
+      {% endif %}
+
     </div>
+    <!-- End of Attendance Card -->
+
+
   </div>
 
   <!-- Right Column: Live Camera Stream -->
@@ -200,13 +376,21 @@ Attendance System{% endblock %} {% block profile_action %}
           <i class="fa-solid fa-video me-2 text-primary"></i>Live Camera Stream
         </h2>
         <!-- Status Badge with IDs for JavaScript control -->
-        <div id="cameraStatusBadge"
+        <div
+          id="cameraStatusBadge"
           class="status-badge d-flex align-items-center gap-2 px-2 py-1 rounded shadow-sm border"
-          style="background: rgba(255,255,255,0.1);">
+          style="background: rgba(255, 255, 255, 0.1)"
+        >
           <!-- Dot defaults to yellow (warning) while connecting -->
-          <span id="cameraStatusDot" class="spinner-grow spinner-grow-sm text-warning" role="status"
-            style="width: 10px; height: 10px;"></span>
-          <span id="cameraStatusText" class="small fw-bold text-warning">Connecting...</span>
+          <span
+            id="cameraStatusDot"
+            class="spinner-grow spinner-grow-sm text-warning"
+            role="status"
+            style="width: 10px; height: 10px"
+          ></span>
+          <span id="cameraStatusText" class="small fw-bold text-warning"
+            >Connecting...</span
+          >
         </div>
       </div>
 
@@ -214,44 +398,53 @@ Attendance System{% endblock %} {% block profile_action %}
       <!-- Added aspect-ratio and rounded corners so it perfectly matches the UI -->
       <div
         class="camera-frame bg-black position-relative overflow-hidden rounded-3 shadow-sm border border-secondary border-opacity-25"
-        style="aspect-ratio: 16/9; width: 100%">
+        style="aspect-ratio: 16/9; width: 100%"
+      >
         <!-- The scanning animation overlay -->
         <div class="scan-overlay"></div>
 
         <!-- Live Camera Feed Image with onload and onerror triggers -->
-        <img src="{{ url_for('main.video_feed') }}" alt="Live Face Recognition Stream" class="w-100 h-100"
-          style="object-fit: cover; object-position: center" id="cameraStream" onload="updateCameraStatus('active')"
-          onerror="updateCameraStatus('error')" />
+        <img
+          src="{{ url_for('main.video_feed') }}"
+          alt="Live Face Recognition Stream"
+          class="w-100 h-100"
+          style="object-fit: cover; object-position: center"
+          id="cameraStream"
+          onload="updateCameraStatus('active')"
+          onerror="updateCameraStatus('error')"
+        />
 
         <!-- Fallback text placeholder if the camera fails to load -->
-        <div id="fallbackStreamText"
+        <div
+          id="fallbackStreamText"
           class="position-absolute top-50 start-50 translate-middle text-center text-secondary small"
-          style="display: none; z-index: 1">
-          <i class="fa-solid fa-camera-slash fa-2x mb-2 d-block mx-auto text-danger"></i>
+          style="display: none; z-index: 1"
+        >
+          <i
+            class="fa-solid fa-camera-slash fa-2x mb-2 d-block mx-auto text-danger"
+          ></i>
           <span class="text-danger fw-semibold">[ Camera Stream Offline ]</span>
         </div>
       </div>
 
       <!-- Action Button triggering capture logic -->
       <div class="mt-2 mb-0">
-        <button id="captureBtn"
+        <button
+          id="captureBtn"
           class="btn btn-primary fw-semibold w-100 py-2 d-flex align-items-center justify-content-center gap-2"
-          onclick="captureAttendance()">
+          onclick="captureAttendance()"
+        >
           <i class="fa-solid fa-camera-retro"></i>Capture & Mark Attendance
         </button>
       </div>
     </div>
   </div>
 </div>
-{% endblock %}
-
-
-
-{% block extra_js %}
+{% endblock %} {% block extra_js %}
 <script>
   document.addEventListener("DOMContentLoaded", function () {
-    // 1. Set Current Date
-    const dateElement = document.getElementById("currentDate");
+    // 1. Set Current Date to the new unified ID
+    const dateElement = document.getElementById("currentDateDisplay");
     if (dateElement) {
       const options = { year: "numeric", month: "short", day: "numeric" };
       dateElement.textContent = new Date().toLocaleDateString("en-US", options);
@@ -268,39 +461,55 @@ Attendance System{% endblock %} {% block profile_action %}
   document.addEventListener("DOMContentLoaded", function () {
     setTimeout(() => {
       if (!cameraConnected) {
-        updateCameraStatus('timeout');
+        updateCameraStatus("timeout");
       }
     }, CAMERA_TIMEOUT_MS);
   });
 
   function updateCameraStatus(status) {
-    const dot = document.getElementById('cameraStatusDot');
-    const text = document.getElementById('cameraStatusText');
-    const badge = document.getElementById('cameraStatusBadge');
+    // Elements for the right panel (Camera Card)
+    const dot = document.getElementById("cameraStatusDot");
+    const text = document.getElementById("cameraStatusText");
+    const badge = document.getElementById("cameraStatusBadge");
+    
+    // Element for the left panel (System Overview Card)
+    const engineBadge = document.getElementById("engine-status");
 
-    if (status === 'active') {
+    if (status === "active") {
       cameraConnected = true; // Prevents the timeout from triggering
-      dot.className = 'bg-success rounded-circle';
-      text.className = 'small fw-bold text-success';
-      text.textContent = 'Camera Active';
-      badge.style.borderColor = 'var(--bs-success)';
-    }
-    else if (status === 'error' || status === 'timeout') {
+      dot.className = "bg-success rounded-circle";
+      text.className = "small fw-bold text-success";
+      text.textContent = "Camera Active";
+      badge.style.borderColor = "var(--bs-success)";
+      
+      // Update the Left Panel Engine Badge
+      if(engineBadge) {
+          engineBadge.className = 'badge bg-success-subtle text-success small border border-success border-opacity-25 px-2 py-1';
+          engineBadge.innerHTML = '<i class="fa-solid fa-circle-check me-1"></i>Engine Active';
+      }
+      
+    } else if (status === "error" || status === "timeout") {
       // Change badge to Red
-      dot.className = 'bg-danger rounded-circle';
-      text.className = 'small fw-bold text-danger';
-      text.textContent = status === 'timeout' ? 'Connection Timeout' : 'Camera Offline';
-      badge.style.borderColor = 'var(--bs-danger)';
+      dot.className = "bg-danger rounded-circle";
+      text.className = "small fw-bold text-danger";
+      text.textContent = status === "timeout" ? "Connection Timeout" : "Camera Offline";
+      badge.style.borderColor = "var(--bs-danger)";
+      
+      // Update the Left Panel Engine Badge
+      if(engineBadge) {
+          engineBadge.className = 'badge bg-danger-subtle text-danger small border border-danger border-opacity-25 px-2 py-1';
+          engineBadge.innerHTML = '<i class="fa-solid fa-triangle-exclamation me-1"></i>Engine Offline';
+      }
 
       // Hide video stream and show interactive error message
-      document.getElementById('cameraStream').style.display = 'none';
-      const fallback = document.getElementById('fallbackStreamText');
-      fallback.style.display = 'block';
+      document.getElementById("cameraStream").style.display = "none";
+      const fallback = document.getElementById("fallbackStreamText");
+      fallback.style.display = "block";
 
       fallback.innerHTML = `
             <i class="fa-solid fa-camera-slash fa-2x mb-2 d-block mx-auto text-danger"></i>
             <span class="text-danger fw-semibold d-block mb-3">
-              [ ${status === 'timeout' ? 'Camera Connection Timed Out' : 'Camera Stream Unavailable'} ]
+              [ ${status === "timeout" ? "Camera Connection Timed Out" : "Camera Stream Unavailable"} ]
             </span>
             <button class="btn btn-sm btn-outline-danger" onclick="window.location.reload()">
               <i class="fa-solid fa-rotate-right me-1"></i> Retry Connection
@@ -309,7 +518,11 @@ Attendance System{% endblock %} {% block profile_action %}
 
       // Show a toast notifying the user
       if (typeof showToast === "function") {
-        showToast("Camera failed to initialize. Please check camera or permissions and try again.", "Hardware Error", "danger");
+        showToast(
+          "Camera failed to initialize. Please check camera or permissions and try again.",
+          "Hardware Error",
+          "danger",
+        );
       }
     }
   }
@@ -317,7 +530,8 @@ Attendance System{% endblock %} {% block profile_action %}
   // ==========================================
   // 2. Handle Capture & Mark Attendance Trigger
   // ==========================================
-  function captureAttendance() {
+  // Notice we added 'forceCheckout = false' as a parameter
+  function captureAttendance(forceCheckout = false) {
     const role = document.getElementById("role").value;
     const userId = document.getElementById("userId").value.trim();
 
@@ -334,33 +548,74 @@ Attendance System{% endblock %} {% block profile_action %}
     let csrfToken = "";
     const metaCsrf = document.querySelector('meta[name="csrf-token"]');
     if (metaCsrf) {
-      csrfToken = metaCsrf.getAttribute('content');
+        csrfToken = metaCsrf.getAttribute('content');
     }
 
     fetch("/api/mark-attendance", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "X-CSRFToken": csrfToken
+        "X-CSRFToken": csrfToken 
       },
-      body: JSON.stringify({ role: role, user_id: userId }),
+      // Pass the override flag to the Python backend
+      body: JSON.stringify({ 
+          role: role, 
+          user_id: userId,
+          confirm_early_out: forceCheckout 
+      }),
     })
       .then(async (response) => {
         const isJson = response.headers.get('content-type')?.includes('application/json');
         const data = isJson ? await response.json() : null;
-
+        
         if (!response.ok) {
-          const errorMsg = (data && data.message) ? data.message : "Server rejected the request (Check CSRF or Console).";
-          throw new Error(errorMsg);
+            const errorMsg = (data && data.message) ? data.message : "Server rejected the request.";
+            throw new Error(errorMsg);
         }
         return data;
       })
       .then((data) => {
+        
+       // ========================================================
+        // INTERCEPT THE EARLY DEPARTURE WARNING
+        // ========================================================
+        if (data.status === 'confirm') {
+            // Use SweetAlert2 instead of the ugly browser popup
+            Swal.fire({
+                title: data.title,
+                text: data.message,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33', // Red for warning
+                cancelButtonColor: '#6c757d', // Grey for cancel
+                confirmButtonText: 'Punch Out',
+                cancelButtonText: 'Stay Logged In'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Re-run with the override flag
+                    captureAttendance(true);
+                } else {
+                    showToast("Punch out cancelled. You are still checked in.", "Action Cancelled", "info");
+                }
+            });
+            
+            return; // Stop the script here
+        }
+        
+        // ========================================================
+        // STANDARD NOTIFICATIONS (Success / Errors)
+        // ========================================================
         const title = data.title || (data.success ? "Success" : "Notice");
-        const msg = data.message || "Action processed, but no message provided.";
+        const msg = data.message || "Action processed.";
         const status = data.status || (data.success ? "success" : "info");
-
+        
         showToast(msg, title, status);
+        // ---> NEW LOGIC: AUTO-REFRESH UI ON SUCCESS <---
+        if (status === 'success') {
+            setTimeout(() => {
+                window.location.reload();
+            }, 1800); // 1.8 seconds gives them just enough time to read the success message
+        }
       })
       .catch((error) => {
         console.error("Backend Error:", error);
@@ -371,5 +626,5 @@ Attendance System{% endblock %} {% block profile_action %}
         btn.innerHTML = originalText;
       });
   }
-</script>
+  </script>
 {% endblock %}

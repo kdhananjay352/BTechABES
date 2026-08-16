@@ -7,10 +7,10 @@ from flask_wtf.csrf import validate_csrf, ValidationError
 from sqlalchemy import func
 from werkzeug.utils import secure_filename
 from extensions import db
-from models import User, Student, FacultyStaff
+# Ensure Department and Course are imported
+from models import User, Student, FacultyStaff, Department, Course
 from services.face_detection import extract_face_encoding, save_encoding
 from sqlalchemy.exc import SQLAlchemyError
-
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -50,9 +50,7 @@ def login():
             return redirect(url_for('auth.login'))
 
         # 4. Role Match Check
-        # Maps form options ('teacher', 'student', 'admin', 'staff') to user's DB role
         if user.role.lower() != selected_role:
-            # Handle teacher/faculty terminology overlap gracefully
             if not (selected_role == 'teacher' and user.role.lower() in ['teacher', 'faculty']):
                 role_label = 'Teacher / Faculty' if selected_role == 'teacher' else selected_role.capitalize()
                 flash(
@@ -97,6 +95,7 @@ def register():
         pin_code = request.form.get('pincode', '').strip()
         address = request.form.get('address', '').strip()
 
+        # Capture dynamic FK IDs instead of strings
         current_draft = {
             'role': role,
             'username': username,
@@ -113,12 +112,12 @@ def register():
             'address': address,
             'roll_no': request.form.get('roll_no', '').strip(),
             'admission_no': request.form.get('admission_no', '').strip(),
-            'branch': request.form.get('branch', ''),
+            'course_id': request.form.get('course_id', ''),
             'session': request.form.get('session', ''),
             'student_qualification': request.form.get('student_qualification', '').strip(),
             'employee_id': request.form.get('employee_id', '').strip(),
             'designation': request.form.get('designation', '').strip(),
-            'department': request.form.get('department', ''),
+            'department_id': request.form.get('department_id', ''),
             'faculty_qualification': request.form.get('faculty_qualification', '').strip()
         }
 
@@ -138,7 +137,7 @@ def register():
             flash('Passwords do not match.', 'danger')
             return redirect(url_for('auth.register', step=1))
 
-        # 2. Date of Birth Validation (Must be >= 17 years old & not future)
+        # 2. Date of Birth Validation
         dob = None
         if dob_str:
             try:
@@ -208,6 +207,9 @@ def register():
             db.session.flush()
 
             if role == 'student':
+                # Convert the course ID to an integer securely
+                course_val = int(current_draft['course_id']) if current_draft.get('course_id') and current_draft['course_id'].isdigit() else None
+                
                 student_profile = Student(
                     student_id=new_user.id,
                     roll_no=current_draft['roll_no'],
@@ -215,7 +217,7 @@ def register():
                     full_name=full_name,
                     gender=gender,
                     dob=dob,
-                    branch=current_draft['branch'],
+                    course_id=course_val,
                     session=current_draft['session'],
                     mobile_no=mobile_no,
                     father_name=father_name,
@@ -231,13 +233,16 @@ def register():
                 db.session.add(student_profile)
 
             elif role in ['faculty', 'staff']:
+                # Convert the department ID to an integer securely
+                dept_val = int(current_draft['department_id']) if current_draft.get('department_id') and current_draft['department_id'].isdigit() else None
+                
                 faculty_profile = FacultyStaff(
                     staff_id=new_user.id,
                     employee_id=current_draft['employee_id'],
                     full_name=full_name,
                     gender=gender,
                     dob=dob,
-                    department=current_draft['department'],
+                    department_id=dept_val,
                     designation=current_draft['designation'],
                     mobile_no=mobile_no,
                     father_name=father_name,
@@ -264,8 +269,12 @@ def register():
                 f'An error occurred during registration: {str(err)}', 'danger')
             return redirect(url_for('auth.register'))
 
+    # Retrieve draft data and fetch the lists to populate HTML dropdowns
     draft_data = session.pop('registration_draft', None)
-    return render_template('register.html', draft_data=draft_data)
+    departments = Department.query.order_by(Department.name).all()
+    courses = Course.query.order_by(Course.name).all()
+    
+    return render_template('register.html', draft_data=draft_data, departments=departments, courses=courses)
 
 
 # ==============================================================================

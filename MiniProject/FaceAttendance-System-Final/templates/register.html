@@ -53,10 +53,9 @@
                             <i class="fa-solid fa-floppy-disk text-warning fa-lg"></i>
                             <div>
                                 <h6 class="mb-0 fw-semibold text-white small">
-                                    Local Draft Auto-Save
+                                    Local Draft Saving
                                 </h6>
-                                <span class="text-secondary extra-small">Progress preserved automatically in local
-                                    session</span>
+                                <span class="text-secondary extra-small">Manually save your progress to local session</span>
                             </div>
                         </div>
                     </div>
@@ -119,8 +118,7 @@
                                     <div class="input-group">
                                         <span class="input-group-text bg-white"><i
                                                 class="fa-solid fa-user-shield text-muted"></i></span>
-                                        <select id="role" name="role" class="form-select"
-                                            onchange="toggleRoleFields(); autoSaveDraft();" required>
+                                        <select id="role" name="role" class="form-select" onchange="toggleRoleFields();" required>
                                             <option value="student" selected>Student</option>
                                             <option value="faculty">Faculty</option>
                                             <option value="staff">Staff</option>
@@ -133,20 +131,16 @@
                                         <label for="username" class="form-label text-muted small fw-medium">Username
                                             <span class="text-danger">*</span></label>
                                         <div class="input-group">
-                                            <span class="input-group-text bg-white"><i
-                                                    class="fa-solid fa-at text-muted"></i></span>
-                                            <input type="text" id="username" name="username" class="form-control"
-                                                placeholder="john_doe" required oninput="autoSaveDraft()" />
+                                            <span class="input-group-text bg-white"><i class="fa-solid fa-at text-muted"></i></span>
+                                            <input type="text" id="username" name="username" class="form-control" placeholder="john_doe" required />
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <label for="email" class="form-label text-muted small fw-medium">Email Address
                                             <span class="text-danger">*</span></label>
                                         <div class="input-group">
-                                            <span class="input-group-text bg-white"><i
-                                                    class="fa-solid fa-envelope text-muted"></i></span>
-                                            <input type="email" id="email" name="email" class="form-control"
-                                                placeholder="john.doe@abes.ac.in" required oninput="autoSaveDraft()" />
+                                            <span class="input-group-text bg-white"><i class="fa-solid fa-envelope text-muted"></i></span>
+                                            <input type="email" id="email" name="email" class="form-control" placeholder="john.doe@abes.ac.in" required />
                                         </div>
                                     </div>
                                 </div>
@@ -157,34 +151,21 @@
                                         <label for="password" class="form-label text-muted small fw-medium">Password
                                             <span class="text-danger">*</span></label>
                                         <div class="input-group">
-                                            <span class="input-group-text bg-white"><i
-                                                    class="fa-solid fa-lock text-muted"></i></span>
-                                            <!-- Added border-end-0 to blend with the eye icon -->
-                                            <input type="password" id="password" name="password"
-                                                class="form-control border-end-0" required oninput="autoSaveDraft()" />
-                                            <!-- Added clickable eye toggle -->
-                                            <span class="input-group-text bg-white bg-transparent"
-                                                onclick="togglePasswordVisibility('password', 'icon-pwd')"
-                                                style="cursor: pointer">
+                                            <span class="input-group-text bg-white"><i class="fa-solid fa-lock text-muted"></i></span>
+                                            <input type="password" id="password" name="password" class="form-control border-end-0" required />
+                                            <span class="input-group-text bg-white bg-transparent" onclick="togglePasswordVisibility('password', 'icon-pwd')" style="cursor: pointer">
                                                 <i class="fa-regular fa-eye-slash text-muted" id="icon-pwd"></i>
                                             </span>
                                         </div>
                                     </div>
                                     <!-- Confirm Password Field -->
                                     <div class="col-md-6">
-                                        <label for="confirm_password"
-                                            class="form-label text-muted small fw-medium">Confirm Password
+                                        <label for="confirm_password" class="form-label text-muted small fw-medium">Confirm Password
                                             <span class="text-danger">*</span></label>
                                         <div class="input-group">
-                                            <span class="input-group-text bg-white"><i
-                                                    class="fa-solid fa-key text-muted"></i></span>
-                                            <!-- Added border-end-0 to blend with the eye icon -->
-                                            <input type="password" id="confirm_password" name="confirm_password"
-                                                class="form-control border-end-0" required oninput="autoSaveDraft()" />
-                                            <!-- Added clickable eye toggle -->
-                                            <span class="input-group-text bg-white bg-transparent"
-                                                onclick="togglePasswordVisibility('confirm_password','icon-confirm-pwd',)"
-                                                style="cursor: pointer">
+                                            <span class="input-group-text bg-white"><i class="fa-solid fa-key text-muted"></i></span>
+                                            <input type="password" id="confirm_password" name="confirm_password" class="form-control border-end-0" required />
+                                            <span class="input-group-text bg-white bg-transparent" onclick="togglePasswordVisibility('confirm_password','icon-confirm-pwd')" style="cursor: pointer">
                                                 <i class="fa-regular fa-eye-slash text-muted" id="icon-confirm-pwd"></i>
                                             </span>
                                         </div>
@@ -197,29 +178,22 @@
                         <div class="step-panel d-none" id="step-2">
                             <div class="bg-light p-3 p-md-4 rounded-3 border mb-3">
                                 <h6 class="fw-bold text-primary mb-3">
-                                    <i class="fa-solid fa-address-card me-2"></i>Step 2: Personal
-                                    Details
+                                    <i class="fa-solid fa-address-card me-2"></i>Step 2: Personal Details
                                 </h6>
 
                                 <div class="row g-3 mb-3">
                                     <div class="col-md-6">
-                                        <label for="full_name" class="form-label text-muted small fw-medium">Full Name
-                                            <span class="text-danger">*</span></label>
+                                        <label for="full_name" class="form-label text-muted small fw-medium">Full Name <span class="text-danger">*</span></label>
                                         <div class="input-group">
-                                            <span class="input-group-text bg-white"><i
-                                                    class="fa-solid fa-user text-muted"></i></span>
-                                            <input type="text" id="full_name" name="full_name" class="form-control"
-                                                placeholder="John Doe" required oninput="autoSaveDraft()" />
+                                            <span class="input-group-text bg-white"><i class="fa-solid fa-user text-muted"></i></span>
+                                            <input type="text" id="full_name" name="full_name" class="form-control" placeholder="John Doe" required />
                                         </div>
                                     </div>
                                     <div class="col-md-3">
-                                        <label for="gender" class="form-label text-muted small fw-medium">Gender <span
-                                                class="text-danger">*</span></label>
+                                        <label for="gender" class="form-label text-muted small fw-medium">Gender <span class="text-danger">*</span></label>
                                         <div class="input-group">
-                                            <span class="input-group-text bg-white"><i
-                                                    class="fa-solid fa-venus-mars text-muted"></i></span>
-                                            <select id="gender" name="gender" class="form-select" required
-                                                onchange="autoSaveDraft()">
+                                            <span class="input-group-text bg-white"><i class="fa-solid fa-venus-mars text-muted"></i></span>
+                                            <select id="gender" name="gender" class="form-select" required>
                                                 <option value="Male" selected>Male</option>
                                                 <option value="Female">Female</option>
                                                 <option value="Other">Other</option>
@@ -227,92 +201,67 @@
                                         </div>
                                     </div>
                                     <div class="col-md-3">
-                                        <label for="dob" class="form-label text-muted small fw-medium">Date of Birth
-                                            <span class="text-danger">*</span></label>
+                                        <label for="dob" class="form-label text-muted small fw-medium">Date of Birth <span class="text-danger">*</span></label>
                                         <div class="input-group">
-                                            <span class="input-group-text bg-white"><i
-                                                    class="fa-solid fa-calendar text-muted"></i></span>
-                                            <input type="date" id="dob" name="dob" class="form-control" required
-                                                onchange="autoSaveDraft()" />
+                                            <span class="input-group-text bg-white"><i class="fa-solid fa-calendar text-muted"></i></span>
+                                            <input type="date" id="dob" name="dob" class="form-control" required />
                                         </div>
                                     </div>
                                 </div>
 
                                 <div class="row g-3 mb-3">
                                     <div class="col-md-4">
-                                        <label for="mobile_no" class="form-label text-muted small fw-medium">Mobile
-                                            Number <span class="text-danger">*</span></label>
+                                        <label for="mobile_no" class="form-label text-muted small fw-medium">Mobile Number <span class="text-danger">*</span></label>
                                         <div class="input-group">
-                                            <span class="input-group-text bg-white"><i
-                                                    class="fa-solid fa-phone text-muted"></i></span>
-                                            <input type="tel" id="mobile_no" name="mobile_no" class="form-control"
-                                                placeholder="9876543210" required oninput="autoSaveDraft()" />
+                                            <span class="input-group-text bg-white"><i class="fa-solid fa-phone text-muted"></i></span>
+                                            <input type="tel" id="mobile_no" name="mobile_no" class="form-control" placeholder="9876543210" required />
                                         </div>
                                     </div>
                                     <div class="col-md-4">
-                                        <label for="father_name" class="form-label text-muted small fw-medium">Father's
-                                            Name <span class="text-danger">*</span></label>
+                                        <label for="father_name" class="form-label text-muted small fw-medium">Father's Name <span class="text-danger">*</span></label>
                                         <div class="input-group">
-                                            <span class="input-group-text bg-white"><i
-                                                    class="fa-solid fa-user-tie text-muted"></i></span>
-                                            <input type="text" id="father_name" name="father_name" class="form-control"
-                                                required oninput="autoSaveDraft()" />
+                                            <span class="input-group-text bg-white"><i class="fa-solid fa-user-tie text-muted"></i></span>
+                                            <input type="text" id="father_name" name="father_name" class="form-control" required />
                                         </div>
                                     </div>
                                     <div class="col-md-4">
-                                        <label for="mother_name" class="form-label text-muted small fw-medium">Mother's
-                                            Name <span class="text-danger">*</span></label>
+                                        <label for="mother_name" class="form-label text-muted small fw-medium">Mother's Name <span class="text-danger">*</span></label>
                                         <div class="input-group">
-                                            <span class="input-group-text bg-white"><i
-                                                    class="fa-solid fa-user-large text-muted"></i></span>
-                                            <input type="text" id="mother_name" name="mother_name" class="form-control"
-                                                required oninput="autoSaveDraft()" />
+                                            <span class="input-group-text bg-white"><i class="fa-solid fa-user-large text-muted"></i></span>
+                                            <input type="text" id="mother_name" name="mother_name" class="form-control" required />
                                         </div>
                                     </div>
                                 </div>
 
                                 <div class="row g-3 mb-3">
                                     <div class="col-md-4">
-                                        <label for="city" class="form-label text-muted small fw-medium">City <span
-                                                class="text-danger">*</span></label>
+                                        <label for="city" class="form-label text-muted small fw-medium">City <span class="text-danger">*</span></label>
                                         <div class="input-group">
-                                            <span class="input-group-text bg-white"><i
-                                                    class="fa-solid fa-city text-muted"></i></span>
-                                            <input type="text" id="city" name="city" class="form-control" required
-                                                oninput="autoSaveDraft()" />
+                                            <span class="input-group-text bg-white"><i class="fa-solid fa-city text-muted"></i></span>
+                                            <input type="text" id="city" name="city" class="form-control" required />
                                         </div>
                                     </div>
                                     <div class="col-md-4">
-                                        <label for="state" class="form-label text-muted small fw-medium">State <span
-                                                class="text-danger">*</span></label>
+                                        <label for="state" class="form-label text-muted small fw-medium">State <span class="text-danger">*</span></label>
                                         <div class="input-group">
-                                            <span class="input-group-text bg-white"><i
-                                                    class="fa-solid fa-map-location-dot text-muted"></i></span>
-                                            <input type="text" id="state" name="state" class="form-control" required
-                                                oninput="autoSaveDraft()" />
+                                            <span class="input-group-text bg-white"><i class="fa-solid fa-map-location-dot text-muted"></i></span>
+                                            <input type="text" id="state" name="state" class="form-control" required />
                                         </div>
                                     </div>
                                     <div class="col-md-4">
-                                        <label for="pincode" class="form-label text-muted small fw-medium">Pincode <span
-                                                class="text-danger">*</span></label>
+                                        <label for="pincode" class="form-label text-muted small fw-medium">Pincode <span class="text-danger">*</span></label>
                                         <div class="input-group">
-                                            <span class="input-group-text bg-white"><i
-                                                    class="fa-solid fa-location-pin text-muted"></i></span>
-                                            <input type="text" id="pincode" name="pincode" class="form-control" required
-                                                oninput="autoSaveDraft()" />
+                                            <span class="input-group-text bg-white"><i class="fa-solid fa-location-pin text-muted"></i></span>
+                                            <input type="text" id="pincode" name="pincode" class="form-control" required />
                                         </div>
                                     </div>
                                 </div>
 
                                 <div>
-                                    <label for="address" class="form-label text-muted small fw-medium">Full Residential
-                                        Address
-                                        <span class="text-danger">*</span></label>
+                                    <label for="address" class="form-label text-muted small fw-medium">Full Residential Address <span class="text-danger">*</span></label>
                                     <div class="input-group">
-                                        <span class="input-group-text bg-white"><i
-                                                class="fa-solid fa-house text-muted"></i></span>
-                                        <textarea id="address" name="address" class="form-control" rows="2" required
-                                            oninput="autoSaveDraft()"></textarea>
+                                        <span class="input-group-text bg-white"><i class="fa-solid fa-house text-muted"></i></span>
+                                        <textarea id="address" name="address" class="form-control" rows="2" required></textarea>
                                     </div>
                                 </div>
                             </div>
@@ -322,89 +271,52 @@
                         <div class="step-panel d-none" id="step-3">
                             <div class="bg-light p-3 p-md-4 rounded-3 border mb-3">
                                 <h6 class="fw-bold text-primary mb-3">
-                                    <i class="fa-solid fa-graduation-cap me-2"></i>Step 3:
-                                    Institutional Details
+                                    <i class="fa-solid fa-graduation-cap me-2"></i>Step 3: Institutional Details
                                 </h6>
 
                                 <!-- STUDENT FIELDS -->
                                 <div id="studentFields">
                                     <div class="row g-3 mb-3">
                                         <div class="col-md-6">
-                                            <label for="roll_no" class="form-label text-muted small fw-medium">Roll
-                                                Number <span class="text-danger">*</span></label>
+                                            <label for="roll_no" class="form-label text-muted small fw-medium">Roll Number <span class="text-danger">*</span></label>
                                             <div class="input-group">
-                                                <span class="input-group-text bg-white"><i
-                                                        class="fa-solid fa-hashtag text-muted"></i></span>
-                                                <input type="text" name="roll_no" id="roll_no" class="form-control"
-                                                    placeholder="ST-2026-081" oninput="autoSaveDraft()" />
+                                                <span class="input-group-text bg-white"><i class="fa-solid fa-hashtag text-muted"></i></span>
+                                                <input type="text" name="roll_no" id="roll_no" class="form-control" placeholder="ST-2026-081" />
                                             </div>
                                         </div>
                                         <div class="col-md-6">
-                                            <label for="admission_no"
-                                                class="form-label text-muted small fw-medium">Admission Number
-                                                <span class="text-danger">*</span></label>
+                                            <label for="admission_no" class="form-label text-muted small fw-medium">Admission Number <span class="text-danger">*</span></label>
                                             <div class="input-group">
-                                                <span class="input-group-text bg-white"><i
-                                                        class="fa-solid fa-id-card text-muted"></i></span>
-                                                <input type="text" name="admission_no" id="admission_no"
-                                                    class="form-control" placeholder="ADM-2026-112"
-                                                    oninput="autoSaveDraft()" />
+                                                <span class="input-group-text bg-white"><i class="fa-solid fa-id-card text-muted"></i></span>
+                                                <input type="text" name="admission_no" id="admission_no" class="form-control" placeholder="ADM-2026-112" />
                                             </div>
                                         </div>
                                     </div>
 
                                     <div class="row g-3 mb-3">
                                         <div class="col-md-6">
-                                            <label for="branch" class="form-label text-muted small fw-medium">Branch /
-                                                Course
-                                                <span class="text-danger">*</span></label>
+                                            <label for="course_id" class="form-label text-muted small fw-medium">Branch / Course <span class="text-danger">*</span></label>
                                             <div class="input-group">
-                                                <span class="input-group-text bg-white"><i
-                                                        class="fa-solid fa-laptop-code text-muted"></i></span>
-                                                <select name="branch" id="branch" class="form-select"
-                                                    onchange="updateSessionOptions(); autoSaveDraft();">
-                                                    <!-- 4-Year Programs -->
-                                                    <option value="B.Tech - CSE" data-duration="4" selected>
-                                                        B.Tech - CSE (4 Years)
-                                                    </option>
-                                                    <option value="B.Tech - ECE" data-duration="4">
-                                                        B.Tech - ECE (4 Years)
-                                                    </option>
-                                                    <option value="B.Tech - ME" data-duration="4">
-                                                        B.Tech - ME (4 Years)
-                                                    </option>
-
-                                                    <!-- 3-Year Programs -->
-                                                    <option value="B.Tech - CSE (Lateral)" data-duration="3">
-                                                        B.Tech - CSE Lateral (3 Years)
-                                                    </option>
-                                                    <option value="BCA" data-duration="3">
-                                                        BCA (3 Years)
-                                                    </option>
-
-                                                    <!-- 2-Year Programs -->
-                                                    <option value="MCA" data-duration="2">
-                                                        MCA (2 Years)
-                                                    </option>
-                                                    <option value="M.Tech - CSE" data-duration="2">
-                                                        M.Tech - CSE (2 Years)
-                                                    </option>
-                                                    <option value="MBA" data-duration="2">
-                                                        MBA (2 Years)
-                                                    </option>
+                                                <span class="input-group-text bg-white"><i class="fa-solid fa-laptop-code text-muted"></i></span>
+                                                <!-- Dynamic Course Dropdown based on the DB Table -->
+                                                <select name="course_id" id="course_id" class="form-select" onchange="updateSessionOptions();">
+                                                    <option value="" selected disabled>Select your course...</option>
+                                                    {% for course in courses %}
+                                                        <!-- Setting dummy durations for Session Options logic -->
+                                                        {% set dur = 3 if 'Lateral' in course.name or 'BCA' in course.name else (2 if 'M.Tech' in course.name or 'MBA' in course.name or 'MCA' in course.name else 4) %}
+                                                        <option value="{{ course.id }}" data-duration="{{ dur }}">
+                                                            {{ course.name }} ({{ course.course_type }})
+                                                        </option>
+                                                    {% endfor %}
                                                 </select>
                                             </div>
                                         </div>
 
                                         <div class="col-md-6">
-                                            <label for="session" class="form-label text-muted small fw-medium">Academic
-                                                Session
-                                                <span class="text-danger">*</span></label>
+                                            <label for="session" class="form-label text-muted small fw-medium">Academic Session <span class="text-danger">*</span></label>
                                             <div class="input-group">
-                                                <span class="input-group-text bg-white"><i
-                                                        class="fa-solid fa-calendar-days text-muted"></i></span>
-                                                <select name="session" id="session" class="form-select"
-                                                    onchange="autoSaveDraft()">
+                                                <span class="input-group-text bg-white"><i class="fa-solid fa-calendar-days text-muted"></i></span>
+                                                <select name="session" id="session" class="form-select">
                                                     <!-- Populated dynamically by JS -->
                                                 </select>
                                             </div>
@@ -412,15 +324,10 @@
                                     </div>
 
                                     <div>
-                                        <label for="student_qualification"
-                                            class="form-label text-muted small fw-medium">Last Qualification</label>
+                                        <label for="student_qualification" class="form-label text-muted small fw-medium">Last Qualification</label>
                                         <div class="input-group">
-                                            <span class="input-group-text bg-white"><i
-                                                    class="fa-solid fa-certificate text-muted"></i></span>
-                                            <input type="text" name="student_qualification" id="student_qualification"
-                                                class="form-control"
-                                                placeholder="Senior Secondary (10+2) / Diploma / Graduation"
-                                                oninput="autoSaveDraft()" />
+                                            <span class="input-group-text bg-white"><i class="fa-solid fa-certificate text-muted"></i></span>
+                                            <input type="text" name="student_qualification" id="student_qualification" class="form-control" placeholder="Senior Secondary (10+2) / Diploma / Graduation" />
                                         </div>
                                     </div>
                                 </div>
@@ -429,62 +336,39 @@
                                 <div id="facultyFields" class="d-none">
                                     <div class="row g-3 mb-3">
                                         <div class="col-md-6">
-                                            <label for="employee_id"
-                                                class="form-label text-muted small fw-medium">Employee ID <span
-                                                    class="text-danger">*</span></label>
+                                            <label for="employee_id" class="form-label text-muted small fw-medium">Employee ID <span class="text-danger">*</span></label>
                                             <div class="input-group">
-                                                <span class="input-group-text bg-white"><i
-                                                        class="fa-solid fa-id-badge text-muted"></i></span>
-                                                <input type="text" name="employee_id" id="employee_id"
-                                                    class="form-control" placeholder="EMP-2026-04"
-                                                    oninput="autoSaveDraft()" />
+                                                <span class="input-group-text bg-white"><i class="fa-solid fa-id-badge text-muted"></i></span>
+                                                <input type="text" name="employee_id" id="employee_id" class="form-control" placeholder="EMP-2026-04" />
                                             </div>
                                         </div>
                                         <div class="col-md-6">
-                                            <label for="designation"
-                                                class="form-label text-muted small fw-medium">Designation <span
-                                                    class="text-danger">*</span></label>
+                                            <label for="designation" class="form-label text-muted small fw-medium">Designation <span class="text-danger">*</span></label>
                                             <div class="input-group">
-                                                <span class="input-group-text bg-white"><i
-                                                        class="fa-solid fa-briefcase text-muted"></i></span>
-                                                <input type="text" name="designation" id="designation"
-                                                    class="form-control" placeholder="Assistant Professor"
-                                                    oninput="autoSaveDraft()" />
+                                                <span class="input-group-text bg-white"><i class="fa-solid fa-briefcase text-muted"></i></span>
+                                                <input type="text" name="designation" id="designation" class="form-control" placeholder="Assistant Professor" />
                                             </div>
                                         </div>
                                     </div>
                                     <div class="row g-3">
                                         <div class="col-md-6">
-                                            <label for="department"
-                                                class="form-label text-muted small fw-medium">Department <span
-                                                    class="text-danger">*</span></label>
+                                            <label for="department_id" class="form-label text-muted small fw-medium">Department <span class="text-danger">*</span></label>
                                             <div class="input-group">
-                                                <span class="input-group-text bg-white"><i
-                                                        class="fa-solid fa-building text-muted"></i></span>
-                                                <select name="department" id="department" class="form-select"
-                                                    onchange="autoSaveDraft()">
-                                                    <option value="Department of Computer Science" selected>
-                                                        Department of Computer Science
-                                                    </option>
-                                                    <option value="Department of Electronics">
-                                                        Department of Electronics
-                                                    </option>
-                                                    <option value="Department of Mechanical">
-                                                        Department of Mechanical
-                                                    </option>
+                                                <span class="input-group-text bg-white"><i class="fa-solid fa-building text-muted"></i></span>
+                                                <!-- Dynamic Department Dropdown based on DB Table -->
+                                                <select name="department_id" id="department_id" class="form-select">
+                                                    <option value="" selected disabled>Select your department...</option>
+                                                    {% for dept in departments %}
+                                                        <option value="{{ dept.id }}">{{ dept.name }}</option>
+                                                    {% endfor %}
                                                 </select>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
-                                            <label for="faculty_qualification"
-                                                class="form-label text-muted small fw-medium">Highest
-                                                Qualification</label>
+                                            <label for="faculty_qualification" class="form-label text-muted small fw-medium">Highest Qualification</label>
                                             <div class="input-group">
-                                                <span class="input-group-text bg-white"><i
-                                                        class="fa-solid fa-user-graduate text-muted"></i></span>
-                                                <input type="text" name="faculty_qualification"
-                                                    id="faculty_qualification" class="form-control"
-                                                    placeholder="M.Tech / Ph.D." oninput="autoSaveDraft()" />
+                                                <span class="input-group-text bg-white"><i class="fa-solid fa-user-graduate text-muted"></i></span>
+                                                <input type="text" name="faculty_qualification" id="faculty_qualification" class="form-control" placeholder="M.Tech / Ph.D." />
                                             </div>
                                         </div>
                                     </div>
@@ -496,8 +380,7 @@
                         <div class="step-panel d-none" id="step-4">
                             <div class="bg-light p-3 p-md-4 rounded-3 border mb-3">
                                 <h6 class="fw-bold text-primary mb-2">
-                                    <i class="fa-solid fa-camera me-2"></i>Step 4: AI Facial
-                                    Feature Extraction Photo
+                                    <i class="fa-solid fa-camera me-2"></i>Step 4: AI Facial Feature Extraction Photo
                                 </h6>
                                 <p class="text-muted extra-small mb-3">
                                     Upload a clear front-facing photograph. Allowed formats:
@@ -506,31 +389,25 @@
                                 </p>
 
                                 <div class="input-group">
-                                    <span class="input-group-text bg-white"><i
-                                            class="fa-solid fa-file-image text-muted"></i></span>
-                                    <input type="file" id="face_image" name="face_image"
-                                        accept="image/png, image/jpeg, image/jpg" class="form-control" required
-                                        onchange="validateImageFile(this)" />
+                                    <span class="input-group-text bg-white"><i class="fa-solid fa-file-image text-muted"></i></span>
+                                    <input type="file" id="face_image" name="face_image" accept="image/png, image/jpeg, image/jpg" class="form-control" required onchange="validateImageFile(this)" />
                                 </div>
 
-                                <div id="image-error-alert"
-                                    class="alert alert-danger extra-small mt-3 d-none py-2 px-3">
+                                <div id="image-error-alert" class="alert alert-danger extra-small mt-3 d-none py-2 px-3">
                                     <i class="fa-solid fa-circle-exclamation me-1"></i>
                                     <span id="image-error-text"></span>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- STEP 5: FINAL DRAFT REVIEW (VERTICAL SCROLLER) -->
+                        <!-- STEP 5: FINAL DRAFT REVIEW -->
                         <div class="step-panel d-none" id="step-5">
                             <div class="bg-light p-3 p-md-4 rounded-3 border mb-3">
                                 <h6 class="fw-bold text-success mb-2">
-                                    <i class="fa-solid fa-clipboard-check me-2"></i>Step 5: Draft
-                                    Summary & Final Review
+                                    <i class="fa-solid fa-clipboard-check me-2"></i>Step 5: Draft Summary & Final Review
                                 </h6>
                                 <p class="text-muted extra-small mb-3">
-                                    Please verify all saved draft details in the scrollable view
-                                    below before submitting.
+                                    Please verify all details in the scrollable view below before submitting.
                                 </p>
 
                                 <div class="border rounded bg-white" style="max-height: 280px; overflow-y: auto">
@@ -547,32 +424,26 @@
                         <div class="d-flex align-items-center justify-content-between mt-4 pt-2 border-top">
                             <!-- Left Group: Back & Reset -->
                             <div class="d-flex align-items-center gap-2">
-                                <button type="button" class="btn btn-outline-secondary btn-sm px-3 fw-bold d-none"
-                                    id="btn-back" onclick="navigateStep(-1)">
+                                <button type="button" class="btn btn-outline-secondary btn-sm px-3 fw-bold d-none" id="btn-back" onclick="navigateStep(-1)">
                                     <i class="fa-solid fa-arrow-left me-1"></i> Back
                                 </button>
-                                <button type="button" class="btn btn-outline-danger btn-sm px-3 fw-bold" id="btn-reset"
-                                    onclick="resetRegistrationForm()">
+                                <button type="button" class="btn btn-outline-danger btn-sm px-3 fw-bold" id="btn-reset" onclick="resetRegistrationForm()">
                                     <i class="fa-solid fa-rotate-left me-1"></i> Reset
                                 </button>
                             </div>
 
                             <!-- Right Group: Save Draft + Next Step / Submit -->
                             <div class="d-flex align-items-center gap-2">
-                                <button type="button" class="btn btn-outline-primary btn-sm px-3 fw-bold"
-                                    onclick="manualSaveDraft()">
+                                <button type="button" class="btn btn-outline-primary btn-sm px-3 fw-bold" onclick="manualSaveDraft()">
                                     <i class="fa-solid fa-bookmark me-1"></i> Save Draft
                                 </button>
 
-                                <button type="button" class="btn btn-primary btn-sm px-4 fw-bold" id="btn-next"
-                                    onclick="handleNextClick()">
+                                <button type="button" class="btn btn-primary btn-sm px-4 fw-bold" id="btn-next" onclick="handleNextClick()">
                                     Next Step <i class="fa-solid fa-arrow-right ms-1"></i>
                                 </button>
 
-                                <button type="button" class="btn btn-success btn-sm px-4 fw-bold d-none" id="btn-submit"
-                                    onclick="submitRegistrationForm()">
-                                    <i class="fa-solid fa-cloud-arrow-up me-1"></i> Confirm &
-                                    Submit Registration
+                                <button type="button" class="btn btn-success btn-sm px-4 fw-bold d-none" id="btn-submit" onclick="submitRegistrationForm()">
+                                    <i class="fa-solid fa-cloud-arrow-up me-1"></i> Confirm & Submit
                                 </button>
                             </div>
                         </div>
@@ -587,7 +458,9 @@
         </div>
     </div>
 </div>
-{% endblock %} {% block extra_js %}
+{% endblock %} 
+
+{% block extra_js %}
 <!-- Offline Local CryptoJS Library -->
 <script src="{{ url_for('static', filename='js/crypto-js.min.js') }}"></script>
 
@@ -606,10 +479,9 @@
     const REGEX_EMAIL = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     const REGEX_MOBILE = /^[6-9]\d{9}$/;
     const REGEX_PINCODE = /^[1-9][0-9]{5}$/;
-    const REGEX_PASSWORD =
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    const REGEX_PASSWORD = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
-    // Encrypted Local Draft Auto-Save
+    // Encrypted Local Draft Auto-Save - Called ONLY on button click now
     function autoSaveDraft() {
         const formData = {};
         const inputs = document.querySelectorAll(
@@ -623,10 +495,7 @@
 
         try {
             const rawJson = JSON.stringify(formData);
-            const encryptedData = CryptoJS.AES.encrypt(
-                rawJson,
-                ENCRYPTION_SECRET,
-            ).toString();
+            const encryptedData = CryptoJS.AES.encrypt(rawJson, ENCRYPTION_SECRET).toString();
             localStorage.setItem(DRAFT_KEY, encryptedData);
         } catch (e) {
             console.error("Error encrypting draft:", e);
@@ -655,9 +524,9 @@
                 toggleRoleFields();
             }
 
-            if (formData["branch"]) {
-                const branchEl = document.querySelector('[name="branch"]');
-                if (branchEl) branchEl.value = formData["branch"];
+            if (formData["course_id"]) {
+                const courseEl = document.querySelector('[name="course_id"]');
+                if (courseEl) courseEl.value = formData["course_id"];
                 updateSessionOptions();
             }
 
@@ -668,10 +537,7 @@
                 }
             });
         } catch (e) {
-            console.error(
-                "Failed to decrypt local draft. Draft cleared for security.",
-                e,
-            );
+            console.error("Failed to decrypt local draft. Draft cleared for security.", e);
             clearLocalDraft();
         }
     }
@@ -681,8 +547,7 @@
         const alertBox = document.getElementById("step-error-alert");
         const alertText = document.getElementById("step-error-text");
         alertBox.className = "alert alert-success extra-small py-2 px-3 mb-3";
-        alertText.innerHTML =
-            '<i class="fa-solid fa-lock me-1"></i> Progress safely encrypted and saved as draft in local session!';
+        alertText.innerHTML = '<i class="fa-solid fa-lock me-1"></i> Progress safely encrypted and saved as draft in local session!';
         alertBox.classList.remove("d-none");
         setTimeout(() => alertBox.classList.add("d-none"), 3000);
     }
@@ -692,11 +557,7 @@
     }
 
     function resetRegistrationForm() {
-        if (
-            confirm(
-                "Are you sure you want to delete all entered data and reset the registration process?",
-            )
-        ) {
+        if (confirm("Are you sure you want to delete all entered data and reset the registration process?")) {
             clearLocalDraft();
             document.getElementById("registrationForm").reset();
             const alertBox = document.getElementById("step-error-alert");
@@ -706,23 +567,18 @@
     }
 
     function updateSessionOptions() {
-        const branchSelect = document.getElementById("branch");
+        const courseSelect = document.getElementById("course_id");
         const sessionSelect = document.getElementById("session");
-        if (!branchSelect || !sessionSelect) return;
+        if (!courseSelect || !sessionSelect) return;
 
-        const selectedOption = branchSelect.options[branchSelect.selectedIndex];
-        const duration = parseInt(
-            selectedOption.getAttribute("data-duration") || "4",
-            10,
-        );
+        // Skip logic if course isn't selected yet
+        if (courseSelect.selectedIndex < 0) return; 
+
+        const selectedOption = courseSelect.options[courseSelect.selectedIndex];
+        const duration = parseInt(selectedOption.getAttribute("data-duration") || "4", 10);
 
         const currentYear = new Date().getFullYear();
-        const startYearRange = [
-            currentYear - 2,
-            currentYear - 1,
-            currentYear,
-            currentYear + 1,
-        ];
+        const startYearRange = [currentYear - 2, currentYear - 1, currentYear, currentYear + 1];
 
         const previousVal = sessionSelect.value;
         sessionSelect.innerHTML = "";
@@ -730,7 +586,6 @@
         startYearRange.forEach((startYr) => {
             const endYr = startYr + duration;
             const sessionVal = `${startYr}-${endYr}`;
-
             const opt = document.createElement("option");
             opt.value = sessionVal;
             opt.textContent = `${startYr} - ${endYr}`;
@@ -738,14 +593,10 @@
             if (startYr === currentYear - 1) {
                 opt.selected = true;
             }
-
             sessionSelect.appendChild(opt);
         });
 
-        if (
-            previousVal &&
-            Array.from(sessionSelect.options).some((o) => o.value === previousVal)
-        ) {
+        if (previousVal && Array.from(sessionSelect.options).some((o) => o.value === previousVal)) {
             sessionSelect.value = previousVal;
         }
     }
@@ -754,18 +605,10 @@
         const dobInput = document.getElementById("dob");
         if (dobInput) {
             const today = new Date();
-            const minAgeDate = new Date(
-                today.getFullYear() - 17,
-                today.getMonth(),
-                today.getDate(),
-            );
+            const minAgeDate = new Date(today.getFullYear() - 17, today.getMonth(), today.getDate());
             dobInput.setAttribute("max", minAgeDate.toISOString().split("T")[0]);
 
-            const maxAgeDate = new Date(
-                today.getFullYear() - 100,
-                today.getMonth(),
-                today.getDate(),
-            );
+            const maxAgeDate = new Date(today.getFullYear() - 100, today.getMonth(), today.getDate());
             dobInput.setAttribute("min", maxAgeDate.toISOString().split("T")[0]);
         }
     }
@@ -783,22 +626,19 @@
             const confirmPwd = document.getElementById("confirm_password").value;
 
             if (!username || !email || !pwd || !confirmPwd) {
-                alertText.textContent =
-                    "Please complete all mandatory credentials (*) on Step 1.";
+                alertText.textContent = "Please complete all mandatory credentials (*) on Step 1.";
                 alertBox.classList.remove("d-none");
                 return false;
             }
 
             if (!REGEX_EMAIL.test(email)) {
-                alertText.textContent =
-                    "Please enter a valid email address with a complete domain extension (e.g. john.doe@abes.ac.in).";
+                alertText.textContent = "Please enter a valid email address with a complete domain extension (e.g. john.doe@abes.ac.in).";
                 alertBox.classList.remove("d-none");
                 return false;
             }
 
             if (!REGEX_PASSWORD.test(pwd)) {
-                alertText.textContent =
-                    "Password must be at least 8 characters long and contain an uppercase letter, lowercase letter, number, and special character (@$!%*?&).";
+                alertText.textContent = "Password must be at least 8 characters long and contain an uppercase letter, lowercase letter, number, and special character (@$!%*?&).";
                 alertBox.classList.remove("d-none");
                 return false;
             }
@@ -809,22 +649,11 @@
                 return false;
             }
         } else if (currentStep === 2) {
-            const requiredIds = [
-                "full_name",
-                "dob",
-                "mobile_no",
-                "father_name",
-                "mother_name",
-                "city",
-                "state",
-                "pincode",
-                "address",
-            ];
+            const requiredIds = ["full_name", "dob", "mobile_no", "father_name", "mother_name", "city", "state", "pincode", "address"];
             for (let id of requiredIds) {
                 const el = document.getElementById(id);
                 if (!el || !el.value.trim()) {
-                    alertText.textContent =
-                        "Please fill all mandatory personal details (*) before advancing.";
+                    alertText.textContent = "Please fill all mandatory personal details (*) before advancing.";
                     alertBox.classList.remove("d-none");
                     return false;
                 }
@@ -832,8 +661,7 @@
 
             const mobileNo = document.getElementById("mobile_no").value.trim();
             if (!REGEX_MOBILE.test(mobileNo)) {
-                alertText.textContent =
-                    "Please enter a valid 10-digit Indian mobile number.";
+                alertText.textContent = "Please enter a valid 10-digit Indian mobile number.";
                 alertBox.classList.remove("d-none");
                 return false;
             }
@@ -857,8 +685,7 @@
                 }
 
                 if (selectedDate >= today) {
-                    alertText.textContent =
-                        "Date of birth cannot be today or in the future.";
+                    alertText.textContent = "Date of birth cannot be today or in the future.";
                     alertBox.classList.remove("d-none");
                     return false;
                 }
@@ -875,20 +702,20 @@
                 if (
                     !document.getElementById("roll_no").value.trim() ||
                     !document.getElementById("admission_no").value.trim() ||
-                    !document.getElementById("session").value
+                    !document.getElementById("session").value ||
+                    !document.getElementById("course_id").value
                 ) {
-                    alertText.textContent =
-                        "Please fill all mandatory academic fields (*) for student registration.";
+                    alertText.textContent = "Please fill all mandatory academic fields (*) for student registration.";
                     alertBox.classList.remove("d-none");
                     return false;
                 }
             } else {
                 if (
                     !document.getElementById("employee_id").value.trim() ||
-                    !document.getElementById("designation").value.trim()
+                    !document.getElementById("designation").value.trim() ||
+                    !document.getElementById("department_id").value
                 ) {
-                    alertText.textContent =
-                        "Please fill all mandatory institutional fields (*) for faculty/staff.";
+                    alertText.textContent = "Please fill all mandatory institutional fields (*) for faculty/staff.";
                     alertBox.classList.remove("d-none");
                     return false;
                 }
@@ -904,20 +731,14 @@
         return true;
     }
 
-    // Secure Step 1 Availability Check using Fetch API with CSRF Header
     async function checkAccountAvailability() {
-        const username = document
-            .getElementById("username")
-            .value.trim()
-            .toLowerCase();
+        const username = document.getElementById("username").value.trim().toLowerCase();
         const email = document.getElementById("email").value.trim().toLowerCase();
         const alertBox = document.getElementById("step-error-alert");
         const alertText = document.getElementById("step-error-text");
 
         const csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
-        const csrfToken = csrfTokenMeta
-            ? csrfTokenMeta.getAttribute("content")
-            : "";
+        const csrfToken = csrfTokenMeta ? csrfTokenMeta.getAttribute("content") : "";
 
         try {
             const response = await fetch("{{ url_for('auth.check_availability') }}", {
@@ -956,14 +777,12 @@
         if (currentStep === 1) {
             const btnNext = document.getElementById("btn-next");
             btnNext.disabled = true;
-            btnNext.innerHTML =
-                '<i class="fa-solid fa-spinner fa-spin me-1"></i> Checking...';
+            btnNext.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i> Checking...';
 
             const isAvailable = await checkAccountAvailability();
 
             btnNext.disabled = false;
-            btnNext.innerHTML =
-                'Next Step <i class="fa-solid fa-arrow-right ms-1"></i>';
+            btnNext.innerHTML = 'Next Step <i class="fa-solid fa-arrow-right ms-1"></i>';
 
             if (!isAvailable) return;
         }
@@ -987,7 +806,7 @@
         const fileExtension = file.name.split(".").pop().toLowerCase();
 
         if (!ALLOWED_EXTENSIONS.includes(fileExtension)) {
-            errorText.textContent = `Invalid file format (.${fileExtension}). Only .png, .jpg, and .jpeg files are accepted. Draft data remains saved.`;
+            errorText.textContent = `Invalid file format (.${fileExtension}). Only .png, .jpg, and .jpeg files are accepted.`;
             errorBox.classList.remove("d-none");
             fileInput.value = "";
             return false;
@@ -998,10 +817,10 @@
     }
 
     function submitRegistrationForm() {
-        autoSaveDraft();
-        const requiredElements = document.querySelectorAll(
-            "#registrationForm [required]",
-        );
+        // Crucial Step: Wipe the draft from the browser before the form officially submits
+        clearLocalDraft(); 
+        
+        const requiredElements = document.querySelectorAll("#registrationForm [required]");
         requiredElements.forEach((el) => el.removeAttribute("required"));
 
         document.getElementById("registrationForm").submit();
@@ -1027,16 +846,20 @@
         `;
 
         if (role === "student") {
+            const courseSelect = document.getElementById("course_id");
+            const courseText = courseSelect.options[courseSelect.selectedIndex]?.text || "--";
             rows += `
                 <tr><td class="fw-bold text-muted bg-light">Roll Number</td><td>${document.getElementById("roll_no").value || "--"}</td></tr>
                 <tr><td class="fw-bold text-muted bg-light">Admission Number</td><td>${document.getElementById("admission_no").value || "--"}</td></tr>
-                <tr><td class="fw-bold text-muted bg-light">Branch / Session</td><td>${document.getElementById("branch").value} (${document.getElementById("session").value})</td></tr>
+                <tr><td class="fw-bold text-muted bg-light">Course / Session</td><td>${courseText} (${document.getElementById("session").value})</td></tr>
             `;
         } else {
+            const deptSelect = document.getElementById("department_id");
+            const deptText = deptSelect.options[deptSelect.selectedIndex]?.text || "--";
             rows += `
                 <tr><td class="fw-bold text-muted bg-light">Employee ID</td><td>${document.getElementById("employee_id").value || "--"}</td></tr>
                 <tr><td class="fw-bold text-muted bg-light">Designation</td><td>${document.getElementById("designation").value || "--"}</td></tr>
-                <tr><td class="fw-bold text-muted bg-light">Department</td><td>${document.getElementById("department").value || "--"}</td></tr>
+                <tr><td class="fw-bold text-muted bg-light">Department</td><td>${deptText}</td></tr>
             `;
         }
 
@@ -1063,8 +886,7 @@
         const targetPanel = document.getElementById(`step-${currentStep}`);
         if (targetPanel) targetPanel.classList.remove("d-none");
 
-        document.getElementById("step-badge").textContent =
-            `Step ${currentStep} of 5`;
+        document.getElementById("step-badge").textContent = `Step ${currentStep} of 5`;
 
         const btnBack = document.getElementById("btn-back");
         const btnNext = document.getElementById("btn-next");
@@ -1112,9 +934,9 @@
                 toggleRoleFields();
             }
 
-            if (SERVER_DRAFT["branch"]) {
-                const branchEl = document.querySelector('[name="branch"]');
-                if (branchEl) branchEl.value = SERVER_DRAFT["branch"];
+            if (SERVER_DRAFT["course_id"]) {
+                const courseEl = document.querySelector('[name="course_id"]');
+                if (courseEl) courseEl.value = SERVER_DRAFT["course_id"];
                 updateSessionOptions();
             }
 
