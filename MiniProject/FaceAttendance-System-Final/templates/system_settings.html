@@ -3,133 +3,187 @@
 {% block title %}System Settings - Smart Attendance System{% endblock %}
 
 {% block header_actions %}
-<a href="{{ url_for('main.attendance') }}" class="btn fw-semibold btn-header border-0 justify-content-start px-3 text-white">
-  <i class="fa-solid fa-house me-2" style="width: 20px; text-align: center"></i>Dashboard
+<a href="{{ url_for('main.attendance') }}"
+    class="btn fw-semibold btn-header border-0 justify-content-start px-3 text-white">
+    <i class="fa-solid fa-house me-2" style="width: 20px; text-align: center"></i>Dashboard
 </a>
 <a href="#" class="btn fw-semibold btn-header border-0 justify-content-start px-3 active">
-  <i class="fa-solid fa-sliders me-2" style="width: 20px; text-align: center"></i>Settings
+    <i class="fa-solid fa-sliders me-2" style="width: 20px; text-align: center"></i>Settings
 </a>
 {% endblock %}
 
 {% block content %}
 <main class="flex-grow-1 container-fluid py-4 px-md-4">
-    
+
     <!-- Header Area -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h2 class="h4 fw-bold text-dark mb-1">
+            <h2 class="h4 fw-bold mb-1">
                 <i class="fa-solid fa-sliders text-primary me-2"></i>System Configuration
             </h2>
-            <p class="text-muted small mb-0">Manage global AI parameters, attendance rules, and security.</p>
+            <p class="text-muted small mb-0">Manage global AI parameters, attendance rules, and preferences.</p>
         </div>
-        
+
         <button type="submit" form="settingsForm" class="btn btn-primary px-4 fw-semibold shadow-sm">
             <i class="fa-solid fa-floppy-disk me-2"></i>Save Configuration
         </button>
     </div>
 
-    <!-- Main Card with Tabs -->
+    <!-- Main Container Card -->
     <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
-        
-        <!-- Tab Navigation -->
-        <div class="card-header bg-white border-bottom p-0">
-            <ul class="nav nav-tabs nav-justified border-0" id="settingsTabs" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active py-3 fw-bold text-dark border-0 border-bottom border-primary border-3" id="ai-tab" data-bs-toggle="tab" data-bs-target="#ai" type="button" role="tab">
-                        <i class="fa-solid fa-brain me-2 text-primary"></i>AI & Biometrics
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link py-3 fw-bold text-muted border-0" id="attendance-tab" data-bs-toggle="tab" data-bs-target="#attendance" type="button" role="tab">
-                        <i class="fa-solid fa-clock me-2 text-primary"></i>Attendance Rules
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link py-3 fw-bold text-muted border-0" id="security-tab" data-bs-toggle="tab" data-bs-target="#security" type="button" role="tab">
-                        <i class="fa-solid fa-shield-halved me-2 text-primary"></i>Security & System
-                    </button>
-                </li>
-            </ul>
-        </div>
-
-        <!-- Form & Tab Content -->
         <form id="settingsForm" action="{{ url_for('main.system_settings') }}" method="POST">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token else '' }}" />
-            
-            <div class="card-body p-4 p-md-5 tab-content" id="settingsTabsContent">
-                
-                <!-- TAB 1: AI & BIOMETRICS -->
-                <div class="tab-pane fade show active" id="ai" role="tabpanel" tabindex="0">
-                    <h6 class="text-muted fw-bold mb-4 small text-uppercase spacing-1">Facial Recognition Parameters</h6>
-                    
-                    <div class="row g-4">
-                        <div class="col-md-6">
-                            <label for="ai_threshold" class="form-label fw-bold text-dark">Euclidean Distance Threshold</label>
-                            <div class="input-group mb-1">
-                                <span class="input-group-text bg-light"><i class="fa-solid fa-crosshairs"></i></span>
-                                <input type="number" step="0.1" class="form-control" id="ai_threshold" name="ai_threshold" value="{{ settings.ai_threshold }}">
-                            </div>
-                            <div class="form-text small">Lower = Stricter matching (fewer false positives). Default: 18.0</div>
-                        </div>
 
-                        <div class="col-md-6">
-                            <label for="camera_source" class="form-label fw-bold text-dark">Default Camera Source</label>
-                            <select class="form-select" id="camera_source" name="camera_source">
-                                <option value="0" {% if settings.camera_source == '0' %}selected{% endif %}>Built-in Web Camera (0)</option>
-                                <option value="1" {% if settings.camera_source == '1' %}selected{% endif %}>External USB Camera (1)</option>
-                                <option value="rtsp" {% if settings.camera_source == 'rtsp' %}selected{% endif %}>IP Stream (RTSP)</option>
-                            </select>
-                            <div class="form-text small">Select the primary hardware source for frame extraction.</div>
-                        </div>
+            <div class="row g-0">
+
+                <!-- LEFT COLUMN: Vertical Tab Navigation -->
+                <div class="col-lg-3 border-end p-3" style="background-color: var(--bs-tertiary-bg);">
+                    <div class="nav flex-column nav-pills gap-2" id="settingsTabs" role="tablist"
+                        aria-orientation="vertical">
+
+                        <!-- Admin Only Tab -->
+                        {% if role == 'admin' %}
+                        <button
+                            class="nav-link active text-start py-3 px-3 fw-bold bg-primary text-white shadow-sm rounded-3 d-flex align-items-center"
+                            id="ai-tab" data-bs-toggle="pill" data-bs-target="#ai" type="button" role="tab">
+                            <i class="fa-solid fa-brain me-3" style="width: 20px;"></i>AI & Biometrics
+                        </button>
+                        {% endif %}
+
+                        <!-- Admin & Faculty Tab -->
+                        {% if role in ['admin', 'teacher', 'faculty', 'staff'] %}
+                        <button
+                            class="nav-link text-start py-3 px-3 fw-semibold rounded-3 d-flex align-items-center {% if role != 'admin' %}active bg-primary text-white shadow-sm{% else %}text-body{% endif %}"
+                            id="attendance-tab" data-bs-toggle="pill" data-bs-target="#attendance" type="button"
+                            role="tab">
+                            <i class="fa-solid fa-clock me-3" style="width: 20px;"></i>Attendance Rules
+                        </button>
+                        {% endif %}
+
+                        <!-- Preferences Tab (Visible to EVERYONE) -->
+                        <button
+                            class="nav-link text-start py-3 px-3 fw-semibold rounded-3 d-flex align-items-center {% if role == 'student' %}active bg-primary text-white shadow-sm{% else %}text-body{% endif %}"
+                            id="preferences-tab" data-bs-toggle="pill" data-bs-target="#preferences" type="button"
+                            role="tab">
+                            <i class="fa-solid fa-user-gear me-3" style="width: 20px;"></i>Preferences
+                        </button>
+
                     </div>
                 </div>
 
-                <!-- TAB 2: ATTENDANCE RULES -->
-                <div class="tab-pane fade" id="attendance" role="tabpanel" tabindex="0">
-                    <h6 class="text-muted fw-bold mb-4 small text-uppercase spacing-1">Time & Shift Configuration</h6>
-                    
-                    <div class="row g-4">
-                        <div class="col-md-6">
-                            <label for="shift_duration" class="form-label fw-bold text-dark">Standard Shift Duration (Hours)</label>
-                            <div class="input-group mb-1">
-                                <span class="input-group-text bg-light"><i class="fa-solid fa-hourglass-half"></i></span>
-                                <input type="number" step="0.5" class="form-control" id="shift_duration" name="shift_duration" value="{{ settings.shift_duration }}">
+                <!-- RIGHT COLUMN: Tab Content Area -->
+                <div class="col-lg-9 p-4 p-md-5">
+                    <div class="tab-content" id="settingsTabsContent">
+
+                        <!-- TAB 1: AI & BIOMETRICS (ADMIN ONLY) -->
+                        {% if role == 'admin' %}
+                        <div class="tab-pane fade show active" id="ai" role="tabpanel" tabindex="0">
+                            <h5 class="fw-bold mb-3"><i class="fa-solid fa-brain text-primary me-2"></i>Facial
+                                Recognition Parameters</h5>
+                            <p class="text-muted small mb-4">Fine-tune internal algorithmic thresholds and select
+                                hardware streaming inputs.</p>
+
+                            <div class="row g-4">
+                                <div class="col-md-6">
+                                    <label for="ai_threshold" class="form-label fw-bold small">Euclidean Distance
+                                        Threshold</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fa-solid fa-crosshairs"></i></span>
+                                        <input type="number" step="0.1" class="form-control" id="ai_threshold"
+                                            name="ai_threshold" value="{{ settings.ai_threshold }}">
+                                    </div>
+                                    <div class="form-text text-muted" style="font-size: 0.75rem;">Lower = Stricter
+                                        matching. Default: 18.0</div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="camera_source" class="form-label fw-bold small">Default Camera
+                                        Source</label>
+                                    <select class="form-select" id="camera_source" name="camera_source">
+                                        <option value="0" {% if settings.camera_source=='0' %}selected{% endif %}>
+                                            Built-in Web Camera (0)</option>
+                                        <option value="1" {% if settings.camera_source=='1' %}selected{% endif %}>
+                                            External USB Camera (1)</option>
+                                    </select>
+                                    <div class="form-text text-muted" style="font-size: 0.75rem;">Select primary
+                                        hardware capture device.</div>
+                                </div>
                             </div>
-                            <div class="form-text small">Triggers the "early leave" warning for Faculty & Staff.</div>
+                        </div>
+                        {% endif %}
+
+                        <!-- TAB 2: ATTENDANCE RULES (ADMIN & FACULTY) -->
+                        {% if role in ['admin', 'teacher', 'faculty', 'staff'] %}
+                        <div class="tab-pane fade {% if role != 'admin' %}show active{% endif %}" id="attendance"
+                            role="tabpanel" tabindex="0">
+                            <h5 class="fw-bold mb-3"><i class="fa-solid fa-clock text-primary me-2"></i>Time & Shift
+                                Configuration</h5>
+                            <p class="text-muted small mb-4">Configure operational shift limits and scanning cooldown
+                                timers.</p>
+
+                            <div class="row g-4">
+                                <div class="col-md-6">
+                                    <label for="shift_duration" class="form-label fw-bold small">Standard Shift Duration
+                                        (Hours)</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fa-solid fa-hourglass-half"></i></span>
+                                        <input type="number" step="0.5" class="form-control" id="shift_duration"
+                                            name="shift_duration" value="{{ settings.shift_duration }}">
+                                    </div>
+                                    <div class="form-text text-muted" style="font-size: 0.75rem;">Triggers early leave
+                                        warning checks.</div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="cooldown_mins" class="form-label fw-bold small">Punch Cooldown Timer
+                                        (Mins)</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fa-solid fa-stopwatch"></i></span>
+                                        <input type="number" class="form-control" id="cooldown_mins"
+                                            name="cooldown_mins" value="{{ settings.cooldown_mins }}">
+                                    </div>
+                                    <div class="form-text text-muted" style="font-size: 0.75rem;">Prevents duplicate
+                                        accidental scans.</div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- TAB 3: GENERAL PREFERENCES (VISIBLE TO ALL ROLES) -->
+                        <div class="tab-pane fade {% if role == 'student' %}show active{% endif %}" id="preferences"
+                            role="tabpanel" tabindex="0">
+                            <h5 class="fw-bold mb-3"><i class="fa-solid fa-user-gear text-primary me-2"></i>Personal
+                                Account Preferences</h5>
+                            <p class="text-muted small mb-4">Manage appearance options and notification settings
+                                locally.</p>
+
+                            <div class="row g-4">
+                                <!-- Local Theme Toggle Selector -->
+                                <div class="col-md-6">
+                                    <label for="theme_preference" class="form-label fw-bold small">Interface
+                                        Theme</label>
+                                    <select class="form-select" id="theme_preference" name="theme_preference">
+                                        <option value="light">☀️ Light Mode</option>
+                                        <option value="dark">🌙 Dark Mode</option>
+                                    </select>
+                                    <div class="form-text text-muted" style="font-size: 0.75rem;">Applied instantly via
+                                        browser storage.</div>
+                                </div>
+
+                                <!-- Email Notifications -->
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold small d-block">Email Digest Notifications</label>
+                                    <div class="form-check form-switch mt-2">
+                                        <input class="form-check-input" type="checkbox" role="switch"
+                                            id="email_notifications" name="email_notifications"
+                                            style="width: 3rem; height: 1.5rem;" checked>
+                                        <label class="form-check-label ms-2 mt-1 small"
+                                            for="email_notifications">Receive daily attendance logs</label>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="col-md-6">
-                            <label for="cooldown_mins" class="form-label fw-bold text-dark">Punch Cooldown Timer (Mins)</label>
-                            <div class="input-group mb-1">
-                                <span class="input-group-text bg-light"><i class="fa-solid fa-stopwatch"></i></span>
-                                <input type="number" class="form-control" id="cooldown_mins" name="cooldown_mins" value="{{ settings.cooldown_mins }}">
-                            </div>
-                            <div class="form-text small">Prevents accidental double-scans immediately after punching in.</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- TAB 3: SECURITY & SYSTEM -->
-                <div class="tab-pane fade" id="security" role="tabpanel" tabindex="0">
-                    <h6 class="text-muted fw-bold mb-4 small text-uppercase spacing-1">Access Control</h6>
-                    
-                    <div class="row g-4">
-                        <div class="col-md-6">
-                            <label for="session_timeout" class="form-label fw-bold text-dark">Session Inactivity Timeout (Mins)</label>
-                            <div class="input-group mb-1">
-                                <span class="input-group-text bg-light"><i class="fa-solid fa-user-clock"></i></span>
-                                <input type="number" class="form-control" id="session_timeout" name="session_timeout" value="{{ settings.session_timeout }}">
-                            </div>
-                            <div class="form-text small">Automatically logs users out after this period of inactivity.</div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold text-dark d-block">Maintenance Mode</label>
-                            <div class="form-check form-switch mt-2">
-                                <input class="form-check-input" type="checkbox" role="switch" id="maintenance_mode" name="maintenance_mode" style="width: 3rem; height: 1.5rem;" {% if settings.maintenance_mode %}checked{% endif %}>
-                                <label class="form-check-label ms-2 mt-1" for="maintenance_mode">Lock system for all non-admin users</label>
-                            </div>
-                        </div>
                     </div>
                 </div>
 
@@ -141,18 +195,37 @@
 
 {% block extra_js %}
 <script>
-    // Make tabs change border style dynamically when clicked
-    const tabLinks = document.querySelectorAll('#settingsTabs .nav-link');
-    tabLinks.forEach(link => {
-        link.addEventListener('click', function() {
-            // Reset all tabs to default state
-            tabLinks.forEach(l => {
-                l.classList.remove('text-dark', 'border-bottom', 'border-primary', 'border-3');
-                l.classList.add('text-muted');
+    document.addEventListener("DOMContentLoaded", function () {
+        // 1. Theme Initializer: Sync dropdown value with current local storage on page load
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        const themeSelect = document.getElementById('theme_preference');
+        if (themeSelect) {
+            themeSelect.value = currentTheme;
+        }
+
+        // 2. Change theme instantly when user selects an option
+        if (themeSelect) {
+            themeSelect.addEventListener('change', function () {
+                const selectedTheme = this.value;
+                localStorage.setItem('theme', selectedTheme);
+                // THIS LINE APPLIES THE THEME GLOBALLY TO THE ENTIRE PAGE:
+                document.documentElement.setAttribute('data-bs-theme', selectedTheme);
             });
-            // Apply active styles to clicked tab
-            this.classList.remove('text-muted');
-            this.classList.add('text-dark', 'border-bottom', 'border-primary', 'border-3');
+        }
+
+        // 3. Vertical Tab Dynamic Active Styling
+        const tabLinks = document.querySelectorAll('#settingsTabs .nav-link');
+        tabLinks.forEach(link => {
+            link.addEventListener('click', function () {
+                // Reset all vertical tabs
+                tabLinks.forEach(l => {
+                    l.classList.remove('active', 'bg-primary', 'text-white', 'shadow-sm');
+                    l.classList.add('text-body');
+                });
+                // Activate clicked tab
+                this.classList.remove('text-body');
+                this.classList.add('active', 'bg-primary', 'text-white', 'shadow-sm');
+            });
         });
     });
 </script>

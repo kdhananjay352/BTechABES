@@ -67,7 +67,7 @@
             </div>
 
             <!-- RIGHT MULTI-STEP WIZARD FORM PANEL -->
-            <div class="col-lg-8 bg-white p-4 p-md-5 d-flex flex-column justify-content-between">
+            <div class="col-lg-8  p-4 p-md-5 d-flex flex-column justify-content-between">
                 <div>
                     <div class="d-flex align-items-center justify-content-between mb-3">
                         <div>
@@ -106,7 +106,7 @@
 
                         <!-- STEP 1: ACCOUNT CREDENTIALS -->
                         <div class="step-panel" id="step-1">
-                            <div class="bg-light p-3 p-md-4 rounded-3 border mb-3">
+                            <div class=" p-3 p-md-4 rounded-3 border mb-3">
                                 <h6 class="fw-bold text-primary mb-3">
                                     <i class="fa-solid fa-user-gear me-2"></i>Step 1: Account
                                     Credentials
@@ -116,7 +116,7 @@
                                     <label for="role" class="form-label text-muted small fw-medium">Select Role <span
                                             class="text-danger">*</span></label>
                                     <div class="input-group">
-                                        <span class="input-group-text bg-white"><i
+                                        <span class="input-group-text "><i
                                                 class="fa-solid fa-user-shield text-muted"></i></span>
                                         <select id="role" name="role" class="form-select" onchange="toggleRoleFields();" required>
                                             <option value="student" selected>Student</option>
@@ -131,7 +131,7 @@
                                         <label for="username" class="form-label text-muted small fw-medium">Username
                                             <span class="text-danger">*</span></label>
                                         <div class="input-group">
-                                            <span class="input-group-text bg-white"><i class="fa-solid fa-at text-muted"></i></span>
+                                            <span class="input-group-text "><i class="fa-solid fa-at text-muted"></i></span>
                                             <input type="text" id="username" name="username" class="form-control" placeholder="john_doe" required />
                                         </div>
                                     </div>
@@ -139,7 +139,7 @@
                                         <label for="email" class="form-label text-muted small fw-medium">Email Address
                                             <span class="text-danger">*</span></label>
                                         <div class="input-group">
-                                            <span class="input-group-text bg-white"><i class="fa-solid fa-envelope text-muted"></i></span>
+                                            <span class="input-group-text "><i class="fa-solid fa-envelope text-muted"></i></span>
                                             <input type="email" id="email" name="email" class="form-control" placeholder="john.doe@abes.ac.in" required />
                                         </div>
                                     </div>
@@ -151,9 +151,9 @@
                                         <label for="password" class="form-label text-muted small fw-medium">Password
                                             <span class="text-danger">*</span></label>
                                         <div class="input-group">
-                                            <span class="input-group-text bg-white"><i class="fa-solid fa-lock text-muted"></i></span>
+                                            <span class="input-group-text "><i class="fa-solid fa-lock text-muted"></i></span>
                                             <input type="password" id="password" name="password" class="form-control border-end-0" required />
-                                            <span class="input-group-text bg-white bg-transparent" onclick="togglePasswordVisibility('password', 'icon-pwd')" style="cursor: pointer">
+                                            <span class="input-group-text  bg-transparent" onclick="togglePasswordVisibility('password', 'icon-pwd')" style="cursor: pointer">
                                                 <i class="fa-regular fa-eye-slash text-muted" id="icon-pwd"></i>
                                             </span>
                                         </div>
@@ -163,9 +163,9 @@
                                         <label for="confirm_password" class="form-label text-muted small fw-medium">Confirm Password
                                             <span class="text-danger">*</span></label>
                                         <div class="input-group">
-                                            <span class="input-group-text bg-white"><i class="fa-solid fa-key text-muted"></i></span>
+                                            <span class="input-group-text "><i class="fa-solid fa-key text-muted"></i></span>
                                             <input type="password" id="confirm_password" name="confirm_password" class="form-control border-end-0" required />
-                                            <span class="input-group-text bg-white bg-transparent" onclick="togglePasswordVisibility('confirm_password','icon-confirm-pwd')" style="cursor: pointer">
+                                            <span class="input-group-text  bg-transparent" onclick="togglePasswordVisibility('confirm_password','icon-confirm-pwd')" style="cursor: pointer">
                                                 <i class="fa-regular fa-eye-slash text-muted" id="icon-confirm-pwd"></i>
                                             </span>
                                         </div>
@@ -176,7 +176,7 @@
 
                         <!-- STEP 2: PERSONAL DEMOGRAPHICS -->
                         <div class="step-panel d-none" id="step-2">
-                            <div class="bg-light p-3 p-md-4 rounded-3 border mb-3">
+                            <div class=" p-3 p-md-4 rounded-3 border mb-3">
                                 <h6 class="fw-bold text-primary mb-3">
                                     <i class="fa-solid fa-address-card me-2"></i>Step 2: Personal Details
                                 </h6>
@@ -185,14 +185,14 @@
                                     <div class="col-md-6">
                                         <label for="full_name" class="form-label text-muted small fw-medium">Full Name <span class="text-danger">*</span></label>
                                         <div class="input-group">
-                                            <span class="input-group-text bg-white"><i class="fa-solid fa-user text-muted"></i></span>
+                                            <span class="input-group-text "><i class="fa-solid fa-user text-muted"></i></span>
                                             <input type="text" id="full_name" name="full_name" class="form-control" placeholder="John Doe" required />
                                         </div>
                                     </div>
                                     <div class="col-md-3">
                                         <label for="gender" class="form-label text-muted small fw-medium">Gender <span class="text-danger">*</span></label>
                                         <div class="input-group">
-                                            <span class="input-group-text bg-white"><i class="fa-solid fa-venus-mars text-muted"></i></span>
+                                            <span class="input-group-text "><i class="fa-solid fa-venus-mars text-muted"></i></span>
                                             <select id="gender" name="gender" class="form-select" required>
                                                 <option value="Male" selected>Male</option>
                                                 <option value="Female">Female</option>
@@ -203,7 +203,7 @@
                                     <div class="col-md-3">
                                         <label for="dob" class="form-label text-muted small fw-medium">Date of Birth <span class="text-danger">*</span></label>
                                         <div class="input-group">
-                                            <span class="input-group-text bg-white"><i class="fa-solid fa-calendar text-muted"></i></span>
+                                            <span class="input-group-text "><i class="fa-solid fa-calendar text-muted"></i></span>
                                             <input type="date" id="dob" name="dob" class="form-control" required />
                                         </div>
                                     </div>
@@ -213,21 +213,21 @@
                                     <div class="col-md-4">
                                         <label for="mobile_no" class="form-label text-muted small fw-medium">Mobile Number <span class="text-danger">*</span></label>
                                         <div class="input-group">
-                                            <span class="input-group-text bg-white"><i class="fa-solid fa-phone text-muted"></i></span>
+                                            <span class="input-group-text "><i class="fa-solid fa-phone text-muted"></i></span>
                                             <input type="tel" id="mobile_no" name="mobile_no" class="form-control" placeholder="9876543210" required />
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <label for="father_name" class="form-label text-muted small fw-medium">Father's Name <span class="text-danger">*</span></label>
                                         <div class="input-group">
-                                            <span class="input-group-text bg-white"><i class="fa-solid fa-user-tie text-muted"></i></span>
+                                            <span class="input-group-text "><i class="fa-solid fa-user-tie text-muted"></i></span>
                                             <input type="text" id="father_name" name="father_name" class="form-control" required />
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <label for="mother_name" class="form-label text-muted small fw-medium">Mother's Name <span class="text-danger">*</span></label>
                                         <div class="input-group">
-                                            <span class="input-group-text bg-white"><i class="fa-solid fa-user-large text-muted"></i></span>
+                                            <span class="input-group-text "><i class="fa-solid fa-user-large text-muted"></i></span>
                                             <input type="text" id="mother_name" name="mother_name" class="form-control" required />
                                         </div>
                                     </div>
@@ -237,21 +237,21 @@
                                     <div class="col-md-4">
                                         <label for="city" class="form-label text-muted small fw-medium">City <span class="text-danger">*</span></label>
                                         <div class="input-group">
-                                            <span class="input-group-text bg-white"><i class="fa-solid fa-city text-muted"></i></span>
+                                            <span class="input-group-text "><i class="fa-solid fa-city text-muted"></i></span>
                                             <input type="text" id="city" name="city" class="form-control" required />
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <label for="state" class="form-label text-muted small fw-medium">State <span class="text-danger">*</span></label>
                                         <div class="input-group">
-                                            <span class="input-group-text bg-white"><i class="fa-solid fa-map-location-dot text-muted"></i></span>
+                                            <span class="input-group-text "><i class="fa-solid fa-map-location-dot text-muted"></i></span>
                                             <input type="text" id="state" name="state" class="form-control" required />
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <label for="pincode" class="form-label text-muted small fw-medium">Pincode <span class="text-danger">*</span></label>
                                         <div class="input-group">
-                                            <span class="input-group-text bg-white"><i class="fa-solid fa-location-pin text-muted"></i></span>
+                                            <span class="input-group-text "><i class="fa-solid fa-location-pin text-muted"></i></span>
                                             <input type="text" id="pincode" name="pincode" class="form-control" required />
                                         </div>
                                     </div>
@@ -260,7 +260,7 @@
                                 <div>
                                     <label for="address" class="form-label text-muted small fw-medium">Full Residential Address <span class="text-danger">*</span></label>
                                     <div class="input-group">
-                                        <span class="input-group-text bg-white"><i class="fa-solid fa-house text-muted"></i></span>
+                                        <span class="input-group-text "><i class="fa-solid fa-house text-muted"></i></span>
                                         <textarea id="address" name="address" class="form-control" rows="2" required></textarea>
                                     </div>
                                 </div>
@@ -269,7 +269,7 @@
 
                         <!-- STEP 3: INSTITUTIONAL DETAILS -->
                         <div class="step-panel d-none" id="step-3">
-                            <div class="bg-light p-3 p-md-4 rounded-3 border mb-3">
+                            <div class=" p-3 p-md-4 rounded-3 border mb-3">
                                 <h6 class="fw-bold text-primary mb-3">
                                     <i class="fa-solid fa-graduation-cap me-2"></i>Step 3: Institutional Details
                                 </h6>
@@ -280,14 +280,14 @@
                                         <div class="col-md-6">
                                             <label for="roll_no" class="form-label text-muted small fw-medium">Roll Number <span class="text-danger">*</span></label>
                                             <div class="input-group">
-                                                <span class="input-group-text bg-white"><i class="fa-solid fa-hashtag text-muted"></i></span>
+                                                <span class="input-group-text "><i class="fa-solid fa-hashtag text-muted"></i></span>
                                                 <input type="text" name="roll_no" id="roll_no" class="form-control" placeholder="ST-2026-081" />
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <label for="admission_no" class="form-label text-muted small fw-medium">Admission Number <span class="text-danger">*</span></label>
                                             <div class="input-group">
-                                                <span class="input-group-text bg-white"><i class="fa-solid fa-id-card text-muted"></i></span>
+                                                <span class="input-group-text "><i class="fa-solid fa-id-card text-muted"></i></span>
                                                 <input type="text" name="admission_no" id="admission_no" class="form-control" placeholder="ADM-2026-112" />
                                             </div>
                                         </div>
@@ -297,7 +297,7 @@
                                         <div class="col-md-6">
                                             <label for="course_id" class="form-label text-muted small fw-medium">Branch / Course <span class="text-danger">*</span></label>
                                             <div class="input-group">
-                                                <span class="input-group-text bg-white"><i class="fa-solid fa-laptop-code text-muted"></i></span>
+                                                <span class="input-group-text "><i class="fa-solid fa-laptop-code text-muted"></i></span>
                                                 <!-- Dynamic Course Dropdown based on the DB Table -->
                                                 <select name="course_id" id="course_id" class="form-select" onchange="updateSessionOptions();">
                                                     <option value="" selected disabled>Select your course...</option>
@@ -315,7 +315,7 @@
                                         <div class="col-md-6">
                                             <label for="session" class="form-label text-muted small fw-medium">Academic Session <span class="text-danger">*</span></label>
                                             <div class="input-group">
-                                                <span class="input-group-text bg-white"><i class="fa-solid fa-calendar-days text-muted"></i></span>
+                                                <span class="input-group-text "><i class="fa-solid fa-calendar-days text-muted"></i></span>
                                                 <select name="session" id="session" class="form-select">
                                                     <!-- Populated dynamically by JS -->
                                                 </select>
@@ -326,7 +326,7 @@
                                     <div>
                                         <label for="student_qualification" class="form-label text-muted small fw-medium">Last Qualification</label>
                                         <div class="input-group">
-                                            <span class="input-group-text bg-white"><i class="fa-solid fa-certificate text-muted"></i></span>
+                                            <span class="input-group-text "><i class="fa-solid fa-certificate text-muted"></i></span>
                                             <input type="text" name="student_qualification" id="student_qualification" class="form-control" placeholder="Senior Secondary (10+2) / Diploma / Graduation" />
                                         </div>
                                     </div>
@@ -338,14 +338,14 @@
                                         <div class="col-md-6">
                                             <label for="employee_id" class="form-label text-muted small fw-medium">Employee ID <span class="text-danger">*</span></label>
                                             <div class="input-group">
-                                                <span class="input-group-text bg-white"><i class="fa-solid fa-id-badge text-muted"></i></span>
+                                                <span class="input-group-text "><i class="fa-solid fa-id-badge text-muted"></i></span>
                                                 <input type="text" name="employee_id" id="employee_id" class="form-control" placeholder="EMP-2026-04" />
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <label for="designation" class="form-label text-muted small fw-medium">Designation <span class="text-danger">*</span></label>
                                             <div class="input-group">
-                                                <span class="input-group-text bg-white"><i class="fa-solid fa-briefcase text-muted"></i></span>
+                                                <span class="input-group-text "><i class="fa-solid fa-briefcase text-muted"></i></span>
                                                 <input type="text" name="designation" id="designation" class="form-control" placeholder="Assistant Professor" />
                                             </div>
                                         </div>
@@ -354,7 +354,7 @@
                                         <div class="col-md-6">
                                             <label for="department_id" class="form-label text-muted small fw-medium">Department <span class="text-danger">*</span></label>
                                             <div class="input-group">
-                                                <span class="input-group-text bg-white"><i class="fa-solid fa-building text-muted"></i></span>
+                                                <span class="input-group-text "><i class="fa-solid fa-building text-muted"></i></span>
                                                 <!-- Dynamic Department Dropdown based on DB Table -->
                                                 <select name="department_id" id="department_id" class="form-select">
                                                     <option value="" selected disabled>Select your department...</option>
@@ -367,7 +367,7 @@
                                         <div class="col-md-6">
                                             <label for="faculty_qualification" class="form-label text-muted small fw-medium">Highest Qualification</label>
                                             <div class="input-group">
-                                                <span class="input-group-text bg-white"><i class="fa-solid fa-user-graduate text-muted"></i></span>
+                                                <span class="input-group-text "><i class="fa-solid fa-user-graduate text-muted"></i></span>
                                                 <input type="text" name="faculty_qualification" id="faculty_qualification" class="form-control" placeholder="M.Tech / Ph.D." />
                                             </div>
                                         </div>
@@ -378,7 +378,7 @@
 
                         <!-- STEP 4: AI PHOTO UPLOAD -->
                         <div class="step-panel d-none" id="step-4">
-                            <div class="bg-light p-3 p-md-4 rounded-3 border mb-3">
+                            <div class=" p-3 p-md-4 rounded-3 border mb-3">
                                 <h6 class="fw-bold text-primary mb-2">
                                     <i class="fa-solid fa-camera me-2"></i>Step 4: AI Facial Feature Extraction Photo
                                 </h6>
@@ -389,7 +389,7 @@
                                 </p>
 
                                 <div class="input-group">
-                                    <span class="input-group-text bg-white"><i class="fa-solid fa-file-image text-muted"></i></span>
+                                    <span class="input-group-text "><i class="fa-solid fa-file-image text-muted"></i></span>
                                     <input type="file" id="face_image" name="face_image" accept="image/png, image/jpeg, image/jpg" class="form-control" required onchange="validateImageFile(this)" />
                                 </div>
 
@@ -402,7 +402,7 @@
 
                         <!-- STEP 5: FINAL DRAFT REVIEW -->
                         <div class="step-panel d-none" id="step-5">
-                            <div class="bg-light p-3 p-md-4 rounded-3 border mb-3">
+                            <div class=" p-3 p-md-4 rounded-3 border mb-3">
                                 <h6 class="fw-bold text-success mb-2">
                                     <i class="fa-solid fa-clipboard-check me-2"></i>Step 5: Draft Summary & Final Review
                                 </h6>
@@ -410,7 +410,7 @@
                                     Please verify all details in the scrollable view below before submitting.
                                 </p>
 
-                                <div class="border rounded bg-white" style="max-height: 280px; overflow-y: auto">
+                                <div class="border rounded " style="max-height: 280px; overflow-y: auto">
                                     <table class="table table-sm table-striped table-hover extra-small mb-0">
                                         <tbody id="reviewTableBody">
                                             <!-- Dynamically populated by JS -->
@@ -832,38 +832,38 @@
         const fileInput = document.getElementById("face_image");
 
         let rows = `
-            <tr><td class="fw-bold text-muted bg-light" style="width:35%">Role</td><td>${role.toUpperCase()}</td></tr>
-            <tr><td class="fw-bold text-muted bg-light">Username</td><td>${document.getElementById("username").value || "--"}</td></tr>
-            <tr><td class="fw-bold text-muted bg-light">Email Address</td><td>${document.getElementById("email").value || "--"}</td></tr>
-            <tr><td class="fw-bold text-muted bg-light">Full Name</td><td>${document.getElementById("full_name").value || "--"}</td></tr>
-            <tr><td class="fw-bold text-muted bg-light">Gender</td><td>${document.getElementById("gender").value || "--"}</td></tr>
-            <tr><td class="fw-bold text-muted bg-light">Date of Birth</td><td>${document.getElementById("dob").value || "--"}</td></tr>
-            <tr><td class="fw-bold text-muted bg-light">Mobile Number</td><td>${document.getElementById("mobile_no").value || "--"}</td></tr>
-            <tr><td class="fw-bold text-muted bg-light">Father's Name</td><td>${document.getElementById("father_name").value || "--"}</td></tr>
-            <tr><td class="fw-bold text-muted bg-light">Mother's Name</td><td>${document.getElementById("mother_name").value || "--"}</td></tr>
-            <tr><td class="fw-bold text-muted bg-light">City / State / Pincode</td><td>${document.getElementById("city").value}, ${document.getElementById("state").value} - ${document.getElementById("pincode").value}</td></tr>
-            <tr><td class="fw-bold text-muted bg-light">Address</td><td>${document.getElementById("address").value || "--"}</td></tr>
+            <tr><td class="fw-bold text-muted " style="width:35%">Role</td><td>${role.toUpperCase()}</td></tr>
+            <tr><td class="fw-bold text-muted ">Username</td><td>${document.getElementById("username").value || "--"}</td></tr>
+            <tr><td class="fw-bold text-muted ">Email Address</td><td>${document.getElementById("email").value || "--"}</td></tr>
+            <tr><td class="fw-bold text-muted ">Full Name</td><td>${document.getElementById("full_name").value || "--"}</td></tr>
+            <tr><td class="fw-bold text-muted ">Gender</td><td>${document.getElementById("gender").value || "--"}</td></tr>
+            <tr><td class="fw-bold text-muted ">Date of Birth</td><td>${document.getElementById("dob").value || "--"}</td></tr>
+            <tr><td class="fw-bold text-muted ">Mobile Number</td><td>${document.getElementById("mobile_no").value || "--"}</td></tr>
+            <tr><td class="fw-bold text-muted ">Father's Name</td><td>${document.getElementById("father_name").value || "--"}</td></tr>
+            <tr><td class="fw-bold text-muted ">Mother's Name</td><td>${document.getElementById("mother_name").value || "--"}</td></tr>
+            <tr><td class="fw-bold text-muted ">City / State / Pincode</td><td>${document.getElementById("city").value}, ${document.getElementById("state").value} - ${document.getElementById("pincode").value}</td></tr>
+            <tr><td class="fw-bold text-muted ">Address</td><td>${document.getElementById("address").value || "--"}</td></tr>
         `;
 
         if (role === "student") {
             const courseSelect = document.getElementById("course_id");
             const courseText = courseSelect.options[courseSelect.selectedIndex]?.text || "--";
             rows += `
-                <tr><td class="fw-bold text-muted bg-light">Roll Number</td><td>${document.getElementById("roll_no").value || "--"}</td></tr>
-                <tr><td class="fw-bold text-muted bg-light">Admission Number</td><td>${document.getElementById("admission_no").value || "--"}</td></tr>
-                <tr><td class="fw-bold text-muted bg-light">Course / Session</td><td>${courseText} (${document.getElementById("session").value})</td></tr>
+                <tr><td class="fw-bold text-muted ">Roll Number</td><td>${document.getElementById("roll_no").value || "--"}</td></tr>
+                <tr><td class="fw-bold text-muted ">Admission Number</td><td>${document.getElementById("admission_no").value || "--"}</td></tr>
+                <tr><td class="fw-bold text-muted ">Course / Session</td><td>${courseText} (${document.getElementById("session").value})</td></tr>
             `;
         } else {
             const deptSelect = document.getElementById("department_id");
             const deptText = deptSelect.options[deptSelect.selectedIndex]?.text || "--";
             rows += `
-                <tr><td class="fw-bold text-muted bg-light">Employee ID</td><td>${document.getElementById("employee_id").value || "--"}</td></tr>
-                <tr><td class="fw-bold text-muted bg-light">Designation</td><td>${document.getElementById("designation").value || "--"}</td></tr>
-                <tr><td class="fw-bold text-muted bg-light">Department</td><td>${deptText}</td></tr>
+                <tr><td class="fw-bold text-muted ">Employee ID</td><td>${document.getElementById("employee_id").value || "--"}</td></tr>
+                <tr><td class="fw-bold text-muted ">Designation</td><td>${document.getElementById("designation").value || "--"}</td></tr>
+                <tr><td class="fw-bold text-muted ">Department</td><td>${deptText}</td></tr>
             `;
         }
 
-        rows += `<tr><td class="fw-bold text-muted bg-light">Uploaded Image File</td><td><i class="fa-solid fa-file-image text-primary me-1"></i> ${fileInput.files[0] ? fileInput.files[0].name : "--"}</td></tr>`;
+        rows += `<tr><td class="fw-bold text-muted ">Uploaded Image File</td><td><i class="fa-solid fa-file-image text-primary me-1"></i> ${fileInput.files[0] ? fileInput.files[0].name : "--"}</td></tr>`;
 
         tbody.innerHTML = rows;
     }
