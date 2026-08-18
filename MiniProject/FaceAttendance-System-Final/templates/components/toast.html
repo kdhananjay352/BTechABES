@@ -1,33 +1,36 @@
 <!-- PLUGGABLE NATIVE BOOTSTRAP 5 TOAST CONTAINER (Positioned at Bottom-Right) -->
-<div class="toast-container position-fixed end-0 p-3" style="top: 80px; z-index: 1090;" id="globalToastContainer">
+<div class="toast-container position-fixed end-0 p-3" style="bottom: 80px; z-index: 1090;" id="globalToastContainer">
     <!-- <div class="toast-container position-fixed end-0 p-3" style="bottom: 40px; z-index: 1090;" id="globalToastContainer"> -->
     {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
     {% for category, message in messages %}
-    {% set bg_class = 'bg-primary text-white' %}
+    {% set toast_type = 'info' %}
     {% set icon_class = 'fa-circle-info' %}
 
     {% if category == 'success' %}
-    {% set bg_class = 'bg-success text-white' %}
+    {% set toast_type = 'success' %}
     {% set icon_class = 'fa-circle-check' %}
     {% elif category in ['danger', 'error'] %}
-    {% set bg_class = 'bg-danger text-white' %}
+    {% set toast_type = 'danger' %}
     {% set icon_class = 'fa-circle-exclamation' %}
     {% elif category == 'warning' %}
-    {% set bg_class = 'bg-warning text-dark' %}
+    {% set toast_type = 'warning' %}
     {% set icon_class = 'fa-triangle-exclamation' %}
+    {% elif category == 'info' %}
+    {% set toast_type = 'info' %}
+    {% set icon_class = 'fa-circle-info' %}
     {% endif %}
 
     <!-- Native BS5 Toast using data attributes -->
-    <div class="toast align-items-center {{ bg_class }} border-0 shadow-lg mb-2 rounded-3 overflow-hidden" role="alert"
+    <div class="toast toast-{{ toast_type }} align-items-center shadow-lg mb-2 rounded-3 overflow-hidden" role="alert"
         aria-live="assertive" aria-atomic="true" data-bs-autohide="true" data-bs-delay="5000">
         <div class="d-flex align-items-center p-2">
             <div class="toast-body extra-small fw-medium d-flex align-items-center gap-2">
-                <i class="fa-solid {{ icon_class }} fa-lg"></i>
+                <i class="fa-solid {{ icon_class }} fa-lg toast-icon"></i>
                 <span>{{ message }}</span>
             </div>
-            <button type="button" class="btn-close {{ 'btn-close-white' if category != 'warning' else '' }} me-2 m-auto"
-                data-bs-dismiss="toast" aria-label="Close"></button>
+            <button type="button" class="btn-close toast-close-btn me-2 m-auto" data-bs-dismiss="toast"
+                aria-label="Close"></button>
         </div>
     </div>
     {% endfor %}

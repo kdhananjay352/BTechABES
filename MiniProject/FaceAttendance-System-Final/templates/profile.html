@@ -16,6 +16,33 @@
         display: flex;
         flex-direction: column;
     }
+
+    @media (max-width: 991.98px) {
+        body {
+            height: auto !important;
+            overflow: auto !important;
+        }
+
+        main {
+            overflow: visible !important;
+        }
+
+        .container-fluid {
+            overflow: visible !important;
+        }
+
+        .row,
+        .col-lg-8,
+        .col-lg-4 {
+            overflow: visible !important;
+            height: auto !important;
+            min-height: auto !important;
+        }
+
+        .card-body {
+            overflow: visible !important;
+        }
+    }
 </style>
 {% endblock %}
 
@@ -53,7 +80,7 @@
 
         <!-- LEFT COLUMN: Static Avatar -->
         <div class="col-lg-4 col-xl-3 h-100 overflow-y-auto pb-3">
-            <div class="card shadow-sm border-0 rounded-4 overflow-hidden mb-4">
+            <div class="card profile-side-panel shadow-sm rounded-4 overflow-hidden mb-4">
                 <div class="pt-5 pb-4 px-3 text-center position-relative"
                     style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%)">
                     <img src="{{ url_for('static', filename='uploads/faces/' + user_photo) if user_photo else 'https://ui-avatars.com/api/?name=' + current_user.username|urlencode + '&background=2563eb&color=fff' }}"
@@ -100,11 +127,11 @@
 
             <!-- ADDED id="profileForm" so the top button can trigger it -->
             <form id="profileForm" action="{{ url_for('main.profile') }}" method="POST"
-                class="card shadow-sm border-0 rounded-4 h-100 d-flex flex-column">
+                class="card profile-main-panel shadow-sm rounded-4 h-100 d-flex flex-column">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token else '' }}" />
 
                 <!-- FIXED CARD HEADER -->
-                <div class="card-header  border-bottom p-4 flex-shrink-0 rounded-top-4">
+                <div class="card-header border-bottom p-4 flex-shrink-0 rounded-top-4">
                     <h5 class="mb-0 fw-bold">Personal Information</h5>
                 </div>
 

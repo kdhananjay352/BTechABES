@@ -13,8 +13,7 @@ from services.face_detection import extract_face_encoding, save_encoding
 from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.security import generate_password_hash
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadTimeSignature
-
-
+from rate_limiter import limiter
 
 
 auth_bp = Blueprint('auth', __name__)
@@ -31,6 +30,7 @@ def allowed_file(filename):
 # LOGIN ROUTE (UPDATED WITH ROLE VALIDATION)
 # ==============================================================================
 @auth_bp.route('/login', methods=['GET', 'POST'])
+@limiter.limit("8 per minute", key_func=lambda: request.remote_addr)
 def login():
     if current_user.is_authenticated:
         return redirect(url_for('main.attendance'))
@@ -80,6 +80,7 @@ def login():
 # REGISTER ROUTE
 # ==============================================================================
 @auth_bp.route('/register', methods=['GET', 'POST'])
+@limiter.limit("5 per minute", key_func=lambda: request.remote_addr)
 def register():
     if request.method == 'POST':
         role = request.form.get('role')
@@ -213,8 +214,9 @@ def register():
 
             if role == 'student':
                 # Convert the course ID to an integer securely
-                course_val = int(current_draft['course_id']) if current_draft.get('course_id') and current_draft['course_id'].isdigit() else None
-                
+                course_val = int(current_draft['course_id']) if current_draft.get(
+                    'course_id') and current_draft['course_id'].isdigit() else None
+
                 student_profile = Student(
                     student_id=new_user.id,
                     roll_no=current_draft['roll_no'],
@@ -239,8 +241,9 @@ def register():
 
             elif role in ['faculty', 'staff']:
                 # Convert the department ID to an integer securely
-                dept_val = int(current_draft['department_id']) if current_draft.get('department_id') and current_draft['department_id'].isdigit() else None
-                
+                dept_val = int(current_draft['department_id']) if current_draft.get(
+                    'department_id') and current_draft['department_id'].isdigit() else None
+
                 faculty_profile = FacultyStaff(
                     staff_id=new_user.id,
                     employee_id=current_draft['employee_id'],
@@ -278,7 +281,7 @@ def register():
     draft_data = session.pop('registration_draft', None)
     departments = Department.query.order_by(Department.name).all()
     courses = Course.query.order_by(Course.name).all()
-    
+
     return render_template('register.html', draft_data=draft_data, departments=departments, courses=courses)
 
 
@@ -338,14 +341,14 @@ def logout():
     return redirect(url_for('auth.login'))
 
 
-
-
 # Helper function to get the serializer
 def get_reset_serializer():
     # Uses your app's SECRET_KEY to encrypt the token
     return URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
 
+
 @auth_bp.route('/forgot-password', methods=['GET', 'POST'])
+@limiter.limit("5 per minute", key_func=lambda: request.remote_addr)
 def forgot_password():
     if request.method == 'POST':
         email = request.form.get('email', '').strip().lower()
@@ -355,22 +358,25 @@ def forgot_password():
             # 1. Generate a secure token valid for 3600 seconds (1 hour)
             s = get_reset_serializer()
             token = s.dumps(user.email, salt='password-reset-salt')
-            
+
             # 2. Create the reset link
-            reset_link = url_for('auth.reset_password', token=token, _external=True)
-            
+            reset_link = url_for('auth.reset_password',
+                                 token=token, _external=True)
+
             # 3. TODO: Send the email!
             # You will need to configure Flask-Mail or an API like SendGrid here.
             print(f"DEBUG: Send this link to {user.email}: {reset_link}")
-            
-        # Security Best Practice: Always show the same success message whether the 
+
+        # Security Best Practice: Always show the same success message whether the
         # email exists or not, to prevent hackers from "guessing" valid emails.
         flash('If an account with that email exists, a password reset link has been sent.', 'info')
         return redirect(url_for('auth.login'))
 
     return render_template('forgot_password.html')
 
+
 @auth_bp.route('/reset-password/<token>', methods=['GET', 'POST'])
+@limiter.limit("5 per minute", key_func=lambda: request.remote_addr)
 def reset_password(token):
     s = get_reset_serializer()
     try:
@@ -400,7 +406,7 @@ def reset_password(token):
         # Hash new password and save
         user.password = generate_password_hash(new_password)
         db.session.commit()
-        
+
         flash('Your password has been reset successfully! You can now log in.', 'success')
         return redirect(url_for('auth.login'))
 

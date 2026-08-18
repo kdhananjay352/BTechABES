@@ -16,68 +16,64 @@
 <main class="flex-grow-1 container-fluid py-4 px-md-4">
 
     <!-- Header Area -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4 settings-header-row">
+        <div class="settings-header-copy">
             <h2 class="h4 fw-bold mb-1">
                 <i class="fa-solid fa-sliders text-primary me-2"></i>System Configuration
             </h2>
             <p class="text-muted small mb-0">Manage global AI parameters, attendance rules, and preferences.</p>
         </div>
 
-        <button type="submit" form="settingsForm" class="btn btn-primary px-4 fw-semibold shadow-sm">
-            <i class="fa-solid fa-floppy-disk me-2"></i>Save Configuration
+        <button type="submit" form="settingsForm" class="btn btn-primary fw-semibold shadow-sm settings-save-btn">
+            <i class="fa-solid fa-floppy-disk me-2"></i>Save
         </button>
     </div>
 
     <!-- Main Container Card -->
-    <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+    <div class="settings-page-shell card shadow-sm border-0 rounded-4 overflow-hidden w-100">
         <form id="settingsForm" action="{{ url_for('main.system_settings') }}" method="POST">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token else '' }}" />
 
-            <div class="row g-0">
+            <div class="settings-layout">
 
                 <!-- LEFT COLUMN: Vertical Tab Navigation -->
-                <div class="col-lg-3 border-end p-3" style="background-color: var(--bs-tertiary-bg);">
-                    <div class="nav flex-column nav-pills gap-2" id="settingsTabs" role="tablist"
+                <aside class="settings-sidebar">
+                    <div class="nav flex-column nav-pills gap-2 p-3" id="settingsTabs" role="tablist"
                         aria-orientation="vertical">
 
-                        <!-- Admin Only Tab -->
                         {% if role == 'admin' %}
                         <button
-                            class="nav-link active text-start py-3 px-3 fw-bold bg-primary text-white shadow-sm rounded-3 d-flex align-items-center"
+                            class="nav-link active text-start py-3 px-3 fw-bold bg-primary text-white shadow-sm rounded-3 d-flex align-items-center w-100"
                             id="ai-tab" data-bs-toggle="pill" data-bs-target="#ai" type="button" role="tab">
                             <i class="fa-solid fa-brain me-3" style="width: 20px;"></i>AI & Biometrics
                         </button>
                         {% endif %}
 
-                        <!-- Admin & Faculty Tab -->
                         {% if role in ['admin', 'teacher', 'faculty', 'staff'] %}
                         <button
-                            class="nav-link text-start py-3 px-3 fw-semibold rounded-3 d-flex align-items-center {% if role != 'admin' %}active bg-primary text-white shadow-sm{% else %}text-body{% endif %}"
+                            class="nav-link text-start py-3 px-3 fw-semibold rounded-3 d-flex align-items-center w-100 {% if role != 'admin' %}active bg-primary text-white shadow-sm{% else %}text-body{% endif %}"
                             id="attendance-tab" data-bs-toggle="pill" data-bs-target="#attendance" type="button"
                             role="tab">
                             <i class="fa-solid fa-clock me-3" style="width: 20px;"></i>Attendance Rules
                         </button>
                         {% endif %}
 
-                        <!-- Preferences Tab (Visible to EVERYONE) -->
                         <button
-                            class="nav-link text-start py-3 px-3 fw-semibold rounded-3 d-flex align-items-center {% if role == 'student' %}active bg-primary text-white shadow-sm{% else %}text-body{% endif %}"
+                            class="nav-link text-start py-3 px-3 fw-semibold rounded-3 d-flex align-items-center w-100 {% if role == 'student' %}active bg-primary text-white shadow-sm{% else %}text-body{% endif %}"
                             id="preferences-tab" data-bs-toggle="pill" data-bs-target="#preferences" type="button"
                             role="tab">
                             <i class="fa-solid fa-user-gear me-3" style="width: 20px;"></i>Preferences
                         </button>
 
                     </div>
-                </div>
+                </aside>
 
                 <!-- RIGHT COLUMN: Tab Content Area -->
-                <div class="col-lg-9 p-4 p-md-5">
-                    <div class="tab-content" id="settingsTabsContent">
+                <section class="settings-content p-4 p-md-5">
+                    <div class="tab-content settings-tab-content" id="settingsTabsContent">
 
-                        <!-- TAB 1: AI & BIOMETRICS (ADMIN ONLY) -->
                         {% if role == 'admin' %}
-                        <div class="tab-pane fade show active" id="ai" role="tabpanel" tabindex="0">
+                        <div class="tab-pane fade show active settings-tab-pane" id="ai" role="tabpanel" tabindex="0">
                             <h5 class="fw-bold mb-3"><i class="fa-solid fa-brain text-primary me-2"></i>Facial
                                 Recognition Parameters</h5>
                             <p class="text-muted small mb-4">Fine-tune internal algorithmic thresholds and select
@@ -112,10 +108,9 @@
                         </div>
                         {% endif %}
 
-                        <!-- TAB 2: ATTENDANCE RULES (ADMIN & FACULTY) -->
                         {% if role in ['admin', 'teacher', 'faculty', 'staff'] %}
-                        <div class="tab-pane fade {% if role != 'admin' %}show active{% endif %}" id="attendance"
-                            role="tabpanel" tabindex="0">
+                        <div class="tab-pane fade {% if role != 'admin' %}show active{% endif %} settings-tab-pane"
+                            id="attendance" role="tabpanel" tabindex="0">
                             <h5 class="fw-bold mb-3"><i class="fa-solid fa-clock text-primary me-2"></i>Time & Shift
                                 Configuration</h5>
                             <p class="text-muted small mb-4">Configure operational shift limits and scanning cooldown
@@ -149,34 +144,34 @@
                         </div>
                         {% endif %}
 
-                        <!-- TAB 3: GENERAL PREFERENCES (VISIBLE TO ALL ROLES) -->
-                        <div class="tab-pane fade {% if role == 'student' %}show active{% endif %}" id="preferences"
-                            role="tabpanel" tabindex="0">
+                        <div class="tab-pane fade {% if role == 'student' %}show active{% endif %} settings-tab-pane"
+                            id="preferences" role="tabpanel" tabindex="0">
                             <h5 class="fw-bold mb-3"><i class="fa-solid fa-user-gear text-primary me-2"></i>Personal
                                 Account Preferences</h5>
                             <p class="text-muted small mb-4">Manage appearance options and notification settings
                                 locally.</p>
 
                             <div class="row g-4">
-                                <!-- Local Theme Toggle Selector -->
                                 <div class="col-md-6">
                                     <label for="theme_preference" class="form-label fw-bold small">Interface
                                         Theme</label>
                                     <select class="form-select" id="theme_preference" name="theme_preference">
-                                        <option value="light">☀️ Light Mode</option>
-                                        <option value="dark">🌙 Dark Mode</option>
+                                        <option value="light" {% if settings.theme_preference=='light' %}selected{%
+                                            endif %}>☀️ Light Mode</option>
+                                        <option value="dark" {% if settings.theme_preference=='dark' %}selected{% endif
+                                            %}>🌙 Dark Mode</option>
                                     </select>
                                     <div class="form-text text-muted" style="font-size: 0.75rem;">Applied instantly via
                                         browser storage.</div>
                                 </div>
 
-                                <!-- Email Notifications -->
                                 <div class="col-md-6">
                                     <label class="form-label fw-bold small d-block">Email Digest Notifications</label>
                                     <div class="form-check form-switch mt-2">
                                         <input class="form-check-input" type="checkbox" role="switch"
                                             id="email_notifications" name="email_notifications"
-                                            style="width: 3rem; height: 1.5rem;" checked>
+                                            style="width: 3rem; height: 1.5rem;" {% if settings.email_notifications
+                                            %}checked{% endif %}>
                                         <label class="form-check-label ms-2 mt-1 small"
                                             for="email_notifications">Receive daily attendance logs</label>
                                     </div>
@@ -185,7 +180,7 @@
                         </div>
 
                     </div>
-                </div>
+                </section>
 
             </div>
         </form>

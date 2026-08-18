@@ -12,8 +12,7 @@ from models import User, Student, FacultyStaff, AttendanceRecord, Course, Depart
 from services.face_detection import extract_face_encoding
 from flask import render_template, request, flash, redirect, url_for
 from werkzeug.security import check_password_hash, generate_password_hash
-
-
+from rate_limiter import limiter
 
 
 main_bp = Blueprint('main', __name__)
@@ -65,14 +64,14 @@ def index():
 def attendance():
     today_date = date.today()
     role = current_user.role.lower() if current_user.role else 'student'
-    
+
     # 1. EVERYONE: Get the logged-in user's own record for today
     my_attendance = AttendanceRecord.query.filter_by(
-        user_id=current_user.id, 
+        user_id=current_user.id,
         date=today_date
     ).first()
-    
-    
+
+
 # 2. ADMIN ONLY: Fetch campus-wide metrics
     admin_stats = {}
     if role == 'admin':
@@ -80,31 +79,30 @@ def attendance():
         admin_stats['total_present'] = db.session.query(func.count(db.distinct(AttendanceRecord.user_id))).filter(
             AttendanceRecord.date == today_date
         ).scalar() or 0
-        
+
         # Total students present today
         admin_stats['students_present'] = db.session.query(func.count(db.distinct(AttendanceRecord.user_id)))\
             .join(User, AttendanceRecord.user_id == User.id)\
             .filter(AttendanceRecord.date == today_date, User.role == 'student').scalar() or 0
-            
+
         # Total faculty/staff present today
         admin_stats['faculty_present'] = db.session.query(func.count(db.distinct(AttendanceRecord.user_id)))\
             .join(User, AttendanceRecord.user_id == User.id)\
             .filter(AttendanceRecord.date == today_date, User.role.in_(['teacher', 'faculty', 'staff'])).scalar() or 0
 
     # 3. FACULTY ONLY: Fetch branch-specific metrics
-    # 3. FACULTY ONLY: Fetch branch-specific metrics
     teacher_stats = {}
     if role in ['teacher', 'faculty', 'staff']:
-        
+
         if current_user.faculty_profile and current_user.faculty_profile.department_info:
             display_name = current_user.faculty_profile.department_info.name
             dept_id = current_user.faculty_profile.department_id
         else:
             display_name = 'General'
             dept_id = None
-            
+
         teacher_stats['department'] = display_name
-        
+
         try:
             if dept_id:
                 count = db.session.query(func.count(db.distinct(AttendanceRecord.user_id)))\
@@ -115,30 +113,30 @@ def attendance():
                         AttendanceRecord.date == today_date,
                         User.role == 'student',
                         Course.department_id == dept_id
-                    ).scalar()
-                
+                ).scalar()
+
                 teacher_stats['branch_students_present'] = count or 0
             else:
                 teacher_stats['branch_students_present'] = 0
-                
+
         except Exception as e:
             print(f"Query Error: {e}")
             teacher_stats['branch_students_present'] = 0
-                
+
         except Exception as e:
             print(f"Query Error: {e}")
             teacher_stats['branch_students_present'] = 0
 
     # 4. Return everything to the frontend
     return render_template(
-        'attendance.html', 
-        user=current_user, 
+        'attendance.html',
+        user=current_user,
         my_attendance=my_attendance,
         admin_stats=admin_stats,
         teacher_stats=teacher_stats
     )
-    
-    
+
+
 @main_bp.route('/attendance-summary')
 @login_required
 def attendance_summary():
@@ -227,17 +225,14 @@ def mark_attendance():
 
     # 5. Compare the Faces using Euclidean Distance
     distance = np.linalg.norm(saved_encoding - live_encoding)
-    threshold = 18.0  
-    
+    threshold = 18.0
     if distance < threshold:
         # -- MATCH FOUND --
         user_account = profile.user_account
         today_date = date.today()
         current_time = datetime.now()
-        
         # Check if they sent the "Yes, I want to leave early" override flag
         confirm_early_out = data.get('confirm_early_out', False)
-        
         # Look for today's existing record
         existing_record = AttendanceRecord.query.filter_by(
             user_id=user_account.id,
@@ -257,29 +252,29 @@ def mark_attendance():
                 )
                 db.session.add(new_record)
                 db.session.commit()
-                
+
                 return jsonify({
-                    'status': 'success', 
+                    'status': 'success',
                     'title': 'Punched In',
                     'message': f'Good morning, {profile.full_name}! Your check-in is recorded.'
                 })
-#           SCENARIO B: Second scan of the day -> PUNCH OUT
+            # SCENARIO B: Second scan of the day -> PUNCH OUT
             elif existing_record and not existing_record.time_out:
                 # Calculate hours worked so far
                 time_diff = current_time - existing_record.time_in
                 hours_worked = time_diff.total_seconds() / 3600.0
 
                 # Prevent accidental double-scans within 5 minutes (0.08 hours)
-                if hours_worked < 0.08: 
+                if hours_worked < 0.08:
                     return jsonify({
-                        'status': 'warning', 
-                        'title': 'Too Soon', 
+                        'status': 'warning',
+                        'title': 'Too Soon',
                         'message': 'You just punched in! Please wait at least 5 minutes before punching out.'
                     })
 
                 # FACULTY/STAFF MANDATORY CHECK: Trigger 8.5hr warning
                 if role != 'student' and hours_worked < 8.5 and not confirm_early_out:
-                    
+
                     # 1. Calculate time worked
                     worked_mins_total = int(hours_worked * 60)
                     h = worked_mins_total // 60
@@ -290,14 +285,14 @@ def mark_attendance():
                     short_total = 510 - worked_mins_total
                     short_h = short_total // 60
                     short_m = short_total % 60
-                    
+
                     if short_h > 0:
                         short_str = f"{short_h} hrs {short_m} mins"
                     else:
                         short_str = f"{short_m} mins"
 
                     return jsonify({
-                        'status': 'confirm', 
+                        'status': 'confirm',
                         'title': 'Confirm Punch-Out',
                         'message': f'You have completed {time_str} today, which is {short_str} short of the standard 8.5 working hours.\n\nDo you want to punch out now?'
                     })
@@ -311,29 +306,28 @@ def mark_attendance():
                 db.session.commit()
 
                 return jsonify({
-                    'status': 'success', 
+                    'status': 'success',
                     'title': 'Punched Out',
                     'message': f'Goodbye, {profile.full_name}! You logged {existing_record.total_hours} hours today.'
                 })
-                    
+
             # SCENARIO C: Third scan of the day -> ALREADY DONE
             else:
                 return jsonify({
-                    'status': 'warning', 
+                    'status': 'warning',
                     'title': 'Already Marked',
                     'message': f'Attendance for {profile.full_name} is already marked for today. you cannot punch in/out again until tomorrow.'
                 })
-                
+
         except Exception as e:
             db.session.rollback()
             print(f"Database Error: {e}")
             return jsonify({'status': 'danger', 'title': 'Database Error', 'message': 'Error while saving attendance.'})
-            
+
     else:
         # -- NO MATCH --
         return jsonify({'status': 'danger', 'title': 'Verification Failed', 'message': 'Face mismatch. You do not match the registered user for this ID.'})
-    
-    
+
 
 # ==============================================================================
 # PROFILE ROUTE
@@ -352,8 +346,10 @@ def profile():
         try:
             # Update editable fields from the form
             user_profile.mobile_no = request.form.get('mobile_no', '').strip()
-            user_profile.father_name = request.form.get('father_name', '').strip()
-            user_profile.mother_name = request.form.get('mother_name', '').strip()
+            user_profile.father_name = request.form.get(
+                'father_name', '').strip()
+            user_profile.mother_name = request.form.get(
+                'mother_name', '').strip()
             user_profile.address = request.form.get('address', '').strip()
             user_profile.city = request.form.get('city', '').strip()
             user_profile.state = request.form.get('state', '').strip()
@@ -362,7 +358,7 @@ def profile():
             db.session.commit()
             flash('Your profile has been successfully updated.', 'success')
             return redirect(url_for('main.profile'))
-            
+
         except SQLAlchemyError as err:
             db.session.rollback()
             flash('Database error occurred while updating profile.', 'danger')
@@ -378,6 +374,7 @@ def profile():
 
 @main_bp.route('/change-password', methods=['GET', 'POST'])
 @login_required
+@limiter.limit("5 per minute", key_func=lambda: request.remote_addr)
 def change_password():
     if request.method == 'POST':
         current_password = request.form.get('current_password')
@@ -398,19 +395,22 @@ def change_password():
         if not check_password_hash(current_user.password_hash, current_password):
             flash('The current password you entered is incorrect.', 'danger')
             return redirect(url_for('main.change_password'))
-            
+
         # Prevent reusing the same password (Updated to password_hash)
         if check_password_hash(current_user.password_hash, new_password):
-            flash('Your new password must be different from your current password.', 'warning')
+            flash(
+                'Your new password must be different from your current password.', 'warning')
             return redirect(url_for('main.change_password'))
 
         # Update and hash the new password (Updated to password_hash)
         try:
             current_user.password_hash = generate_password_hash(new_password)
             db.session.commit()
-            flash('Your password has been successfully updated! Please use it for future logins.', 'success')
-            return redirect(url_for('main.attendance')) # Redirect to profile on success
-            
+            flash(
+                'Your password has been successfully updated! Please use it for future logins.', 'success')
+            # Redirect to profile on success
+            return redirect(url_for('main.attendance'))
+
         except Exception as e:
             db.session.rollback()
             flash('A database error occurred. Please try again.', 'danger')
@@ -420,23 +420,13 @@ def change_password():
 
 
 # ==============================================================================
-# system setting 
+# system setting
 # ==============================================================================
 
 @main_bp.route('/settings', methods=['GET', 'POST'])
 @login_required
 def system_settings():
     role = current_user.role.lower() if current_user.role else 'student'
-
-    if request.method == 'POST':
-        # Restrict students from saving system-level configurations
-        if role == 'student':
-            flash('Permission Denied: Students cannot modify system settings.', 'danger')
-            return redirect(url_for('main.system_settings'))
-
-        # Handle saving logic for Admin/Faculty here...
-        flash('Settings have been successfully updated.', 'success')
-        return redirect(url_for('main.system_settings'))
 
     current_settings = {
         'ai_threshold': 18.0,
@@ -445,7 +435,27 @@ def system_settings():
         'cooldown_mins': 5,
         'session_timeout': 10,
         'maintenance_mode': False,
-        'email_notifications': True
+        'email_notifications': True,
+        'theme_preference': 'dark'
     }
+
+    if request.method == 'POST':
+        if role == 'student':
+            flash('Permission Denied: Students cannot modify system settings.', 'danger')
+            return redirect(url_for('main.system_settings'))
+
+        current_settings.update({
+            'ai_threshold': float(request.form.get('ai_threshold', current_settings['ai_threshold'])),
+            'camera_source': request.form.get('camera_source', current_settings['camera_source']),
+            'shift_duration': float(request.form.get('shift_duration', current_settings['shift_duration'])),
+            'cooldown_mins': int(request.form.get('cooldown_mins', current_settings['cooldown_mins'])),
+            'session_timeout': int(request.form.get('session_timeout', current_settings['session_timeout'])),
+            'maintenance_mode': request.form.get('maintenance_mode') == 'on',
+            'email_notifications': request.form.get('email_notifications') == 'on',
+            'theme_preference': request.form.get('theme_preference', current_settings['theme_preference'])
+        })
+
+        flash('Settings have been successfully updated.', 'success')
+        return render_template('system_settings.html', settings=current_settings, role=role)
 
     return render_template('system_settings.html', settings=current_settings, role=role)

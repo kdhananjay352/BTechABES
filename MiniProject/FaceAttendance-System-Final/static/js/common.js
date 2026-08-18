@@ -76,21 +76,29 @@
             iconClass = "fa-solid fa-triangle-exclamation text-warning fa-lg"; // Yellow Triangle (Missing Input)
         }
 
+        const variantClass = type === "success"
+            ? "toast-success"
+            : type === "danger" || type === "error"
+                ? "toast-danger"
+                : type === "warning"
+                    ? "toast-warning"
+                    : "toast-info";
+
         const toastEl = document.createElement("div");
-        toastEl.className = "toast align-items-center text-bg-light border-0 mb-2 shadow";
+        toastEl.className = `toast align-items-center border-0 mb-2 shadow ${variantClass}`;
         toastEl.setAttribute("role", "status");
         toastEl.setAttribute("aria-live", "polite");
         toastEl.setAttribute("aria-atomic", "true");
         toastEl.innerHTML = `
             <div class="d-flex p-1">
-                <div class="toast-body d-flex align-items-center gap-2 border-start border-3 ${type === 'danger' ? 'border-danger' : type === 'success' ? 'border-success' : type === 'warning' ? 'border-warning' : 'border-primary'}">
-                    <i class="${iconClass} me-1"></i>
+                <div class="toast-body d-flex align-items-center gap-2">
+                    <i class="${iconClass} toast-icon me-1"></i>
                     <div class="d-flex flex-column lh-sm">
-                        ${title ? '<strong class="text-dark">' + title + "</strong>" : ""}
-                        <span class="text-muted small mt-1">${message}</span>
+                        ${title ? '<strong class="toast-title">' + title + "</strong>" : ""}
+                        <span class="small mt-1 toast-message">${message}</span>
                     </div>
                 </div>
-                <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                <button type="button" class="btn-close toast-close-btn me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
             </div>`;
 
         container.appendChild(toastEl);

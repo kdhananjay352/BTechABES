@@ -6,16 +6,12 @@ Handles user registration, login, logout, and credential validation.
 import os
 from flask import Flask, redirect, url_for, flash, request, jsonify, session
 from flask_wtf.csrf import CSRFError
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
 from config import Config
 from extensions import db, login_manager, csrf
 from routes.auth import auth_bp
 from routes.main import main_bp
+from rate_limiter import limiter
 from datetime import timedelta
-
-limiter = Limiter(key_func=get_remote_address, default_limits=[
-    "200 per day", "50 per hour"], storage_uri="memory://")
 
 
 def create_app():
@@ -23,7 +19,7 @@ def create_app():
 
     flask_app = Flask(__name__)
     flask_app.config.from_object(Config)
-    
+
     # 10-Minute Idle Timeout Configuration
     flask_app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=10)
 
@@ -84,8 +80,15 @@ def create_app():
         if request.is_json or request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             return jsonify({'valid': False, 'errors': {'rate_limit': 'Too many requests. Please try again later.'}}), 429
 
-        flash('Too many requests. Please wait 60 seconds before trying again.', 'danger')
-        return redirect(url_for('auth.login'))
+        if request.path.startswith('/static/') or request.path.startswith('/favicon'):
+            return '', 429
+
+        message = 'Too many requests. Please wait a moment before trying again.'
+        flash(message, 'warning')
+
+        if request.referrer:
+            return redirect(request.referrer)
+        return redirect(url_for('main.attendance'))
 
     return flask_app
 
