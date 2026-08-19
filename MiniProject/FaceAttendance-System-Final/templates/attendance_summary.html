@@ -2,7 +2,9 @@
 
 {% block title %}Attendance Summary - Attendance System{% endblock %}
 
-{% block header_actions %}
+{% block body_class %}attendance-summary-shell{% endblock %}
+
+{% block profile_action %}
 <!-- Native Bootstrap 5 Profile Dropdown -->
 
 <div class="dropdown">
@@ -87,10 +89,18 @@
       </div>
     </li>
 
-    <!-- Links -->
-    {% if user.role == 'faculty' or user.role == 'staff' %}
-        <!-- Faculty & Staff Links -->
-    {% endif %}
+        <!-- Links -->
+        {% if user.role == 'faculty' or user.role == 'staff' %}
+        <li>
+            <a
+                class="dropdown-item py-2 d-flex align-items-center fw-medium small"
+                href="{{ url_for('main.attendance_summary') }}"
+            >
+                <i class="fa-solid fa-chart-column me-2 text-primary" style="width: 18px"></i>
+                Attendance Reports & Summary
+            </a>
+        </li>
+        {% endif %}
 
     <li>
       <a class="dropdown-item py-2 d-flex align-items-center text-secondary small" href="{{ url_for('main.profile') }}">
@@ -129,11 +139,18 @@
 </div>
 {% endblock %}
 
+{% block header_actions %}
+<a href="{{ url_for('main.attendance') }}"
+    class="btn btn-outline-light fw-semibold btn-header border-0 justify-content-start px-3">
+    <i class="fa-solid fa-camera me-2" style="width: 20px; text-align: center"></i>Mark Attendance
+</a>
+{% endblock %}
+
 {% block content %}
-<div class="main-container flex-column gap-3">
+<div class="main-container attendance-summary-page flex-column gap-3">
 
     <!-- Top Summary Stat Cards -->
-    <div class="row g-3">
+    <div class="summary-stats row g-2">
         <div class="col-md-3 col-sm-6">
             <div class="card-custom py-3 px-3 d-flex flex-row align-items-center gap-3">
                 <div class="rounded-circle bg-primary bg-opacity-10 p-3 text-primary">
@@ -141,7 +158,7 @@
                 </div>
                 <div>
                     <span class="text-muted small d-block">Total Enrolled</span>
-                    <h4 class="mb-0 fw-bold">128</h4>
+                    <h4 class="mb-0 fw-bold">{{ stats.total_enrolled }}</h4>
                 </div>
             </div>
         </div>
@@ -153,7 +170,7 @@
                 </div>
                 <div>
                     <span class="text-muted small d-block">Present Today</span>
-                    <h4 class="mb-0 fw-bold text-success">112</h4>
+                    <h4 class="mb-0 fw-bold text-success">{{ stats.present }}</h4>
                 </div>
             </div>
         </div>
@@ -165,7 +182,7 @@
                 </div>
                 <div>
                     <span class="text-muted small d-block">Absent Today</span>
-                    <h4 class="mb-0 fw-bold text-danger">16</h4>
+                    <h4 class="mb-0 fw-bold text-danger">{{ stats.absent }}</h4>
                 </div>
             </div>
         </div>
@@ -177,7 +194,7 @@
                 </div>
                 <div>
                     <span class="text-muted small d-block">Attendance Rate</span>
-                    <h4 class="mb-0 fw-bold">87.5%</h4>
+                    <h4 class="mb-0 fw-bold">{{ stats.rate }}%</h4>
                 </div>
             </div>
         </div>
@@ -192,19 +209,19 @@
                 <h2 class="mb-1"><i class="fa-solid fa-chart-column me-2 text-primary"></i>Class Attendance Logs</h2>
                 <p class="text-muted small mb-0">Search and filter recorded attendance history</p>
             </div>
-            <div class="d-flex gap-2">
-                <a href="{{ url_for('main.attendance') }}" class="btn btn-outline-secondary btn-sm fw-semibold">
+            <div class="summary-actions d-flex gap-2">
+                    <a href="{{ url_for('main.attendance') }}" class="btn btn-success btn-sm fw-semibold">
                     <i class="fa-solid fa-camera me-1"></i>Mark Attendance
                 </a>
-                <button class="btn btn-primary btn-sm fw-semibold"
-                    onclick="showToast('Exporting Data', 'Downloading Attendance CSV report...', 'info')">
+                <a class="btn btn-primary btn-sm fw-semibold"
+                    href="{{ url_for('main.export_attendance_summary', date=selected_date, search=search, status=status, course_id=selected_course_id) }}">
                     <i class="fa-solid fa-file-arrow-down me-1"></i>Export CSV
-                </button>
+                </a>
             </div>
         </div>
 
         <!-- Filter Controls -->
-        <div class="row g-2 mb-3  p-3 rounded border">
+        <form method="get" action="{{ url_for('main.attendance_summary') }}" class="summary-filter row g-2 mb-3 p-3 rounded border">
             <div class="col-md-3">
                 <label class="form-label text-muted extra-small fw-medium mb-1">
                     <i class="fa-solid fa-user-tag me-1"></i>Search Student
@@ -212,7 +229,7 @@
                 <div class="input-group input-group-sm">
                     <span class="input-group-text bg-white"><i
                             class="fa-solid fa-magnifying-glass text-muted"></i></span>
-                    <input type="text" id="searchInput" class="form-control" placeholder="Name or Roll No...">
+                    <input type="search" id="searchInput" name="search" value="{{ search }}" class="form-control" placeholder="Name or Roll No...">
                 </div>
             </div>
 
@@ -220,18 +237,18 @@
                 <label class="form-label text-muted extra-small fw-medium mb-1">
                     <i class="fa-solid fa-calendar-day me-1"></i>Date
                 </label>
-                <input type="date" id="dateFilter" class="form-control form-control-sm">
+                <input type="date" id="dateFilter" name="date" value="{{ selected_date }}" class="form-control form-control-sm">
             </div>
 
             <div class="col-md-3 col-sm-6">
                 <label class="form-label text-muted extra-small fw-medium mb-1">
                     <i class="fa-solid fa-graduation-cap me-1"></i>Branch / Course
                 </label>
-                <select class="form-select form-select-sm">
-                    <option value="all">All Branches</option>
-                    <option value="btech_cse" selected>B.Tech - CSE</option>
-                    <option value="btech_ece">B.Tech - ECE</option>
-                    <option value="btech_me">B.Tech - ME</option>
+                <select class="form-select form-select-sm" name="course_id">
+                    <option value="all" {% if selected_course_id == 'all' %}selected{% endif %}>All Branches</option>
+                    {% for course in courses %}
+                    <option value="{{ course.id }}" {% if selected_course_id == course.id|string %}selected{% endif %}>{{ course.name }}</option>
+                    {% endfor %}
                 </select>
             </div>
 
@@ -239,17 +256,21 @@
                 <label class="form-label text-muted extra-small fw-medium mb-1">
                     <i class="fa-solid fa-filter me-1"></i>Status
                 </label>
-                <select class="form-select form-select-sm">
-                    <option value="all">All Statuses</option>
-                    <option value="present">Present</option>
-                    <option value="absent">Absent</option>
+                <select class="form-select form-select-sm" name="status">
+                    <option value="all" {% if status == 'all' %}selected{% endif %}>All Statuses</option>
+                    <option value="present" {% if status == 'present' %}selected{% endif %}>Present</option>
+                    <option value="absent" {% if status == 'absent' %}selected{% endif %}>Absent</option>
                 </select>
             </div>
-        </div>
+            <div class="filter-actions col-12 d-flex justify-content-end gap-2">
+                <a href="{{ url_for('main.attendance_summary') }}" class="btn btn-outline-secondary btn-sm">Reset</a>
+                <button type="submit" class="btn btn-primary btn-sm"><i class="fa-solid fa-filter me-1"></i>Apply Filters</button>
+            </div>
+        </form>
 
         <!-- Responsive Attendance Table -->
         <div class="table-responsive flex-grow-1">
-            <table class="table table-hover align-middle mb-0">
+            <table class="summary-table table table-hover align-middle mb-0">
                 <thead class="table-light text-muted small">
                     <tr>
                         <th scope="col"><i class="fa-solid fa-id-badge me-1"></i>Roll / ID</th>
@@ -261,112 +282,63 @@
                     </tr>
                 </thead>
                 <tbody class="small">
+                    {% for row in rows %}
                     <tr>
-                        <td class="fw-semibold">ST-2026-081</td>
-                        <td>
-                            <div class="d-flex align-items-center gap-2">
-                                <img src="https://ui-avatars.com/api/?name=Aarav+Sharma&background=0D8ABC&color=fff"
-                                    width="28" height="28" class="rounded-circle">
-                                <span>Aarav Sharma</span>
-                            </div>
-                        </td>
-                        <td>B.Tech (CSE)</td>
-                        <td>08 Aug 2026, 09:15 AM</td>
-                        <td>
-                            <span class="badge  text-dark border">
-                                <i class="fa-solid fa-face-viewfinder text-primary me-1"></i>Face AI
-                            </span>
-                        </td>
+                        <td class="fw-semibold">{{ row.identifier }}</td>
+                        <td>{{ row.name }}</td>
+                        <td>{{ row.course }}</td>
+                        <td>{{ row.date }}{% if row.time_in != '-' %}, {{ row.time_in }}{% endif %}</td>
+                        <td><span class="badge text-dark border"><i class="fa-solid fa-shield-halved text-primary me-1"></i>{{ row.verification_method }}</span></td>
                         <td class="text-center">
-                            <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1">
-                                <i class="fa-solid fa-circle-check me-1"></i>Present
+                            <span class="badge {% if row.status == 'Present' %}bg-success-subtle text-success border-success-subtle{% else %}bg-danger-subtle text-danger border-danger-subtle{% endif %} border px-3 py-1">
+                                <i class="fa-solid {% if row.status == 'Present' %}fa-circle-check{% else %}fa-circle-xmark{% endif %} me-1"></i>{{ row.status }}
                             </span>
                         </td>
                     </tr>
-                    <tr>
-                        <td class="fw-semibold">ST-2026-082</td>
-                        <td>
-                            <div class="d-flex align-items-center gap-2">
-                                <img src="https://ui-avatars.com/api/?name=Ananya+Verma&background=2563eb&color=fff"
-                                    width="28" height="28" class="rounded-circle">
-                                <span>Ananya Verma</span>
-                            </div>
-                        </td>
-                        <td>B.Tech (CSE)</td>
-                        <td>08 Aug 2026, 09:16 AM</td>
-                        <td>
-                            <span class="badge  text-dark border">
-                                <i class="fa-solid fa-face-viewfinder text-primary me-1"></i>Face AI
-                            </span>
-                        </td>
-                        <td class="text-center">
-                            <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1">
-                                <i class="fa-solid fa-circle-check me-1"></i>Present
-                            </span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="fw-semibold">ST-2026-083</td>
-                        <td>
-                            <div class="d-flex align-items-center gap-2">
-                                <img src="https://ui-avatars.com/api/?name=Rohan+Gupta&background=64748b&color=fff"
-                                    width="28" height="28" class="rounded-circle">
-                                <span>Rohan Gupta</span>
-                            </div>
-                        </td>
-                        <td>B.Tech (CSE)</td>
-                        <td>-</td>
-                        <td>
-                            <span class="badge  text-muted border">
-                                <i class="fa-solid fa-ban me-1"></i>None
-                            </span>
-                        </td>
-                        <td class="text-center">
-                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-1">
-                                <i class="fa-solid fa-circle-xmark me-1"></i>Absent
-                            </span>
-                        </td>
-                    </tr>
+                    {% else %}
+                    <tr><td colspan="6" class="text-center text-muted py-4">No attendance records match these filters.</td></tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>
 
         <!-- Footer Pagination Control Bar -->
         <div
-            class="d-flex flex-column flex-sm-row justify-content-between align-items-center gap-3 pt-3 mt-2 border-top">
+            class="pagination-bar d-flex flex-column flex-sm-row justify-content-between align-items-center gap-3 pt-3 mt-2 border-top">
 
             <!-- Left: Records per Page Selector & Counter -->
             <div class="d-flex align-items-center gap-2 text-muted small">
                 <span>Show</span>
-                <select id="recordsPerPage" class="form-select form-select-sm w-auto" style="min-width: 70px;">
-                    <option value="10" selected>10</option>
-                    <option value="25">25</option>
-                    <option value="50">50</option>
-                    <option value="100">100</option>
+                <select id="recordsPerPage" name="per_page" class="form-select form-select-sm w-auto" style="min-width: 70px;" onchange="const params = new URLSearchParams(window.location.search); params.set('per_page', this.value); params.set('page', '1'); window.location.search = params.toString();">
+                    {% for size in [10, 25, 50, 100] %}
+                    <option value="{{ size }}" {% if per_page == size %}selected{% endif %}>{{ size }}</option>
+                    {% endfor %}
                 </select>
                 <span>entries per page</span>
                 <span class="d-none d-md-inline ms-2 border-start ps-2 text-secondary">
-                    Showing <strong>1</strong> to <strong>3</strong> of <strong>128</strong> records
+                    Showing <strong>{{ pagination.first if pagination.total else 0 }}</strong> to <strong>{{ pagination.last if pagination.total else 0 }}</strong> of <strong>{{ pagination.total }}</strong> records
                 </span>
             </div>
 
             <!-- Right: Pagination Links -->
             <nav aria-label="Table Navigation">
                 <ul class="pagination pagination-sm mb-0">
-                    <li class="page-item disabled">
-                        <a class="page-item-link page-link" href="#" tabindex="-1" aria-disabled="true">
+                    <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}">
+                        <a class="page-item-link page-link" href="{{ url_for('main.attendance_summary', page=pagination.prev_num, per_page=per_page, date=selected_date, search=search, status=status, course_id=selected_course_id) if pagination.has_prev else '#' }}" tabindex="{% if not pagination.has_prev %}-1{% endif %}" aria-disabled="{{ 'true' if not pagination.has_prev else 'false' }}">
                             <i class="fa-solid fa-angle-left"></i>
                         </a>
                     </li>
-                    <li class="page-item active" aria-current="page">
-                        <a class="page-link" href="#">1</a>
+                    {% for page_number in pagination.iter_pages(left_edge=1, left_current=1, right_current=1, right_edge=1) %}
+                    {% if page_number %}
+                    <li class="page-item {% if page_number == pagination.page %}active{% endif %}" {% if page_number == pagination.page %}aria-current="page"{% endif %}>
+                        <a class="page-link" href="{{ url_for('main.attendance_summary', page=page_number, per_page=per_page, date=selected_date, search=search, status=status, course_id=selected_course_id) }}">{{ page_number }}</a>
                     </li>
-                    <li class="page-item"><a class="page-link" href="#">2</a></li>
-                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                    {% else %}
                     <li class="page-item disabled"><span class="page-link">...</span></li>
-                    <li class="page-item"><a class="page-link" href="#">13</a></li>
-                    <li class="page-item">
-                        <a class="page-link" href="#">
+                    {% endif %}
+                    {% endfor %}
+                    <li class="page-item {% if not pagination.has_next %}disabled{% endif %}">
+                        <a class="page-link" href="{{ url_for('main.attendance_summary', page=pagination.next_num, per_page=per_page, date=selected_date, search=search, status=status, course_id=selected_course_id) if pagination.has_next else '#' }}">
                             <i class="fa-solid fa-angle-right"></i>
                         </a>
                     </li>
@@ -383,11 +355,236 @@
 {% block extra_js %}
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const dateInput = document.getElementById('dateFilter');
-        if (dateInput) {
-            const today = new Date().toISOString().split('T')[0];
-            dateInput.value = today;
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+            searchInput.focus();
         }
     });
 </script>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .attendance-summary-page {
+        max-width: none;
+        flex: 1 1 auto;
+        min-height: 0;
+        padding: 1rem clamp(1rem, 2vw, 2rem);
+        gap: 1rem !important;
+        overflow-y: auto;
+        overflow-x: hidden;
+        align-self: stretch;
+    }
+
+    body.attendance-summary-shell {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        height: 100vh;
+        min-height: 0;
+        overflow: hidden;
+    }
+
+    body.attendance-summary-shell > header,
+    body.attendance-summary-shell > footer {
+        flex: 0 0 auto;
+    }
+
+    .attendance-summary-page .summary-stats {
+        flex: 0 0 auto;
+        align-items: stretch;
+    }
+
+    .attendance-summary-page .summary-stats > [class*="col-"] {
+        flex: 0 0 25%;
+        width: 25%;
+    }
+
+    .attendance-summary-page .summary-stats .card-custom {
+        width: 100%;
+        min-height: 58px;
+        padding: 0.45rem 0.65rem !important;
+        gap: 0.8rem !important;
+    }
+
+    .attendance-summary-page .summary-stats .rounded-circle {
+        padding: 0.45rem !important;
+        width: 42px;
+        height: 42px;
+        flex: 0 0 42px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .attendance-summary-page .summary-stats h4 {
+        font-size: 1rem;
+    }
+
+    .attendance-summary-page .summary-stats .text-muted {
+        font-size: 0.72rem !important;
+    }
+
+    .attendance-summary-page > .card-custom {
+        flex: 1 1 auto;
+        min-height: 0;
+    }
+
+    .attendance-summary-page > .card-custom .table-responsive {
+        min-height: 140px;
+    }
+
+    .attendance-summary-page .summary-actions {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .attendance-summary-page .summary-actions .btn,
+    .attendance-summary-page .filter-actions .btn {
+        min-width: 132px;
+        height: 38px;
+        padding: 0.5rem 0.85rem;
+        white-space: nowrap;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .attendance-summary-page .summary-filter,
+    .attendance-summary-page .summary-filter .form-control,
+    .attendance-summary-page .summary-filter .form-select {
+        min-width: 0;
+    }
+
+    .attendance-summary-page .summary-table {
+        min-width: 760px;
+    }
+
+    .attendance-summary-page .pagination-bar {
+        flex-shrink: 0;
+    }
+
+    @media (max-width: 767.98px) {
+        .attendance-summary-page {
+            padding: 1rem 0.75rem;
+            gap: 1rem;
+            min-height: 0;
+        }
+
+        .attendance-summary-page .summary-stats > [class*="col-"] {
+            flex: 1 1 50%;
+            width: 50%;
+        }
+
+        .attendance-summary-page .summary-stats .card-custom {
+            width: 100%;
+        }
+
+        .attendance-summary-page .summary-actions {
+            width: 100%;
+            justify-content: stretch;
+        }
+
+        .attendance-summary-page .summary-actions .btn,
+        .attendance-summary-page .filter-actions .btn {
+            flex: 1 1 0;
+            min-width: 0;
+        }
+
+        .attendance-summary-page .summary-filter {
+            padding: 0.75rem !important;
+        }
+
+        .attendance-summary-page .summary-filter .form-control,
+        .attendance-summary-page .summary-filter .form-select {
+            font-size: 0.875rem;
+        }
+
+        .attendance-summary-page .summary-stats .card-custom {
+            min-height: 52px;
+            padding: 0.35rem 0.5rem !important;
+            gap: 0.65rem !important;
+        }
+
+        .attendance-summary-page .summary-stats .rounded-circle {
+            padding: 0.35rem !important;
+            width: 36px;
+            height: 36px;
+            flex-basis: 36px;
+        }
+
+        .attendance-summary-page .summary-stats .rounded-circle i {
+            font-size: 0.9rem;
+        }
+
+        .attendance-summary-page .summary-table {
+            font-size: 0.75rem;
+        }
+
+        .attendance-summary-page .summary-table th,
+        .attendance-summary-page .summary-table td {
+            padding: 0.4rem 0.5rem;
+        }
+
+        .attendance-summary-page .pagination-bar {
+            flex-direction: row !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            gap: 0.5rem !important;
+            flex-wrap: wrap;
+        }
+
+        .attendance-summary-page .pagination-bar > div {
+            flex: 1 1 auto;
+        }
+
+        .attendance-summary-page .pagination-bar nav {
+            flex: 0 0 auto;
+        }
+    }
+
+    @media (max-width: 420px) {
+        .attendance-summary-page .summary-stats > [class*="col-"] {
+            flex-basis: 100%;
+            width: 100%;
+        }
+
+        .attendance-summary-page .summary-actions,
+        .attendance-summary-page .filter-actions {
+            flex-direction: column;
+        }
+
+        .attendance-summary-page .summary-actions .btn,
+        .attendance-summary-page .filter-actions .btn {
+            width: 100%;
+        }
+
+        .attendance-summary-page .pagination .page-link {
+            min-width: 32px;
+            padding: 0.35rem 0.55rem;
+        }
+
+        .attendance-summary-page .summary-stats .card-custom {
+            min-height: 48px;
+        }
+
+        .attendance-summary-page .summary-stats .text-muted {
+            font-size: 0.65rem !important;
+        }
+
+        .attendance-summary-page .summary-stats h4 {
+            font-size: 0.9rem;
+        }
+
+        .attendance-summary-page .summary-table {
+            font-size: 0.68rem;
+        }
+
+        .attendance-summary-page .summary-table th,
+        .attendance-summary-page .summary-table td {
+            padding: 0.3rem 0.4rem;
+        }
+    }
+</style>
 {% endblock %}

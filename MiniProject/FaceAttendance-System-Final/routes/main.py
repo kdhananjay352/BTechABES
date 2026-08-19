@@ -1,10 +1,12 @@
+import csv
+import io
 import os
 import cv2
 import numpy as np
 from datetime import datetime, date
 from flask import Blueprint, render_template, redirect, url_for, request, Response, jsonify, current_app, flash
 from flask_login import login_required, current_user
-from sqlalchemy import func
+from sqlalchemy import false, func, or_
 from sqlalchemy.exc import SQLAlchemyError
 from extensions import db
 from models import User, Student, FacultyStaff, AttendanceRecord, Course, Department
@@ -140,7 +142,150 @@ def attendance():
 @main_bp.route('/attendance-summary')
 @login_required
 def attendance_summary():
-    return render_template('attendance_summary.html', user=current_user)
+    selected_date = _summary_date(request.args.get('date'))
+    search = request.args.get('search', '').strip()
+    status = request.args.get('status', 'all').strip().lower()
+    course_id = request.args.get('course_id', 'all').strip()
+    per_page = _summary_per_page(request.args.get('per_page'))
+    page = max(request.args.get('page', 1, type=int), 1)
+
+    query = _summary_query(selected_date, search, status, course_id)
+    total_records = query.count()
+    pagination = query.order_by(User.username.asc()).paginate(
+        page=page, per_page=per_page, error_out=False
+    )
+    rows = [_summary_row(*result) for result in pagination.items]
+
+    stats_query = _summary_query(selected_date, search, 'all', course_id)
+    total_enrolled = stats_query.with_entities(func.count(User.id)).scalar() or 0
+    present_count = stats_query.filter(AttendanceRecord.id.isnot(None)).count()
+    absent_count = max(total_enrolled - present_count, 0)
+    attendance_rate = round((present_count / total_enrolled) * 100, 1) if total_enrolled else 0
+
+    return render_template(
+        'attendance_summary.html',
+        user=current_user,
+        rows=rows,
+        pagination=pagination,
+        selected_date=selected_date.isoformat(),
+        search=search,
+        status=status,
+        selected_course_id=course_id,
+        per_page=per_page,
+        courses=_summary_courses(),
+        stats={
+            'total_enrolled': total_enrolled,
+            'present': present_count,
+            'absent': absent_count,
+            'rate': attendance_rate,
+        },
+    )
+
+
+@main_bp.route('/attendance-summary/export')
+@login_required
+def export_attendance_summary():
+    selected_date = _summary_date(request.args.get('date'))
+    search = request.args.get('search', '').strip()
+    status = request.args.get('status', 'all').strip().lower()
+    course_id = request.args.get('course_id', 'all').strip()
+    rows = [_summary_row(*result) for result in _summary_query(
+        selected_date, search, status, course_id
+    ).order_by(User.username.asc()).all()]
+
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(['Roll / ID', 'Student Name', 'Branch', 'Date', 'Time In', 'Time Out',
+                     'Verification Method', 'Status', 'Total Hours'])
+    for row in rows:
+        writer.writerow([
+            row['identifier'], row['name'], row['course'], row['date'], row['time_in'],
+            row['time_out'], row['verification_method'], row['status'], row['total_hours']
+        ])
+
+    response = Response(output.getvalue(), mimetype='text/csv')
+    response.headers['Content-Disposition'] = (
+        f'attachment; filename=attendance-summary-{selected_date.isoformat()}.csv'
+    )
+    return response
+
+
+def _summary_date(value):
+    try:
+        return datetime.strptime(value, '%Y-%m-%d').date() if value else date.today()
+    except (TypeError, ValueError):
+        return date.today()
+
+
+def _summary_per_page(value):
+    try:
+        parsed = int(value)
+    except (TypeError, ValueError):
+        parsed = 10
+    return parsed if parsed in {10, 25, 50, 100} else 10
+
+
+def _summary_query(selected_date, search='', status='all', course_id='all'):
+    role = (current_user.role or 'student').lower()
+    query = db.session.query(User, Student, Course, AttendanceRecord).outerjoin(
+        Student, Student.student_id == User.id
+    ).outerjoin(Course, Course.id == Student.course_id).outerjoin(
+        AttendanceRecord,
+        (AttendanceRecord.user_id == User.id) & (AttendanceRecord.date == selected_date)
+    ).filter(User.role == 'student')
+
+    if role == 'student':
+        query = query.filter(User.id == current_user.id)
+    elif role in {'teacher', 'faculty', 'staff'}:
+        department_id = current_user.faculty_profile.department_id if current_user.faculty_profile else None
+        if department_id:
+            query = query.filter(Course.department_id == department_id)
+
+    if search:
+        term = f'%{search}%'
+        query = query.filter(or_(
+            Student.full_name.ilike(term),
+            Student.roll_no.ilike(term),
+            User.username.ilike(term),
+        ))
+
+    if course_id != 'all':
+        try:
+            query = query.filter(Course.id == int(course_id))
+        except (TypeError, ValueError):
+            query = query.filter(false())
+
+    if status == 'present':
+        query = query.filter(AttendanceRecord.id.isnot(None))
+    elif status == 'absent':
+        query = query.filter(AttendanceRecord.id.is_(None))
+
+    return query
+
+
+def _summary_courses():
+    role = (current_user.role or 'student').lower()
+    query = Course.query.order_by(Course.name.asc())
+    if role in {'teacher', 'faculty', 'staff'} and current_user.faculty_profile:
+        query = query.filter(Course.department_id == current_user.faculty_profile.department_id)
+    return query.all()
+
+
+def _summary_row(user, student, course, record):
+    profile = student or user.faculty_profile
+    identifier = student.roll_no if student else getattr(profile, 'employee_id', user.username)
+    name = student.full_name if student else getattr(profile, 'full_name', user.username)
+    return {
+        'identifier': identifier,
+        'name': name,
+        'course': course.name if course else 'N/A',
+        'date': record.date.strftime('%d %b %Y') if record else '-',
+        'time_in': record.time_in.strftime('%I:%M %p') if record and record.time_in else '-',
+        'time_out': record.time_out.strftime('%I:%M %p') if record and record.time_out else '-',
+        'verification_method': record.verification_method if record else 'None',
+        'status': 'Present' if record else 'Absent',
+        'total_hours': f'{record.total_hours:.2f}' if record and record.total_hours is not None else '-',
+    }
 
 
 @main_bp.route('/video_feed')
