@@ -92,18 +92,6 @@
                                         matching. Default: 18.0</div>
                                 </div>
 
-                                <div class="col-md-6">
-                                    <label for="camera_source" class="form-label fw-bold small">Default Camera
-                                        Source</label>
-                                    <select class="form-select" id="camera_source" name="camera_source">
-                                        <option value="0" {% if settings.camera_source=='0' %}selected{% endif %}>
-                                            Built-in Web Camera (0)</option>
-                                        <option value="1" {% if settings.camera_source=='1' %}selected{% endif %}>
-                                            External USB Camera (1)</option>
-                                    </select>
-                                    <div class="form-text text-muted" style="font-size: 0.75rem;">Select primary
-                                        hardware capture device.</div>
-                                </div>
                             </div>
                         </div>
                         {% endif %}
@@ -117,6 +105,7 @@
                                 timers.</p>
 
                             <div class="row g-4">
+                                {% if role == 'admin' %}
                                 <div class="col-md-6">
                                     <label for="shift_duration" class="form-label fw-bold small">Standard Shift Duration
                                         (Hours)</label>
@@ -128,6 +117,7 @@
                                     <div class="form-text text-muted" style="font-size: 0.75rem;">Triggers early leave
                                         warning checks.</div>
                                 </div>
+                                    {% endif %}
 
                                 <div class="col-md-6">
                                     <label for="cooldown_mins" class="form-label fw-bold small">Punch Cooldown Timer
@@ -140,6 +130,34 @@
                                     <div class="form-text text-muted" style="font-size: 0.75rem;">Prevents duplicate
                                         accidental scans.</div>
                                 </div>
+
+                                {% if role == 'admin' %}
+                                <div class="col-md-6">
+                                    <label for="session_timeout" class="form-label fw-bold small">Session Timeout
+                                        (Mins)</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fa-solid fa-hourglass"></i></span>
+                                        <input type="number" min="1" class="form-control" id="session_timeout"
+                                            name="session_timeout" value="{{ settings.session_timeout }}">
+                                    </div>
+                                    <div class="form-text text-muted" style="font-size: 0.75rem;">Controls automatic
+                                        logout after inactivity.</div>
+                                </div>
+                                    {% endif %}
+
+                                {% if role == 'admin' %}
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold small d-block">Maintenance Mode</label>
+                                    <div class="form-check form-switch mt-2">
+                                        <input class="form-check-input" type="checkbox" role="switch"
+                                            id="maintenance_mode" name="maintenance_mode"
+                                            style="width: 3rem; height: 1.5rem;" {% if settings.maintenance_mode %}checked{% endif %}>
+                                        <label class="form-check-label ms-2 mt-1 small" for="maintenance_mode">
+                                            Temporarily restrict system operations
+                                        </label>
+                                    </div>
+                                </div>
+                                {% endif %}
                             </div>
                         </div>
                         {% endif %}
@@ -152,6 +170,18 @@
                                 locally.</p>
 
                             <div class="row g-4">
+                                <div class="col-md-6">
+                                    <label for="camera_source" class="form-label fw-bold small">Camera Source</label>
+                                    <select class="form-select" id="camera_source" name="camera_source">
+                                        <option value="0" {% if settings.camera_source == '0' %}selected{% endif %}>
+                                            Built-in Web Camera (0)</option>
+                                        <option value="1" {% if settings.camera_source == '1' %}selected{% endif %}>
+                                            External USB Camera (1)</option>
+                                    </select>
+                                    <div class="form-text text-muted" style="font-size: 0.75rem;">Choose which camera
+                                        this account uses for attendance verification.</div>
+                                </div>
+
                                 <div class="col-md-6">
                                     <label for="theme_preference" class="form-label fw-bold small">Interface
                                         Theme</label>

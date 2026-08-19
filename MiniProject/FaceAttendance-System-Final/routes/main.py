@@ -9,7 +9,7 @@ from flask_login import login_required, current_user
 from sqlalchemy import false, func, or_
 from sqlalchemy.exc import SQLAlchemyError
 from extensions import db
-from models import User, Student, FacultyStaff, AttendanceRecord, Course, Department
+from models import User, Student, FacultyStaff, AttendanceRecord, Course, Department, SystemSetting
 # Import your existing custom face detection service
 from services.face_detection import extract_face_encoding
 from flask import render_template, request, flash, redirect, url_for
@@ -27,10 +27,10 @@ main_bp = Blueprint('main', __name__)
 global_frame = None
 
 
-def generate_frames():
+def generate_frames(camera_source='0'):
     """Capture video frames from the webcam and yield them as a byte stream."""
     global global_frame
-    camera = cv2.VideoCapture(0)  # 0 is the default built-in webcam
+    camera = cv2.VideoCapture(int(camera_source))
 
     while True:
         success, frame = camera.read()
@@ -48,6 +48,8 @@ def generate_frames():
             # Yield the frame in the multipart format expected by the browser
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
+
+    camera.release()
 
 # ==============================================================================
 # UI ROUTES
@@ -292,7 +294,8 @@ def _summary_row(user, student, course, record):
 @login_required
 def video_feed():
     """Route that provides the live video stream to the frontend."""
-    return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
+    camera_source = load_system_settings(current_user.id)['camera_source']
+    return Response(generate_frames(camera_source), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 # ==============================================================================
 # API: MARK ATTENDANCE ROUTE
@@ -565,42 +568,99 @@ def change_password():
 
 
 # ==============================================================================
-# system setting
+# system settings
 # ==============================================================================
+
+DEFAULT_SYSTEM_SETTINGS = {
+    'ai_threshold': 18.0,
+    'camera_source': '0',
+    'shift_duration': 8.5,
+    'cooldown_mins': 5,
+    'session_timeout': 10,
+    'maintenance_mode': False,
+    'email_notifications': True,
+    'theme_preference': 'dark'
+}
+
+
+def load_system_settings(user_id=None):
+    settings = DEFAULT_SYSTEM_SETTINGS.copy()
+    for setting in SystemSetting.query.all():
+        if setting.key not in settings:
+            continue
+        default_value = settings[setting.key]
+        if isinstance(default_value, bool):
+            settings[setting.key] = setting.value == 'true'
+        elif isinstance(default_value, float):
+            settings[setting.key] = float(setting.value)
+        elif isinstance(default_value, int):
+            settings[setting.key] = int(setting.value)
+        else:
+            settings[setting.key] = setting.value
+    if user_id is not None:
+        user_camera = SystemSetting.query.filter_by(key=f'camera_source_user_{user_id}').first()
+        if user_camera:
+            settings['camera_source'] = user_camera.value
+    return settings
+
+
+def save_system_settings(settings, user_id=None):
+    for key, value in settings.items():
+        if key == 'camera_source':
+            continue
+        setting = SystemSetting.query.filter_by(key=key).first()
+        if setting is None:
+            setting = SystemSetting(key=key, value=str(value).lower() if isinstance(value, bool) else str(value))
+            db.session.add(setting)
+        else:
+            setting.value = str(value).lower() if isinstance(value, bool) else str(value)
+    if user_id is not None:
+        camera_key = f'camera_source_user_{user_id}'
+        camera_setting = SystemSetting.query.filter_by(key=camera_key).first()
+        if camera_setting is None:
+            db.session.add(SystemSetting(key=camera_key, value=settings['camera_source']))
+        else:
+            camera_setting.value = settings['camera_source']
+    db.session.commit()
 
 @main_bp.route('/settings', methods=['GET', 'POST'])
 @login_required
 def system_settings():
     role = current_user.role.lower() if current_user.role else 'student'
-
-    current_settings = {
-        'ai_threshold': 18.0,
-        'camera_source': '0',
-        'shift_duration': 8.5,
-        'cooldown_mins': 5,
-        'session_timeout': 10,
-        'maintenance_mode': False,
-        'email_notifications': True,
-        'theme_preference': 'dark'
-    }
+    current_settings = load_system_settings(current_user.id)
 
     if request.method == 'POST':
-        if role == 'student':
-            flash('Permission Denied: Students cannot modify system settings.', 'danger')
-            return redirect(url_for('main.system_settings'))
+        try:
+            current_settings['theme_preference'] = request.form.get(
+                'theme_preference', current_settings['theme_preference'])
+            current_settings['email_notifications'] = request.form.get('email_notifications') == 'on'
+            current_settings['camera_source'] = request.form.get(
+                'camera_source', current_settings['camera_source'])
+            if current_settings['camera_source'] not in ('0', '1'):
+                raise ValueError
 
-        current_settings.update({
-            'ai_threshold': float(request.form.get('ai_threshold', current_settings['ai_threshold'])),
-            'camera_source': request.form.get('camera_source', current_settings['camera_source']),
-            'shift_duration': float(request.form.get('shift_duration', current_settings['shift_duration'])),
-            'cooldown_mins': int(request.form.get('cooldown_mins', current_settings['cooldown_mins'])),
-            'session_timeout': int(request.form.get('session_timeout', current_settings['session_timeout'])),
-            'maintenance_mode': request.form.get('maintenance_mode') == 'on',
-            'email_notifications': request.form.get('email_notifications') == 'on',
-            'theme_preference': request.form.get('theme_preference', current_settings['theme_preference'])
-        })
+            if role in ['admin', 'teacher', 'faculty', 'staff']:
+                current_settings['cooldown_mins'] = int(request.form.get(
+                    'cooldown_mins', current_settings['cooldown_mins']))
+
+            if role == 'admin':
+                current_settings.update({
+                    'ai_threshold': float(request.form.get('ai_threshold', current_settings['ai_threshold'])),
+                    'camera_source': request.form.get('camera_source', current_settings['camera_source']),
+                    'shift_duration': float(request.form.get('shift_duration', current_settings['shift_duration'])),
+                    'session_timeout': int(request.form.get('session_timeout', current_settings['session_timeout'])),
+                    'maintenance_mode': request.form.get('maintenance_mode') == 'on'
+                })
+
+            if current_settings['cooldown_mins'] < 0 or current_settings['session_timeout'] < 1:
+                raise ValueError
+            save_system_settings(current_settings, current_user.id)
+        except (TypeError, ValueError):
+            db.session.rollback()
+            flash('Please enter valid values for the selected settings.', 'danger')
+            return render_template('system_settings.html', settings=current_settings, role=role)
 
         flash('Settings have been successfully updated.', 'success')
-        return render_template('system_settings.html', settings=current_settings, role=role)
+        return redirect(url_for('main.system_settings'))
 
     return render_template('system_settings.html', settings=current_settings, role=role)

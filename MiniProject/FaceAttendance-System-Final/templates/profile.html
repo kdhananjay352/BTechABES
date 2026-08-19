@@ -2,6 +2,8 @@
 
 {% block title %}My Profile - Smart Attendance System{% endblock %}
 
+{% block body_class %}profile-page-shell{% endblock %}
+
 {% block extra_css %}
 <style>
     /* 1. Lock the whole screen to exactly the monitor height */
@@ -43,6 +45,53 @@
             overflow: visible !important;
         }
     }
+
+    .profile-page-shell .profile-save-btn {
+        min-height: clamp(36px, 4vw, 44px);
+        padding: 0.55rem clamp(0.75rem, 2vw, 1.5rem);
+        font-size: clamp(0.78rem, 1.2vw, 0.95rem);
+        white-space: nowrap;
+    }
+
+    .profile-page-shell .btn-header {
+        min-height: clamp(34px, 3.5vw, 42px);
+        padding-inline: clamp(0.65rem, 1.5vw, 1rem) !important;
+        font-size: clamp(0.78rem, 1vw, 0.9rem);
+    }
+
+    .profile-page-shell .profile-page-title {
+        font-size: clamp(1.05rem, 2vw, 1.5rem);
+    }
+
+    .profile-page-shell .profile-side-panel h5 {
+        font-size: clamp(1rem, 1.5vw, 1.25rem);
+    }
+
+    .profile-page-shell .profile-main-panel .card-header h5,
+    .profile-page-shell .profile-main-panel h6 {
+        font-size: clamp(0.82rem, 1.15vw, 1rem);
+    }
+
+    .profile-page-shell .profile-main-panel .form-label,
+    .profile-page-shell .profile-main-panel .form-control,
+    .profile-page-shell .profile-main-panel .input-group-text {
+        font-size: clamp(0.78rem, 1vw, 0.95rem);
+    }
+
+    .profile-page-shell .profile-side-panel .list-group-item,
+    .profile-page-shell .profile-side-panel .alert {
+        font-size: clamp(0.76rem, 0.95vw, 0.875rem);
+    }
+
+    @media (max-width: 575.98px) {
+        .profile-page-shell .profile-save-btn {
+            padding-inline: 0.7rem;
+        }
+
+        .profile-page-shell .profile-save-btn i {
+            margin-right: 0.35rem !important;
+        }
+    }
 </style>
 {% endblock %}
 
@@ -61,12 +110,12 @@
 
     <!-- PAGE TITLE & GLOBAL ACTIONS: Locked (Will not shrink or scroll) -->
     <div class="d-flex justify-content-between align-items-center mb-4 flex-shrink-0">
-        <h2 class="h4 fw-bold mb-0">
+        <h2 class="h4 profile-page-title fw-bold mb-0">
             <i class="fa-solid fa-user-gear text-primary me-2"></i>Profile Settings
         </h2>
 
         <!-- MOVED SAVE BUTTON: Links to the form below via form="profileForm" -->
-        <button type="submit" form="profileForm" class="btn btn-primary px-4 fw-semibold shadow-sm">
+        <button type="submit" form="profileForm" class="btn btn-primary profile-save-btn fw-semibold shadow-sm">
             <i class="fa-solid fa-floppy-disk me-2"></i>Save Changes
         </button>
     </div>

@@ -11,7 +11,7 @@ from extensions import db, login_manager, csrf
 from routes.auth import auth_bp
 from routes.main import main_bp
 from rate_limiter import limiter
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 
 def create_app():
@@ -22,6 +22,10 @@ def create_app():
 
     # 10-Minute Idle Timeout Configuration
     flask_app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=10)
+
+    @flask_app.context_processor
+    def inject_template_globals():
+        return {'current_year': datetime.now().year}
 
     # Ensure upload directories exist
     os.makedirs(flask_app.config['UPLOAD_FOLDER_FACES'], exist_ok=True)

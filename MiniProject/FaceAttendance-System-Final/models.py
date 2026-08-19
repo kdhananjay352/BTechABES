@@ -147,6 +147,15 @@ class AttendanceRecord(db.Model):
     total_hours = db.Column(db.Float, nullable=True)
 
 
+class SystemSetting(db.Model):
+    """Persistent application-wide configuration values."""
+    __tablename__ = 'system_settings'
+
+    id = db.Column(db.Integer, primary_key=True)
+    key = db.Column(db.String(50), unique=True, nullable=False)
+    value = db.Column(db.Text, nullable=False)
+
+
 @login_manager.user_loader
 def load_user(user_id):
     """Load user by ID for Flask-Login."""

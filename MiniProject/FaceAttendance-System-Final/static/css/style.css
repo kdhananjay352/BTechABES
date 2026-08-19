@@ -539,6 +539,8 @@ header.navbar {
 .camera-frame {
     position: relative;
     width: 100%;
+    max-width: 960px;
+    margin-inline: auto;
     flex: 1 1 auto;
     min-height: 380px;
     aspect-ratio: 16 / 9;
@@ -553,6 +555,7 @@ header.navbar {
 
 .camera-frame img,
 .camera-frame video {
+    display: block;
     width: 100%;
     height: 100%;
     object-fit: cover;
