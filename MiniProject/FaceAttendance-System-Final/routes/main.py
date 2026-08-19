@@ -1,17 +1,18 @@
 import csv
 import io
 import os
+from uuid import uuid4
 import cv2
 import numpy as np
 from datetime import datetime, date
 from flask import Blueprint, render_template, redirect, url_for, request, Response, jsonify, current_app, flash
 from flask_login import login_required, current_user
 from sqlalchemy import false, func, or_
-from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from extensions import db
 from models import User, Student, FacultyStaff, AttendanceRecord, Course, Department, SystemSetting
 # Import your existing custom face detection service
-from services.face_detection import extract_face_encoding
+from services.face_detection import compare_encodings, extract_face_encoding
 from flask import render_template, request, flash, redirect, url_for
 from werkzeug.security import check_password_hash, generate_password_hash
 from rate_limiter import limiter
@@ -22,34 +23,31 @@ main_bp = Blueprint('main', __name__)
 # ==============================================================================
 # GLOBAL CAMERA FRAME STATE
 # ==============================================================================
-# Holds the latest camera frame so the API route can grab it instantly
-# when the "Capture" button is clicked.
-global_frame = None
+# Holds the latest frame for each active authenticated camera stream.
+global_frames = {}
 
 
-def generate_frames(camera_source='0'):
+def generate_frames(user_id, camera_source='0'):
     """Capture video frames from the webcam and yield them as a byte stream."""
-    global global_frame
+    global global_frames
     camera = cv2.VideoCapture(int(camera_source))
 
-    while True:
-        success, frame = camera.read()
-        if not success:
-            break
-        else:
+    try:
+        while True:
+            success, frame = camera.read()
+            if not success:
+                break
             frame = cv2.flip(frame, 1)
-            # Save a clean copy of the current frame for the verification API
-            global_frame = frame.copy()
+            global_frames[user_id] = frame.copy()
 
-            # Encode the frame in JPEG format for the HTML video stream
             ret, buffer = cv2.imencode('.jpg', frame)
             frame_bytes = buffer.tobytes()
 
-            # Yield the frame in the multipart format expected by the browser
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
-
-    camera.release()
+    finally:
+        camera.release()
+        global_frames.pop(user_id, None)
 
 # ==============================================================================
 # UI ROUTES
@@ -123,6 +121,13 @@ def attendance():
             else:
                 teacher_stats['branch_students_present'] = 0
 
+        except IntegrityError:
+            db.session.rollback()
+            return jsonify({
+                'status': 'warning',
+                'title': 'Already Marked',
+                'message': 'Attendance was already recorded for today.'
+            })
         except Exception as e:
             print(f"Query Error: {e}")
             teacher_stats['branch_students_present'] = 0
@@ -295,7 +300,7 @@ def _summary_row(user, student, course, record):
 def video_feed():
     """Route that provides the live video stream to the frontend."""
     camera_source = load_system_settings(current_user.id)['camera_source']
-    return Response(generate_frames(camera_source), mimetype='multipart/x-mixed-replace; boundary=frame')
+    return Response(generate_frames(current_user.id, camera_source), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 # ==============================================================================
 # API: MARK ATTENDANCE ROUTE
@@ -306,39 +311,34 @@ def video_feed():
 @login_required
 def mark_attendance():
     """API endpoint to capture frame, verify face, and save attendance."""
-    global global_frame
+    global global_frames
 
     data = request.get_json()
-    role = data.get('role', '').strip().lower()
-    identifier = data.get('user_id', '').strip()  # Roll No or Employee ID
+    settings = load_system_settings(current_user.id)
+    role = (current_user.role or '').strip().lower()
+    profile = current_user.student_profile if role == 'student' else current_user.faculty_profile
+    identifier = profile.roll_no if role == 'student' and profile else (
+        profile.employee_id if profile else '')
 
     # 1. Validation Errors (Yellow/Warning)
-    if not identifier:
-        return jsonify({'status': 'warning', 'title': 'Missing Input', 'message': 'ID Number is required.'})
+    if not profile or not identifier:
+        return jsonify({'status': 'danger', 'title': 'Profile Error',
+                        'message': 'Your account profile is incomplete. Please contact an administrator.'}), 403
 
-    if global_frame is None:
+    current_frame = global_frames.get(current_user.id)
+    if current_frame is None:
         return jsonify({'status': 'danger', 'title': 'Camera Error', 'message': 'Camera is offline. Cannot capture frame.'})
-
-    # 2. Fetch User Profile
-    profile = None
-    if role == 'student':
-        profile = Student.query.filter_by(roll_no=identifier).first()
-    elif role in ['teacher', 'faculty', 'staff']:
-        profile = FacultyStaff.query.filter_by(employee_id=identifier).first()
-
-    if not profile:
-        return jsonify({'status': 'warning', 'title': 'Not Found', 'message': f'No account found with ID {identifier}.'})
 
     if not profile.encoding_path:
         return jsonify({'status': 'warning', 'title': 'Profile Incomplete', 'message': 'No registered face found for this user.'})
 
     # 3. Extract Face Encoding from LIVE Camera Frame
-    temp_filename = "temp_capture_auth.jpg"
+    temp_filename = f"temp_capture_{current_user.id}_{uuid4().hex}.jpg"
     temp_filepath = os.path.join(current_app.config.get(
         'UPLOAD_FOLDER_FACES', 'static/uploads/faces'), temp_filename)
 
     # Save the current frame to disk temporarily for the extraction service
-    cv2.imwrite(temp_filepath, global_frame)
+    cv2.imwrite(temp_filepath, current_frame)
     live_encoding = extract_face_encoding(temp_filepath)
 
     # Clean up the temporary file immediately
@@ -371,10 +371,10 @@ def mark_attendance():
         print(f"DEBUG: Numpy Load Error -> {str(e)}")
         return jsonify({'status': 'danger', 'title': 'Storage Error', 'message': 'Failed to load registered face data.'})
 
-    # 5. Compare the Faces using Euclidean Distance
-    distance = np.linalg.norm(saved_encoding - live_encoding)
-    threshold = 18.0
-    if distance < threshold:
+    # 5. Compare the faces using the same cosine-similarity metric used at registration.
+    is_match, _similarity = compare_encodings(
+        saved_encoding, live_encoding, settings['ai_threshold'])
+    if is_match:
         # -- MATCH FOUND --
         user_account = profile.user_account
         today_date = date.today()
@@ -412,16 +412,17 @@ def mark_attendance():
                 time_diff = current_time - existing_record.time_in
                 hours_worked = time_diff.total_seconds() / 3600.0
 
-                # Prevent accidental double-scans within 5 minutes (0.08 hours)
-                if hours_worked < 0.08:
+                cooldown_hours = settings['cooldown_mins'] / 60
+                if hours_worked < cooldown_hours:
                     return jsonify({
                         'status': 'warning',
                         'title': 'Too Soon',
                         'message': 'You just punched in! Please wait at least 5 minutes before punching out.'
                     })
 
-                # FACULTY/STAFF MANDATORY CHECK: Trigger 8.5hr warning
-                if role != 'student' and hours_worked < 8.5 and not confirm_early_out:
+                # FACULTY/STAFF MANDATORY CHECK: Trigger the configured shift warning.
+                shift_duration = settings['shift_duration']
+                if role != 'student' and hours_worked < shift_duration and not confirm_early_out:
 
                     # 1. Calculate time worked
                     worked_mins_total = int(hours_worked * 60)
@@ -429,8 +430,8 @@ def mark_attendance():
                     m = worked_mins_total % 60
                     time_str = f"{h} hrs {m} mins" if h > 0 else f"{m} mins"
 
-                    # 2. Calculate time short (8.5 hours = 510 minutes)
-                    short_total = 510 - worked_mins_total
+                    # 2. Calculate time short using the configured shift duration.
+                    short_total = max(0, int(shift_duration * 60) - worked_mins_total)
                     short_h = short_total // 60
                     short_m = short_total % 60
 
@@ -442,7 +443,7 @@ def mark_attendance():
                     return jsonify({
                         'status': 'confirm',
                         'title': 'Confirm Punch-Out',
-                        'message': f'You have completed {time_str} today, which is {short_str} short of the standard 8.5 working hours.\n\nDo you want to punch out now?'
+                        'message': f'You have completed {time_str} today, which is {short_str} short of the standard {shift_duration:g} working hours.\n\nDo you want to punch out now?'
                     })
 
                 # ========================================================
@@ -572,7 +573,7 @@ def change_password():
 # ==============================================================================
 
 DEFAULT_SYSTEM_SETTINGS = {
-    'ai_threshold': 18.0,
+    'ai_threshold': 0.4,
     'camera_source': '0',
     'shift_duration': 8.5,
     'cooldown_mins': 5,
@@ -597,6 +598,8 @@ def load_system_settings(user_id=None):
             settings[setting.key] = int(setting.value)
         else:
             settings[setting.key] = setting.value
+    if not 0 <= settings['ai_threshold'] <= 1:
+        settings['ai_threshold'] = DEFAULT_SYSTEM_SETTINGS['ai_threshold']
     if user_id is not None:
         user_camera = SystemSetting.query.filter_by(key=f'camera_source_user_{user_id}').first()
         if user_camera:

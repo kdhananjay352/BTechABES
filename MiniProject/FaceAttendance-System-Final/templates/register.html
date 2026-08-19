@@ -557,13 +557,18 @@
     }
 
     function resetRegistrationForm() {
-        if (confirm("Are you sure you want to delete all entered data and reset the registration process?")) {
+        showConfirm(
+            "Are you sure you want to delete all entered data and reset the registration process?",
+            "Reset Registration",
+            { confirmButtonText: "Reset Form", confirmButtonColor: "#dc3545" }
+        ).then((result) => {
+            if (!result.isConfirmed) return;
             clearLocalDraft();
             document.getElementById("registrationForm").reset();
             const alertBox = document.getElementById("step-error-alert");
             alertBox.classList.add("d-none");
             jumpToStep(1);
-        }
+        });
     }
 
     function updateSessionOptions() {

@@ -1,0 +1,30 @@
+<!-- Shared application popup component. Pages call showPopup() or showConfirm(). -->
+<script>
+  window.showPopup = function (message, title = "Notice", type = "info", options = {}) {
+    if (window.Swal) {
+      return Swal.fire({
+        title,
+        text: message,
+        icon: type === "danger" ? "error" : type,
+        confirmButtonColor: "#2563eb",
+        ...options
+      });
+    }
+
+    if (window.showToast) {
+      showToast(message, title, type);
+    }
+    return Promise.resolve({ isConfirmed: true });
+  };
+
+  window.showConfirm = function (message, title = "Please Confirm", options = {}) {
+    return showPopup(message, title, "warning", {
+      showCancelButton: true,
+      confirmButtonText: "Confirm",
+      cancelButtonText: "Cancel",
+      confirmButtonColor: "#2563eb",
+      cancelButtonColor: "#6c757d",
+      ...options
+    });
+  };
+</script>

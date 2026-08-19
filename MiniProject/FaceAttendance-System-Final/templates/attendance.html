@@ -570,16 +570,11 @@ Attendance System{% endblock %} {% block profile_action %}
         // INTERCEPT THE EARLY DEPARTURE WARNING
         // ========================================================
         if (data.status === 'confirm') {
-            // Use SweetAlert2 instead of the ugly browser popup
-            Swal.fire({
-                title: data.title,
-                text: data.message,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33', // Red for warning
-                cancelButtonColor: '#6c757d', // Grey for cancel
-                confirmButtonText: 'Punch Out',
-                cancelButtonText: 'Stay Logged In'
+            showConfirm(data.message, data.title, {
+              confirmButtonColor: '#d33',
+              cancelButtonColor: '#6c757d',
+              confirmButtonText: 'Punch Out',
+              cancelButtonText: 'Stay Logged In'
             }).then((result) => {
                 if (result.isConfirmed) {
                     // Re-run with the override flag

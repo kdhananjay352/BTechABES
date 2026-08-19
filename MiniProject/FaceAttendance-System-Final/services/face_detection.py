@@ -1,11 +1,19 @@
 import os
 import numpy as np
 import cv2
-from insightface.app import FaceAnalysis
 
-# Initialize InsightFace Analysis Engine using CPU ONNX Execution Provider
-face_app = FaceAnalysis(name='buffalo_l', providers=['CPUExecutionProvider'])
-face_app.prepare(ctx_id=0, det_size=(640, 640))
+face_app = None
+
+
+def get_face_app():
+    """Initialize the face engine only when a face operation is requested."""
+    global face_app
+    if face_app is None:
+        from insightface.app import FaceAnalysis
+
+        face_app = FaceAnalysis(name='buffalo_l', providers=['CPUExecutionProvider'])
+        face_app.prepare(ctx_id=0, det_size=(640, 640))
+    return face_app
 
 
 def extract_face_encoding(image_path):
@@ -17,8 +25,12 @@ def extract_face_encoding(image_path):
     if img is None:
         return None
 
-    faces = face_app.get(img)
-    if len(faces) == 0:
+    try:
+        faces = get_face_app().get(img)
+    except Exception as error:
+        print(f"Face engine unavailable: {error}")
+        return None
+    if len(faces) != 1:
         return None
 
     return faces[0].embedding

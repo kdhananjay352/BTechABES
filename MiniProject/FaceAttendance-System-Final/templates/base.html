@@ -99,28 +99,87 @@
   <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="{{ url_for('static', filename='js/common.js') }}"></script>
-  {% block extra_js %}
+  {% include 'components/popup.html' %}
+  {% if current_user.is_authenticated %}
   <script>
-    // 10 minutes in milliseconds (10 * 60 * 1000)
-    const IDLE_TIMEOUT = 600000;
-    let idleTimer;
+    (function () {
+      const SESSION_TIMEOUT_MS = 10 * 60 * 1000;
+      const SESSION_WARNING_MS = SESSION_TIMEOUT_MS - (2 * 60 * 1000);
+      let idleTimer;
+      let warningTimer;
+      let sessionDialogOpen = false;
 
-    function resetIdleTimer() {
-      clearTimeout(idleTimer);
-      idleTimer = setTimeout(() => {
-        // Alert the user (optional) and redirect to logout
-        alert("Your session has expired due to inactivity.");
-        window.location.href = "{{ url_for('auth.logout') }}";
-      }, IDLE_TIMEOUT);
-    }
+      function csrfToken() {
+        return document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+      }
 
-    // Reset the countdown whenever the user interacts with the page
-    window.addEventListener("load", resetIdleTimer);
-    document.addEventListener("mousemove", resetIdleTimer);
-    document.addEventListener("keypress", resetIdleTimer);
-    document.addEventListener("scroll", resetIdleTimer);
-    document.addEventListener("click", resetIdleTimer);
+      function extendSession() {
+        return fetch("{{ url_for('auth.extend_session') }}", {
+          method: 'POST',
+          headers: { 'X-CSRFToken': csrfToken(), 'X-Requested-With': 'XMLHttpRequest' }
+        }).then((response) => {
+          if (!response.ok) throw new Error('Session extension failed');
+          return response.json();
+        });
+      }
+
+      function startSessionTimers() {
+        if (sessionDialogOpen) return;
+        clearTimeout(idleTimer);
+        clearTimeout(warningTimer);
+        warningTimer = setTimeout(showSessionWarning, SESSION_WARNING_MS);
+        idleTimer = setTimeout(expireSession, SESSION_TIMEOUT_MS);
+      }
+
+      function showSessionWarning() {
+        if (sessionDialogOpen || !window.showPopup) return;
+        sessionDialogOpen = true;
+        showPopup(
+          'Your session will expire soon because of inactivity.',
+          'Session Expiring',
+          'warning',
+          {
+            showCancelButton: true,
+            confirmButtonText: 'Extend Session',
+            cancelButtonText: 'Sign Out',
+            allowOutsideClick: false,
+            allowEscapeKey: false
+          }
+        ).then((result) => {
+          sessionDialogOpen = false;
+          if (result.isConfirmed) {
+            return extendSession()
+              .then(() => {
+                showToast('Your session has been extended.', 'Session Active', 'success');
+                startSessionTimers();
+              })
+              .catch(expireSession);
+          }
+          window.location.href = "{{ url_for('auth.logout') }}";
+        });
+      }
+
+      function expireSession() {
+        if (sessionDialogOpen || !window.showPopup) return;
+        sessionDialogOpen = true;
+        showPopup('Your session has expired due to inactivity.', 'Session Expired', 'warning', {
+          confirmButtonText: 'Sign In Again',
+          allowOutsideClick: false,
+          allowEscapeKey: false,
+          showCancelButton: false
+        }).then(() => {
+          window.location.href = "{{ url_for('auth.logout') }}";
+        });
+      }
+
+      ['mousemove', 'keypress', 'scroll', 'click', 'touchstart'].forEach((eventName) => {
+        document.addEventListener(eventName, startSessionTimers, { passive: true });
+      });
+      window.addEventListener('load', startSessionTimers);
+    })();
   </script>
+  {% endif %}
+  {% block extra_js %}
   {% endblock %}
 </body>
 

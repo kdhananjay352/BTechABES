@@ -2,6 +2,7 @@ from datetime import datetime, date
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from extensions import db, login_manager
+from sqlalchemy import UniqueConstraint
 
 # ==============================================================================
 # 1. CORE AUTHENTICATION USER MODEL
@@ -135,6 +136,9 @@ class FacultyStaff(db.Model):
 class AttendanceRecord(db.Model):
     """Attendance record model for storing time-in/time-out attendance information."""
     __tablename__ = 'attendance_records'
+    __table_args__ = (
+        UniqueConstraint('user_id', 'date', name='uq_attendance_user_date'),
+    )
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)

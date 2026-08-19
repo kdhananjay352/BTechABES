@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block title %}Page Not Found - Smart Attendance System{% endblock %}
+
+{% block content %}
+<main class="container py-5 text-center">
+  <h1 class="display-5 fw-bold">Page Not Found</h1>
+  <p class="text-muted">The page you requested could not be found.</p>
+  <a class="btn btn-primary" href="{{ url_for('main.index') }}">Return Home</a>
+</main>
+{% endblock %}

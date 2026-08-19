@@ -84,6 +84,11 @@ def login():
 def register():
     if request.method == 'POST':
         role = request.form.get('role')
+        allowed_roles = {'student', 'teacher', 'faculty', 'staff'}
+        if role not in allowed_roles:
+            flash('Invalid registration role. Please choose a supported role.', 'danger')
+            return redirect(url_for('auth.register', step=1))
+
         username = request.form.get('username', '').strip().lower()
         email = request.form.get('email', '').strip().lower()
         password = request.form.get('password', '')
@@ -341,6 +346,15 @@ def logout():
     return redirect(url_for('auth.login'))
 
 
+@auth_bp.route('/extend-session', methods=['POST'])
+@login_required
+def extend_session():
+    """Refresh the authenticated session after an explicit user action."""
+    session.permanent = True
+    session.modified = True
+    return jsonify({'status': 'success', 'message': 'Your session has been extended.'})
+
+
 # Helper function to get the serializer
 def get_reset_serializer():
     # Uses your app's SECRET_KEY to encrypt the token
@@ -403,9 +417,14 @@ def reset_password(token):
             flash('Passwords do not match.', 'danger')
             return render_template('reset_password.html', token=token)
 
-        # Hash new password and save
-        user.password = generate_password_hash(new_password)
-        db.session.commit()
+        # Hash the new password through the model so password metadata is updated too.
+        try:
+            user.set_password(new_password)
+            db.session.commit()
+        except SQLAlchemyError:
+            db.session.rollback()
+            flash('Unable to reset the password right now. Please try again.', 'danger')
+            return render_template('reset_password.html', token=token)
 
         flash('Your password has been reset successfully! You can now log in.', 'success')
         return redirect(url_for('auth.login'))
@@ -418,7 +437,8 @@ def reset_password(token):
 # ==============================================================================
 @auth_bp.errorhandler(404)
 def page_not_found(_e):
-    return render_template('404.html'), 404
+    flash('The page you requested was not found. Please sign in to continue.', 'warning')
+    return redirect(url_for('auth.login'))
 
 
 @auth_bp.errorhandler(500)
@@ -428,4 +448,5 @@ def internal_server_error(_e):
 
 @auth_bp.errorhandler(403)
 def forbidden(_e):
-    return render_template('403.html'), 403
+    flash('Please sign in with an authorized account to continue.', 'warning')
+    return redirect(url_for('auth.login'))

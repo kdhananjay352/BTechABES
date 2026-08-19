@@ -4,7 +4,7 @@ Handles user registration, login, logout, and credential validation.
 """
 
 import os
-from flask import Flask, redirect, url_for, flash, request, jsonify, session
+from flask import Flask, redirect, url_for, flash, request, jsonify, session, render_template
 from flask_wtf.csrf import CSRFError
 from config import Config
 from extensions import db, login_manager, csrf
@@ -75,6 +75,48 @@ def create_app():
             flash(warning_msg, 'warning')
 
         return redirect(url_for('auth.login'))
+
+    # ===========================================================================
+    # BROWSER NAVIGATION ERROR HANDLERS
+    # ===========================================================================
+    def redirect_browser_error(_error, status_code):
+        """Keep invalid browser URLs inside the authentication flow."""
+        if request.path.startswith('/static/') or request.path.startswith('/favicon'):
+            return '', status_code
+
+        if request.is_json or request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({
+                'status': 'error',
+                'message': 'The requested resource was not found.' if status_code == 404
+                else 'You are not authorized to access this resource.'
+            }), status_code
+
+        # If the failing path is already the login page, render it instead of
+        # redirecting back to it — this prevents a redirect loop when the
+        # browser is navigating between a protected page and the login URL.
+        try:
+            login_path = url_for('auth.login')
+        except Exception:
+            login_path = '/login'
+
+        if request.path == login_path or request.path.startswith(login_path):
+            # Render the login page with the requested status code so the
+            # browser receives a normal response instead of a redirect.
+            return render_template('login.html'), status_code
+
+        if status_code == 404:
+            flash('The page you requested was not found. Please sign in to continue.', 'warning')
+        else:
+            flash('Please sign in with an authorized account to continue.', 'warning')
+        return redirect(url_for('auth.login'))
+
+    @flask_app.errorhandler(404)
+    def handle_not_found(error):
+        return redirect_browser_error(error, 404)
+
+    @flask_app.errorhandler(403)
+    def handle_forbidden(error):
+        return redirect_browser_error(error, 403)
 
     # ==============================================================================
     # GLOBAL RATE LIMIT ERROR HANDLER (429)
