@@ -283,13 +283,282 @@ function togglePasswordVisibility(inputId, iconId) {
     const passwordInput = document.getElementById(inputId);
     const toggleIcon = document.getElementById(iconId);
 
-    if (passwordInput.type === 'password') {
-        passwordInput.type = 'text';
-        toggleIcon.classList.remove('fa-eye-slash');
-        toggleIcon.classList.add('fa-eye'); // Shows open eye when text is visible
-    } else {
-        passwordInput.type = 'password';
-        toggleIcon.classList.remove('fa-eye');
-        toggleIcon.classList.add('fa-eye-slash'); // Shows closed eye when text is hidden
+    if (!passwordInput) return;
+
+    const isHidden = passwordInput.type === 'password';
+    passwordInput.type = isHidden ? 'text' : 'password';
+
+    if (!toggleIcon) return;
+
+    toggleIcon.classList.toggle('fa-eye', !isHidden);
+    toggleIcon.classList.toggle('fa-eye-slash', isHidden);
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.toggle-password[data-target]').forEach(function (button) {
+        button.addEventListener('click', function () {
+            const inputId = button.getAttribute('data-target');
+            const passwordInput = document.getElementById(inputId);
+            const toggleIcon = button.querySelector('i');
+
+            if (!passwordInput) return;
+
+            const isHidden = passwordInput.type === 'password';
+            passwordInput.type = isHidden ? 'text' : 'password';
+
+            if (toggleIcon) {
+                toggleIcon.classList.toggle('fa-eye', !isHidden);
+                toggleIcon.classList.toggle('fa-eye-slash', isHidden);
+            }
+
+            button.setAttribute('aria-label', isHidden ? 'Hide password' : 'Show password');
+            button.setAttribute('title', isHidden ? 'Hide password' : 'Show password');
+        });
+    });
+
+    document.querySelectorAll('[data-password-quality-form]').forEach(function (form) {
+        const password = form.querySelector('[data-password-quality-input]');
+        const confirmation = form.querySelector('[data-password-confirmation-input]');
+        const strengthContainer = form.querySelector('[data-password-strength]');
+        const progress = form.querySelector('[data-strength-progress]');
+        const label = form.querySelector('[data-strength-label]');
+        const match = form.querySelector('[data-password-match]');
+
+        if (!password || !confirmation || !strengthContainer || !progress || !label || !match) return;
+
+        function updateRequirements(requirements) {
+            form.querySelectorAll('[data-requirement]').forEach(function (element) {
+                const icon = element.querySelector('i');
+                const satisfied = requirements && requirements[element.dataset.requirement] === true;
+
+                element.classList.toggle('text-success', satisfied);
+                element.classList.toggle('text-muted', !satisfied);
+                if (icon) icon.className = satisfied
+                    ? 'fa-solid fa-circle-check me-1'
+                    : 'fa-solid fa-circle-xmark me-1';
+            });
+        }
+
+        function updateMatch() {
+            if (!confirmation.value) {
+                match.textContent = '';
+                match.className = 'form-text mt-1 lh-sm';
+                confirmation.classList.remove('is-valid', 'is-invalid');
+                return;
+            }
+
+            const matches = password.value === confirmation.value;
+            match.innerHTML = matches
+                ? '<i class="fa-solid fa-circle-check me-1"></i>Passwords match.'
+                : '<i class="fa-solid fa-circle-xmark me-1"></i>Passwords do not match.';
+            match.className = `form-text mt-1 lh-sm ${matches ? 'text-success' : 'text-danger'}`;
+            confirmation.classList.toggle('is-valid', matches);
+            confirmation.classList.toggle('is-invalid', !matches);
+        }
+
+        function updateStrength() {
+            if (!password.value) {
+                strengthContainer.classList.add('d-none');
+                progress.style.width = '0%';
+                label.textContent = '';
+                updateRequirements(null);
+                updateMatch();
+                return;
+            }
+
+            const result = checkPasswordStrength(password.value);
+            const percentage = result.score * 25;
+            strengthContainer.classList.remove('d-none');
+            progress.style.width = `${percentage}%`;
+            progress.setAttribute('aria-valuenow', percentage);
+            progress.className = `progress-bar ${
+                result.score === 1 ? 'bg-danger' :
+                result.score === 2 ? 'bg-warning' :
+                result.score === 3 ? 'bg-info' :
+                result.score === 4 ? 'bg-success' : ''
+            }`;
+            label.textContent = result.label;
+            label.className = `small fw-semibold mt-1 ${
+                result.score === 1 ? 'text-danger' :
+                result.score === 2 ? 'text-warning' :
+                result.score === 3 ? 'text-info' :
+                result.score === 4 ? 'text-success' : ''
+            }`;
+            updateRequirements(result.requirements);
+            updateMatch();
+        }
+
+        password.addEventListener('input', updateStrength);
+        confirmation.addEventListener('input', updateMatch);
+        updateRequirements(null);
+    });
+});
+
+/* ============================================================
+   PASSWORD STRENGTH CHECKER
+   ------------------------------------------------------------
+   Reusable password strength utility.
+
+   Usage:
+
+       const result = checkPasswordStrength(password);
+
+   Returns:
+
+       {
+           score: 0-4,
+           label: "Weak password",
+           color: "#dc3545",
+           isStrong: false,
+           requirements: {
+               length: true,
+               uppercase: false,
+               lowercase: true,
+               number: true,
+               symbol: true
+           }
+       }
+
+   IMPORTANT:
+   "Strong password" is returned ONLY when ALL mandatory
+   requirements are satisfied:
+
+       ✓ At least 8 characters
+       ✓ Uppercase letter
+       ✓ Lowercase letter
+       ✓ Number
+       ✓ Special character
+
+   This function does NOT manipulate the DOM.
+
+   Suitable for:
+   - Change Password
+   - Reset Password
+   - Create Account
+   - Admin User Creation
+   - Profile Password Update
+   ============================================================ */
+
+function checkPasswordStrength(password) {
+
+    /* --------------------------------------------------------
+       Empty password
+       -------------------------------------------------------- */
+
+    if (!password) {
+        return {
+            score: 0,
+            label: '',
+            color: '#e9ecef',
+            isStrong: false,
+
+            requirements: {
+                length: false,
+                uppercase: false,
+                lowercase: false,
+                number: false,
+                symbol: false
+            }
+        };
     }
+
+
+    /* --------------------------------------------------------
+       Individual password requirements
+       -------------------------------------------------------- */
+
+    const requirements = {
+
+        // Minimum 8 characters
+        length: password.length >= 8,
+
+        // At least one uppercase character
+        uppercase: /[A-Z]/.test(password),
+
+        // At least one lowercase character
+        lowercase: /[a-z]/.test(password),
+
+        // At least one number
+        number: /[0-9]/.test(password),
+
+        // At least one special character
+        symbol: /[^A-Za-z0-9]/.test(password)
+    };
+
+
+    /* --------------------------------------------------------
+       Count satisfied requirements
+       -------------------------------------------------------- */
+
+    const satisfiedCount =
+        Object.values(requirements)
+            .filter(Boolean)
+            .length;
+
+
+    /* --------------------------------------------------------
+       Strong password
+       
+       ALL five requirements MUST be satisfied.
+       -------------------------------------------------------- */
+
+    if (satisfiedCount === 5) {
+
+        return {
+            score: 4,
+            label: 'Strong password',
+            color: '#198754',
+            isStrong: true,
+            requirements: requirements
+        };
+    }
+
+
+    /* --------------------------------------------------------
+       Good password
+       
+       Four out of five requirements satisfied.
+       -------------------------------------------------------- */
+
+    if (satisfiedCount === 4) {
+
+        return {
+            score: 3,
+            label: 'Good password',
+            color: '#ffc107',
+            isStrong: false,
+            requirements: requirements
+        };
+    }
+
+
+    /* --------------------------------------------------------
+       Fair password
+       
+       Two or three requirements satisfied.
+       -------------------------------------------------------- */
+
+    if (satisfiedCount >= 2) {
+
+        return {
+            score: 2,
+            label: 'Fair password',
+            color: '#fd7e14',
+            isStrong: false,
+            requirements: requirements
+        };
+    }
+
+
+    /* --------------------------------------------------------
+       Weak password
+       -------------------------------------------------------- */
+
+    return {
+        score: 1,
+        label: 'Weak password',
+        color: '#dc3545',
+        isStrong: false,
+        requirements: requirements
+    };
 }

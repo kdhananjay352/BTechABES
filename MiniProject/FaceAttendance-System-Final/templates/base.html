@@ -79,11 +79,9 @@
   {% include 'components/toast.html' %}
 
   <!-- Main Workspace Block -->
-
-  <!-- Main Content Area class="flex-grow-1" -->
-  <!-- <main > -->
-  {% block content %}{% endblock %}
-  <!-- </main> -->
+  <div class="app-main-content" role="main">
+    {% block content %}{% endblock %}
+  </div>
 
   <!-- Footer Section -->
   <!-- <footer>&copy; 2026 Smart Attendance System | All Rights Reserved</footer> -->

@@ -100,7 +100,7 @@
                     </div>
 
                     <form action="{{ url_for('auth.register') }}" method="POST" enctype="multipart/form-data"
-                        id="registrationForm">
+                        id="registrationForm" data-password-quality-form>
                         <!-- CSRF Hidden Input Token -->
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token else '' }}" />
 
@@ -152,10 +152,24 @@
                                             <span class="text-danger">*</span></label>
                                         <div class="input-group">
                                             <span class="input-group-text "><i class="fa-solid fa-lock text-muted"></i></span>
-                                            <input type="password" id="password" name="password" class="form-control border-end-0" required />
+                                            <input type="password" id="password" name="password" class="form-control border-end-0" data-password-quality-input required />
                                             <span class="input-group-text  bg-transparent" onclick="togglePasswordVisibility('password', 'icon-pwd')" style="cursor: pointer">
                                                 <i class="fa-regular fa-eye-slash text-muted" id="icon-pwd"></i>
                                             </span>
+                                        </div>
+                                        <div class="form-text lh-sm"><i class="fa-solid fa-circle-info me-1"></i>At least 8 characters, including uppercase, lowercase, number and symbol.</div>
+                                        <div data-password-strength class="password-strength-meter d-none mt-2">
+                                            <div class="progress" role="progressbar" aria-label="Password strength" aria-valuemin="0" aria-valuemax="100">
+                                                <div data-strength-progress class="progress-bar" style="width: 0%"></div>
+                                            </div>
+                                            <div data-strength-label class="small fw-semibold mt-1"></div>
+                                            <div class="d-flex flex-nowrap align-items-center gap-1 mt-1">
+                                                {% for requirement, text in [('length', '8+ characters'), ('uppercase', 'Uppercase'), ('lowercase', 'Lowercase'), ('number', 'Number'), ('symbol', 'Symbol')] %}
+                                                <div class="flex-fill px-1">
+                                                    <span data-requirement="{{ requirement }}" class="small text-muted d-block text-nowrap lh-sm"><i class="fa-solid fa-circle-xmark me-1"></i>{{ text }}</span>
+                                                </div>
+                                                {% endfor %}
+                                            </div>
                                         </div>
                                     </div>
                                     <!-- Confirm Password Field -->
@@ -164,11 +178,12 @@
                                             <span class="text-danger">*</span></label>
                                         <div class="input-group">
                                             <span class="input-group-text "><i class="fa-solid fa-key text-muted"></i></span>
-                                            <input type="password" id="confirm_password" name="confirm_password" class="form-control border-end-0" required />
+                                            <input type="password" id="confirm_password" name="confirm_password" class="form-control border-end-0" data-password-confirmation-input required />
                                             <span class="input-group-text  bg-transparent" onclick="togglePasswordVisibility('confirm_password','icon-confirm-pwd')" style="cursor: pointer">
                                                 <i class="fa-regular fa-eye-slash text-muted" id="icon-confirm-pwd"></i>
                                             </span>
                                         </div>
+                                        <div data-password-match class="form-text mt-1 lh-sm"></div>
                                     </div>
                                 </div>
                             </div>

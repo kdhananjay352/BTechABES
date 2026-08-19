@@ -97,7 +97,7 @@
                 href="{{ url_for('main.attendance_summary') }}"
             >
                 <i class="fa-solid fa-chart-column me-2 text-primary" style="width: 18px"></i>
-                Attendance Reports & Summary
+                Attendance Report
             </a>
         </li>
         {% endif %}
@@ -227,7 +227,7 @@
                     <i class="fa-solid fa-user-tag me-1"></i>Search Student
                 </label>
                 <div class="input-group input-group-sm">
-                    <span class="input-group-text bg-white"><i
+                    <span class="input-group-text"><i
                             class="fa-solid fa-magnifying-glass text-muted"></i></span>
                     <input type="search" id="searchInput" name="search" value="{{ search }}" class="form-control" placeholder="Name or Roll No...">
                 </div>
@@ -269,9 +269,9 @@
         </form>
 
         <!-- Responsive Attendance Table -->
-        <div class="table-responsive flex-grow-1">
+        <div class="table-responsive flex-grow-1 ">
             <table class="summary-table table table-hover align-middle mb-0">
-                <thead class="table-light text-muted small">
+                <thead class="small">
                     <tr>
                         <th scope="col"><i class="fa-solid fa-id-badge me-1"></i>Roll / ID</th>
                         <th scope="col"><i class="fa-solid fa-user me-1"></i>Student Name</th>
@@ -288,7 +288,7 @@
                         <td>{{ row.name }}</td>
                         <td>{{ row.course }}</td>
                         <td>{{ row.date }}{% if row.time_in != '-' %}, {{ row.time_in }}{% endif %}</td>
-                        <td><span class="badge text-dark border"><i class="fa-solid fa-shield-halved text-primary me-1"></i>{{ row.verification_method }}</span></td>
+                        <td><span class="badge text-body border"><i class="fa-solid fa-shield-halved text-primary me-1"></i>{{ row.verification_method }}</span></td>
                         <td class="text-center">
                             <span class="badge {% if row.status == 'Present' %}bg-success-subtle text-success border-success-subtle{% else %}bg-danger-subtle text-danger border-danger-subtle{% endif %} border px-3 py-1">
                                 <i class="fa-solid {% if row.status == 'Present' %}fa-circle-check{% else %}fa-circle-xmark{% endif %} me-1"></i>{{ row.status }}
@@ -455,6 +455,48 @@
     .attendance-summary-page .summary-filter .form-control,
     .attendance-summary-page .summary-filter .form-select {
         min-width: 0;
+    }
+
+    .attendance-summary-page .summary-filter {
+        background-color: var(--bs-tertiary-bg);
+        border-color: var(--bs-border-color) !important;
+    }
+
+    .attendance-summary-page .summary-filter .input-group-text {
+        background-color: var(--bs-body-bg);
+        color: var(--bs-secondary-color);
+        border-color: var(--bs-border-color);
+    }
+
+    .attendance-summary-page .summary-table thead th {
+        background-color: var(--bs-tertiary-bg);
+        color: var(--bs-secondary-color);
+        border-color: var(--bs-border-color);
+    }
+
+    .attendance-summary-page .summary-table tbody td {
+        color: var(--bs-body-color);
+        border-color: var(--bs-border-color);
+    }
+
+    .attendance-summary-page .summary-table tbody tr:hover > * {
+        background-color: var(--bs-secondary-bg);
+    }
+
+    .attendance-summary-page .summary-table .badge {
+        border-color: var(--bs-border-color) !important;
+    }
+
+    .attendance-summary-page .pagination .page-link {
+        background-color: var(--bs-body-bg);
+        color: var(--bs-body-color);
+        border-color: var(--bs-border-color);
+    }
+
+    .attendance-summary-page .pagination .page-item.active .page-link {
+        background-color: var(--bs-primary);
+        border-color: var(--bs-primary);
+        color: #fff;
     }
 
     .attendance-summary-page .summary-table {
