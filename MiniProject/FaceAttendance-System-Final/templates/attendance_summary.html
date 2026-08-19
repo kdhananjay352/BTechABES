@@ -4,64 +4,128 @@
 
 {% block header_actions %}
 <!-- Native Bootstrap 5 Profile Dropdown -->
+
 <div class="dropdown">
-    <button class="btn btn-profile-dropdown d-flex align-items-center gap-2 px-2 py-1 rounded-pill shadow-sm"
-        type="button" id="userProfileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+  <!-- Navbar Profile Pill Button with Online Status Dot -->
+  <button
+    class="btn btn-profile-dropdown d-flex align-items-center gap-3 px-2 px-sm-3 py-1 rounded-pill shadow-sm"
+    type="button"
+    id="userProfileDropdown"
+    data-bs-toggle="dropdown"
+    aria-expanded="false"
+    style="width: fit-content"
+  >
+    {% set raw_path = user.student_profile.photo_path if user.student_profile
+    and user.student_profile.photo_path else (user.faculty_profile.photo_path if
+    user.faculty_profile and user.faculty_profile.photo_path else None) %} {%
+    set user_photo = raw_path.replace('\\', '/').split('/')[-1] if raw_path else
+    None %}
 
-        <!-- User Avatar Image -->
-        <img src="{{ url_for('static', filename='images/user_avatar.jpg') }}" alt="User Profile"
-            class="rounded-circle object-fit-cover border border-2 border-primary" width="34" height="34"
-            onerror="this.src='https://ui-avatars.com/api/?name=John+Doe&background=2563eb&color=fff'">
+    <!-- Container for Avatar + Status Dot -->
+    <div class="position-relative d-flex align-items-center">
+      <img
+        src="{{ url_for('static', filename='uploads/faces/' + user_photo) if user_photo else 'https://ui-avatars.com/api/?name=' + user.username|urlencode + '&background=2563eb&color=fff' }}"
+        alt="{{ user.username }}"
+        class="rounded-circle object-fit-cover border border-2 border-primary"
+        width="34"
+        height="34"
+        loading="lazy"
+        onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name={{ user.username|urlencode }}&background=2563eb&color=fff';"
+      />
 
-        <div class="d-none d-sm-flex flex-column text-start me-1">
-            <span class="text-white small fw-bold lh-1">Prof. John Doe</span>
-            <span class="text-white-50 extra-small lh-1 mt-1" style="font-size: 0.72rem;">Teacher / Faculty</span>
+      <!-- Tiny Online Status Indicator Dot -->
+      <span
+        class="position-absolute bottom-0 end-0 p-1 bg-success border border-white rounded-circle"
+        style="width: 10px; height: 10px"
+      >
+        <span class="visually-hidden">Online</span>
+      </span>
+    </div>
+
+    <!-- User Name & Role -->
+    <div class="d-none d-sm-flex flex-column text-start me-1">
+      <span class="text-white small fw-bold lh-1"
+        >{{ user.username | capitalize }}</span
+      >
+      <span
+        class="text-white-50 extra-small lh-1 mt-1"
+        style="font-size: 0.72rem"
+        >{{ user.role | capitalize }}</span
+      >
+    </div>
+  </button>
+
+  <!-- Bootstrap Popover Menu with Fade-In Animation -->
+  <ul
+    class="dropdown-menu dropdown-menu-end shadow-lg border-0 mt-2 py-2"
+    aria-labelledby="userProfileDropdown"
+    style="min-width: 260px; position: absolute"
+  >
+    <!-- Dropdown Header: Detailed User Info -->
+    <li class="px-3 py-2 border-bottom mb-2">
+      <div class="d-flex align-items-center gap-3 py-1">
+        <img
+          src="{{ url_for('static', filename='uploads/faces/' + user_photo) if user_photo else 'https://ui-avatars.com/api/?name=' + user.username|urlencode + '&background=2563eb&color=fff' }}"
+          alt="{{ user.username }}"
+          class="rounded-circle object-fit-cover border border-2 border-primary flex-shrink-0"
+          width="48"
+          height="48"
+          onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name={{ user.username|urlencode }}&background=2563eb&color=fff';"
+        />
+
+        <div class="d-flex flex-column justify-content-center">
+          <span class="fw-bold text-dark small lh-sm">{{ user.username }}</span>
+          <span class="text-muted extra-small" style="font-size: 0.75rem"
+            >{{ user.email }}</span
+          >
+          <span
+            class="badge bg-primary-subtle text-primary mt-1 align-self-start"
+            style="font-size: 0.65rem"
+            >{{ user.role | capitalize }}</span
+          >
         </div>
-    </button>
+      </div>
+    </li>
 
-    <!-- Bootstrap 5 Popover Menu -->
-    <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 mt-2 py-2" aria-labelledby="userProfileDropdown"
-        style="min-width: 260px;">
-        <li class="px-3 py-2 border-bottom mb-2">
-            <div class="d-flex align-items-center gap-2">
-                <img src="{{ url_for('static', filename='images/user_avatar.jpg') }}" alt="User Avatar"
-                    class="rounded-circle object-fit-cover border" width="40" height="40"
-                    onerror="this.src='https://ui-avatars.com/api/?name=John+Doe&background=2563eb&color=fff'">
-                <div class="d-flex flex-column">
-                    <span class="fw-bold text-dark small lh-1">Prof. John Doe</span>
-                    <span class="text-muted extra-small mt-1" style="font-size: 0.75rem;">john.doe@abes.ac.in</span>
-                    <span class="badge bg-primary-subtle text-primary mt-1 align-self-start"
-                        style="font-size: 0.65rem;">Teacher / Faculty</span>
-                </div>
-            </div>
-        </li>
+    <!-- Links -->
+    {% if user.role == 'faculty' or user.role == 'staff' %}
+        <!-- Faculty & Staff Links -->
+    {% endif %}
 
-        <li>
-            <a class="dropdown-item py-2 d-flex align-items-center fw-medium small"
-                href="{{ url_for('main.attendance') }}">
-                <i class="fa-solid fa-camera me-2 text-primary" style="width: 18px;"></i>Mark Attendance
-            </a>
-        </li>
-        <li>
-            <a class="dropdown-item py-2 d-flex align-items-center text-secondary small" href="#">
-                <i class="fa-solid fa-id-card me-2 text-primary" style="width: 18px;"></i>View & Edit Profile
-            </a>
-        </li>
-        <li>
-            <a class="dropdown-item py-2 d-flex align-items-center text-secondary small" href="#">
-                <i class="fa-solid fa-key me-2 text-warning" style="width: 18px;"></i>Change Password
-            </a>
-        </li>
-        <li>
-            <hr class="dropdown-divider my-2">
-        </li>
-        <li>
-            <a class="dropdown-item dropdown-item-danger py-2 d-flex align-items-center text-danger fw-semibold small"
-                href="{{ url_for('auth.logout') }}">
-                <i class="fa-solid fa-right-from-bracket me-2" style="width: 18px;"></i>Sign Out
-            </a>
-        </li>
-    </ul>
+    <li>
+      <a class="dropdown-item py-2 d-flex align-items-center text-secondary small" href="{{ url_for('main.profile') }}">
+        <i class="fa-solid fa-id-card me-2 text-primary" style="width: 18px"></i>View & Edit Profile
+      </a>
+    </li>
+    <li>
+      <a class="dropdown-item py-2 d-flex align-items-center text-secondary small" href="{{ url_for('main.change_password') }}">
+        <i class="fa-solid fa-key me-2 text-warning" style="width: 18px"></i>Change Password
+      </a>
+    </li>
+    <li>
+      <a
+        class="dropdown-item py-2 d-flex align-items-center text-secondary small"
+        href="{{ url_for('main.system_settings') }}"
+      >
+        <i class="fa-solid fa-sliders me-2 text-info" style="width: 18px"></i
+        >System Settings
+      </a>
+    </li>
+
+    <li>
+      <hr class="dropdown-divider my-2" />
+    </li>
+
+    <li>
+      <a
+        class="dropdown-item dropdown-item-danger py-2 d-flex align-items-center text-danger fw-semibold small"
+        href="{{ url_for('auth.logout') }}"
+      >
+        <i class="fa-solid fa-right-from-bracket me-2" style="width: 18px"></i
+        >Sign Out
+      </a>
+    </li>
+  </ul>
 </div>
 {% endblock %}
 

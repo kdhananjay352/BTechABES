@@ -37,11 +37,12 @@ body {
     min-height: 100vh;
 }
 
-/* Lock Desktop Body to enable App Shell Scrolling */
+/* Keep the document scrollable when a page is taller than the viewport. */
 @media (min-width: 992px) {
     body {
-        height: 100vh;
-        overflow: hidden;
+        height: auto;
+        min-height: 100vh;
+        overflow-y: auto;
     }
 }
 
@@ -376,6 +377,12 @@ header.navbar {
     min-height: 620px;
     background: var(--bs-body-bg);
     overflow: hidden;
+}
+
+@media (min-width: 992px) {
+    .settings-layout {
+        min-height: clamp(360px, calc(100vh - var(--header-height) - var(--footer-height) - 150px), 620px);
+    }
 }
 
 .settings-sidebar {
