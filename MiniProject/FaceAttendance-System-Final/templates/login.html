@@ -50,8 +50,7 @@
                 <div class="mb-4">
                     <label for="userRole" class="form-label text-muted small fw-medium">Login Role</label>
                     <div class="input-group">
-                        <span class="input-group-text  text-muted"><i
-                                class="fa-solid fa-user-shield"></i></span>
+                        <span class="input-group-text  text-muted"><i class="fa-solid fa-user-shield"></i></span>
                         <select id="userRole" name="userRole" class="form-select" required>
                             <option value="teacher" selected>Teacher / Faculty</option>
                             <option value="admin">System Administrator</option>
@@ -70,6 +69,7 @@
                             placeholder="e.g. teacher@university.edu" required>
                     </div>
                 </div>
+
                 <!-- Password -->
                 <div class="mb-4">
                     <label for="passwordInput" class="form-label text-muted small fw-medium">Password</label>
@@ -88,13 +88,42 @@
                     </div>
                 </div>
 
+                <!-- Offline Math / Text CAPTCHA Section (Theme Compatible) -->
+                <div class="mb-4">
+                    <label for="captchaInput" class="form-label text-muted small fw-medium">Captcha</label>
+                    <div class="input-group">
+                        <!-- Refresh Button on the Left -->
+                        <button type="button" class="btn btn-outline-secondary border-secondary-subtle"
+                            onclick="refreshCaptcha()" title="Refresh Captcha">
+                            <i class="fa-solid fa-rotate-right" id="refreshIcon"></i>
+                        </button>
+
+                        <!-- CAPTCHA Display Box in the Middle with a fixed width -->
+                        <span id="captchaDisplay"
+                            class="input-group-text font-monospace fw-bold user-select-all px-3 bg-body-secondary text-body border-secondary-subtle justify-content-center"
+                            style="width: 130px; letter-spacing: 2px;">
+                            {{ captcha_question }}
+                        </span>
+
+                        <!-- Answer Input Box on the Right -->
+                        <input type="text" id="captchaInput" name="captcha_answer" class="form-control font-monospace"
+                            placeholder="Enter answer" required autocomplete="off">
+                    </div>
+                    <div class="form-text text-muted mt-1" style="font-size: 0.75rem;">Complete the verification
+                        challenge (case and
+                        symbol sensitive).</div>
+                </div>
+
+
+
                 <!-- Remember Me & Reset Link -->
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" id="rememberMe" name="rememberMe">
                         <label class="form-check-label small text-muted" for="rememberMe">Remember me</label>
                     </div>
-                    <a href="{{ url_for('auth.forgot_password') }}" class="small text-decoration-none text-primary fw-medium">Forgot Password?</a>
+                    <a href="{{ url_for('auth.forgot_password') }}"
+                        class="small text-decoration-none text-primary fw-medium">Forgot Password?</a>
                 </div>
 
                 <!-- Submit Button -->
@@ -115,4 +144,26 @@
 
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- JavaScript for Dynamic Refreshing -->
+<script>
+    function refreshCaptcha() {
+        const icon = document.getElementById('refreshIcon');
+        icon.classList.add('fa-spin');
+
+        fetch("{{ url_for('auth.refresh_captcha') }}")
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('captchaDisplay').innerText = data.captcha;
+                document.getElementById('captchaInput').value = '';
+                setTimeout(() => icon.classList.remove('fa-spin'), 400);
+            })
+            .catch(error => {
+                console.error('Error refreshing captcha:', error);
+                icon.classList.remove('fa-spin');
+            });
+    }
+</script>
 {% endblock %}

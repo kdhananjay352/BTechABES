@@ -17,13 +17,13 @@ A Flask-based attendance platform for student and faculty/staff profiles, face-b
 
 ## Technology Stack
 
-| Layer | Technology |
-| --- | --- |
-| Frontend | HTML, CSS, Bootstrap 5, JavaScript, Font Awesome |
-| Backend | Python 3, Flask, Flask-Login, Flask-WTF |
-| Database | SQLite with SQLAlchemy ORM |
-| Computer vision | OpenCV and InsightFace with ONNX Runtime |
-| Security | Werkzeug password hashing, CSRF protection, signed timed reset tokens, rate limiting |
+| Layer           | Technology                                                                           |
+| --------------- | ------------------------------------------------------------------------------------ |
+| Frontend        | HTML, CSS, Bootstrap 5, JavaScript, Font Awesome                                     |
+| Backend         | Python 3, Flask, Flask-Login, Flask-WTF                                              |
+| Database        | SQLite with SQLAlchemy ORM                                                           |
+| Computer vision | OpenCV and InsightFace with ONNX Runtime                                             |
+| Security        | Werkzeug password hashing, CSRF protection, signed timed reset tokens, rate limiting |
 
 ## Project Structure
 
@@ -64,9 +64,17 @@ pip install -r requirements.txt
 
 The application intentionally refuses to start without an explicit secret key. Generate one in the same terminal session:
 
-```bash
+```bash|MacBook|Linux
 export SECRET_KEY="$(python -c 'import secrets; print(secrets.token_hex(32))')"
 ```
+
+Powershell:
+$env:SECRET_KEY = python -c "import secrets; print(secrets.token_hex(32))"
+Verify:
+$env:SECRET_KEY
+
+Command Prompt:
+for /f %i in ('python -c "import secrets; print(secrets.token_hex(32))"') do set SECRET_KEY=%i
 
 Check that it is available without printing the secret itself:
 
@@ -89,18 +97,18 @@ InsightFace may download or require the `buffalo_l` model on first use. The came
 
 ## Main Routes
 
-| Route | Purpose |
-| --- | --- |
-| `/login` | Authenticate a user |
-| `/register` | Create a student/faculty/staff account |
-| `/attendance` | Attendance terminal and live camera page |
-| `/video_feed` | Authenticated MJPEG camera stream |
-| `/api/mark-attendance` | Verify the current user and record punch-in/out |
-| `/attendance-summary` | Filtered, paginated attendance report |
-| `/attendance-summary/export` | CSV report download |
-| `/profile` | Edit personal profile data |
-| `/change-password` | Change the authenticated user's password |
-| `/settings` | Role-aware system and personal settings |
+| Route                        | Purpose                                         |
+| ---------------------------- | ----------------------------------------------- |
+| `/login`                     | Authenticate a user                             |
+| `/register`                  | Create a student/faculty/staff account          |
+| `/attendance`                | Attendance terminal and live camera page        |
+| `/video_feed`                | Authenticated MJPEG camera stream               |
+| `/api/mark-attendance`       | Verify the current user and record punch-in/out |
+| `/attendance-summary`        | Filtered, paginated attendance report           |
+| `/attendance-summary/export` | CSV report download                             |
+| `/profile`                   | Edit personal profile data                      |
+| `/change-password`           | Change the authenticated user's password        |
+| `/settings`                  | Role-aware system and personal settings         |
 
 ## Documentation
 

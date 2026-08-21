@@ -1,6 +1,8 @@
 import os
 import re
 from datetime import datetime, date
+import random
+import string
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, current_app, session
 from flask_login import login_user, logout_user, current_user, login_required
 from flask_wtf.csrf import validate_csrf, ValidationError
@@ -26,35 +28,97 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in current_app.config['ALLOWED_EXTENSIONS']
 
 
+# =================================================
+# Captcha Puzzle (Updated to track type)
+# =================================================
+def generate_random_captcha():
+    """Randomly returns EITHER a complex alphanumeric string (case-sensitive) OR a math puzzle."""
+    choice = random.choice(['alphanumeric', 'math'])
+
+    if choice == 'alphanumeric':
+        upper = "ABCDEFGHJKLMNPQRSTUVWXYZ"
+        lower = "abcdefghijkmnpqrstuvwxyz"
+        symbols = "!@#$%&*"
+
+        code_chars = [
+            random.choice(upper),
+            random.choice(lower),
+            random.choice(symbols),
+            random.choice(upper),
+            random.choice(lower)
+        ]
+        random.shuffle(code_chars)
+        code = "".join(code_chars)
+
+        # Store both the exact answer and its type in session
+        return code, code, 'alphanumeric'
+    else:
+        num1 = random.randint(1, 10)
+        num2 = random.randint(1, 10)
+        operator = random.choice(['+', '-', '*'])
+
+        if operator == '-' and num1 < num2:
+            num1, num2 = num2, num1
+        elif operator == '*':
+            num1 = random.randint(1, 5)
+            num2 = random.randint(1, 5)
+
+        if operator == '+':
+            answer = num1 + num2
+        elif operator == '-':
+            answer = num1 - num2
+        else:
+            answer = num1 * num2
+
+        question = f"{num1} {operator} {num2} = ?"
+        return question, str(answer), 'math'
+
 # ==============================================================================
-# LOGIN ROUTE (UPDATED WITH ROLE VALIDATION)
+# LOGIN ROUTE (UPDATED WITH CASE-SENSITIVE CAPTCHA VERIFICATION)
 # ==============================================================================
+
+
 @auth_bp.route('/login', methods=['GET', 'POST'])
 @limiter.limit("8 per minute", key_func=lambda: request.remote_addr)
 def login():
+    """Login route with role validation and captcha verification."""
     if current_user.is_authenticated:
         return redirect(url_for('main.attendance'))
 
     if request.method == 'POST':
-        # 1. Capture Form Inputs
+        user_answer = request.form.get('captcha_answer', '').strip()
+        correct_answer = session.get('captcha_answer', '')
+        captcha_type = session.get('captcha_type', 'math')
+
+        # Clear captcha data from session immediately
+        session.pop('captcha_answer', None)
+        session.pop('captcha_type', None)
+
+        # Validate based on type: Alphanumeric is strict case-sensitive, Math is evaluated as value
+        if captcha_type == 'alphanumeric':
+            is_valid = (user_answer == correct_answer)
+        else:
+            is_valid = (user_answer.strip() == correct_answer.strip())
+
+        if not correct_answer or not is_valid:
+            flash('Incorrect Captcha code or answer. Please try again.', 'danger')
+            return redirect(url_for('auth.login'))
+
         selected_role = request.form.get('userRole', '').strip().lower()
         username_or_email = request.form.get('username', '').strip().lower()
         password = request.form.get('password', '')
         remember = True if request.form.get('rememberMe') else False
 
-        # 2. Query User by Email or Username (Case-Insensitive)
         user = User.query.filter(
             (func.lower(User.email) == username_or_email) |
             (func.lower(User.username) == username_or_email)
         ).first()
 
-        # 3. Credential Check
         if not user or not user.check_password(password):
             flash(
                 'Invalid credentials. Please check your username/email and password.', 'danger')
             return redirect(url_for('auth.login'))
 
-        # 4. Role Match Check
         if user.role.lower() != selected_role:
             if not (selected_role == 'teacher' and user.role.lower() in ['teacher', 'faculty']):
                 role_label = 'Teacher / Faculty' if selected_role == 'teacher' else selected_role.capitalize()
@@ -62,18 +126,72 @@ def login():
                     f'Account exists, but assigned role is not "{role_label}". Please select your correct login role.', 'warning')
                 return redirect(url_for('auth.login'))
 
-        # 5. Account Deactivation Check
         if not user.is_active:
             flash(
                 'Your account has been deactivated. Please contact the administrator.', 'warning')
             return redirect(url_for('auth.login'))
 
-        # 6. Authenticate User
         login_user(user, remember=remember)
         flash(f'Welcome back, {user.username}!', 'success')
         return redirect(url_for('main.attendance'))
 
-    return render_template('login.html')
+    # Initial GET Request
+    question, answer, c_type = generate_random_captcha()
+    session['captcha_answer'] = answer
+    session['captcha_type'] = c_type
+    return render_template('login.html', captcha_question=question)
+
+
+@auth_bp.route('/refresh-captcha', methods=['GET'])
+def refresh_captcha():
+    """Refreshes the captcha question, answer, and type."""
+    question, answer, c_type = generate_random_captcha()
+    session['captcha_answer'] = answer
+    session['captcha_type'] = c_type
+    return jsonify({'captcha': question})
+# def login():
+#     if current_user.is_authenticated:
+#         return redirect(url_for('main.attendance'))
+
+#     if request.method == 'POST':
+#         # 1. Capture Form Inputs
+#         selected_role = request.form.get('userRole', '').strip().lower()
+#         username_or_email = request.form.get('username', '').strip().lower()
+#         password = request.form.get('password', '')
+#         remember = True if request.form.get('rememberMe') else False
+
+#         # 2. Query User by Email or Username (Case-Insensitive)
+#         user = User.query.filter(
+#             (func.lower(User.email) == username_or_email) |
+#             (func.lower(User.username) == username_or_email)
+#         ).first()
+
+#         # 3. Credential Check
+#         if not user or not user.check_password(password):
+#             flash(
+#                 'Invalid credentials. Please check your username/email and password.', 'danger')
+#             return redirect(url_for('auth.login'))
+
+#         # 4. Role Match Check
+#         if user.role.lower() != selected_role:
+#             if not (selected_role == 'teacher' and user.role.lower() in ['teacher', 'faculty']):
+#                 role_label = 'Teacher / Faculty' if selected_role == 'teacher' else selected_role.capitalize()
+#                 flash(
+#                     f'Account exists, but assigned role is not "{role_label}". Please select your correct login role.', 'warning')
+#                 return redirect(url_for('auth.login'))
+
+#         # 5. Account Deactivation Check
+#         if not user.is_active:
+#             flash(
+#                 'Your account has been deactivated. Please contact the administrator.', 'warning')
+#             return redirect(url_for('auth.login'))
+
+#         # 6. Authenticate User
+#         login_user(user, remember=remember)
+#         flash(f'Welcome back, {user.username}!', 'success')
+#         return redirect(url_for('main.attendance'))
+
+#     return render_template('login.html')
 
 
 # ==============================================================================
